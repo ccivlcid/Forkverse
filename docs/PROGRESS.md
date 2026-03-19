@@ -1,13 +1,13 @@
 # PROGRESS.md — Development Status
 
 > **Source of truth** for development status, phase tracking, and decision log.
-> Last updated: 2026-03-19
+> Last updated: 2026-03-19 (Phase 0 completed)
 
 ---
 
-## Current Phase: Phase 0 — Documentation & Setup
+## Current Phase: Phase 0 — Documentation & Setup (COMPLETE)
 
-The project is in the **documentation and scaffolding** phase. No application code has been written yet.
+Phase 0 is **complete**. All documentation, configuration files, and project scaffolding are in place. Ready for Phase 1 (Core) implementation.
 
 ---
 
@@ -15,7 +15,7 @@ The project is in the **documentation and scaffolding** phase. No application co
 
 | Phase | Name | Status |
 |-------|------|--------|
-| Phase 0 | Documentation & Setup | **In Progress** |
+| Phase 0 | Documentation & Setup | **Complete** |
 | Phase 1 | Core | Not Started |
 | Phase 2 | Social | Not Started |
 | Phase 3 | Expansion | Not Started |
@@ -46,20 +46,25 @@ The project is in the **documentation and scaffolding** phase. No application co
 - [x] `docs/OVERVIEW.md` — Project overview
 - [x] `docs/PROGRESS.md` — This file
 
+- [x] `package.json` (root) — pnpm workspace config
+- [x] `pnpm-workspace.yaml`
+- [x] `tsconfig.base.json`
+- [x] `.eslintrc.cjs`
+- [x] `.prettierrc`
+- [x] `.gitignore`
+- [x] `.env.example`
+- [x] Per-package `package.json` files (client, server, shared, llm)
+- [x] Per-package `tsconfig.json` files (client, server, shared, llm)
+- [x] Vite config (`packages/client/vite.config.ts`)
+- [x] Tailwind config (`packages/client/tailwind.config.ts`)
+- [x] Vitest config (`vitest.config.ts`)
+- [x] Playwright config (`playwright.config.ts`)
+- [x] DB migration files (`packages/server/src/db/migrations/001-003`)
+- [x] LLM parser unit test examples in TESTING.md
+
 ### Remaining
 
-- [ ] `package.json` (root) — pnpm workspace config
-- [ ] `pnpm-workspace.yaml`
-- [ ] `tsconfig.base.json`
-- [ ] `.eslintrc.cjs`
-- [ ] `.prettierrc`
-- [ ] `.gitignore`
-- [ ] `.env.example`
-- [ ] Per-package `package.json` files
-- [ ] Per-package `tsconfig.json` files
-- [ ] Vite config (`packages/client`)
-- [ ] Tailwind config (`packages/client`)
-- [ ] DB migration files (`packages/server/src/db/migrations/`)
+Phase 0 is **complete**. All documentation and configuration files are in place. Ready for Phase 1 implementation.
 
 ---
 

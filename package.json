@@ -1,0 +1,21 @@
+{
+  "name": "clitoris",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel -r run dev",
+    "dev:client": "pnpm --filter @clitoris/client dev",
+    "dev:server": "pnpm --filter @clitoris/server dev",
+    "build": "pnpm -r run build",
+    "test": "vitest",
+    "test:e2e": "playwright test",
+    "lint": "eslint packages/",
+    "format": "prettier --write packages/"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0",
+    "@playwright/test": "^1.50.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.4.0"
+  }
+}
