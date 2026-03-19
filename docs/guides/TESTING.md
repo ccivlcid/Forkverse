@@ -462,6 +462,80 @@ function seedTestData(): void {
 
 ---
 
+## 6b. LLM Parser Unit Tests
+
+The parser is a critical path with multiple edge cases. Every parsing scenario must have explicit tests.
+
+```typescript
+// packages/llm/src/parser.test.ts
+import { describe, it, expect } from 'vitest';
+import { parseCliCommand, ParseError } from './parser';
+
+describe('parseCliCommand', () => {
+  // Case 1: Clean command (ideal LLM output)
+  it('returns command as-is when output is just the command', () => {
+    const input = 'terminal.social post --user test --lang en --message "Hello" --tags greeting';
+    expect(parseCliCommand(input)).toBe(input);
+  });
+
+  // Case 2: Command with trailing whitespace/newlines
+  it('trims whitespace from clean command', () => {
+    const input = '  terminal.social post --user test --message "Hi"  \n';
+    expect(parseCliCommand(input)).toBe('terminal.social post --user test --message "Hi"');
+  });
+
+  // Case 3: Command wrapped in markdown code fences
+  it('extracts command from markdown code fences', () => {
+    const input = '```\nterminal.social post --user test --message "Hello"\n```';
+    expect(parseCliCommand(input)).toBe('terminal.social post --user test --message "Hello"');
+  });
+
+  it('extracts command from code fences with language tag', () => {
+    const input = '```bash\nterminal.social post --user test --message "Hello"\n```';
+    expect(parseCliCommand(input)).toBe('terminal.social post --user test --message "Hello"');
+  });
+
+  // Case 4: Command buried in explanation text
+  it('finds command among explanation text', () => {
+    const input = 'Here is the command:\nterminal.social post --user test --message "Hello"\nHope this helps!';
+    expect(parseCliCommand(input)).toBe('terminal.social post --user test --message "Hello"');
+  });
+
+  // Case 5: No valid command — throws ParseError
+  it('throws ParseError when no valid command found', () => {
+    expect(() => parseCliCommand('I cannot generate that command')).toThrow(ParseError);
+  });
+
+  it('throws ParseError for empty string', () => {
+    expect(() => parseCliCommand('')).toThrow(ParseError);
+  });
+
+  // Case 6: Multi-line output — only first command line extracted
+  it('extracts only the first line of a multi-line command', () => {
+    const input = 'terminal.social post --user test --message "Line 1"\nterminal.social post --user test --message "Line 2"';
+    expect(parseCliCommand(input)).toBe('terminal.social post --user test --message "Line 1"');
+  });
+
+  // Case 7: Full flags
+  it('parses command with all flags', () => {
+    const input = 'terminal.social post --user jiyeon_dev --lang ko --message "안녕하세요" --tags korean,greeting --visibility public --mention @alice';
+    expect(parseCliCommand(input)).toBe(input);
+  });
+
+  // Case 8: ParseError contains raw output for debugging
+  it('ParseError contains the raw output', () => {
+    try {
+      parseCliCommand('garbage output');
+    } catch (e) {
+      expect(e).toBeInstanceOf(ParseError);
+      expect((e as ParseError).rawOutput).toBe('garbage output');
+    }
+  });
+});
+```
+
+---
+
 ## 7. Mock Patterns
 
 ### Mocking Database

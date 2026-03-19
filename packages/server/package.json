@@ -1,0 +1,28 @@
+{
+  "name": "@clitoris/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -b",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "express": "^5.0.0",
+    "better-sqlite3": "^11.0.0",
+    "pino": "^9.0.0",
+    "pino-pretty": "^13.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "@clitoris/shared": "workspace:*",
+    "@clitoris/llm": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/cors": "^2.8.17",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
