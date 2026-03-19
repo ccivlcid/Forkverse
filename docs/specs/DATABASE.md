@@ -29,6 +29,7 @@ Stores registered user accounts.
 CREATE TABLE users (
   id            TEXT PRIMARY KEY,          -- UUID v7
   username      TEXT UNIQUE NOT NULL,      -- @handle (unique)
+  password_hash TEXT NOT NULL,             -- bcrypt hashed password
   domain        TEXT,                      -- custom domain (e.g. "jiyeon.kim")
   display_name  TEXT,                      -- display name
   bio           TEXT,                      -- profile bio
@@ -43,6 +44,7 @@ CREATE UNIQUE INDEX idx_users_username ON users(username);
 |--------|------|----------|---------|-------------|
 | `id` | TEXT | NO | — | UUID v7 primary key |
 | `username` | TEXT | NO | — | Unique handle (e.g. `jiyeon_dev`) |
+| `password_hash` | TEXT | NO | — | Bcrypt hashed password (never exposed via API) |
 | `domain` | TEXT | YES | NULL | Custom domain link |
 | `display_name` | TEXT | YES | NULL | Display name |
 | `bio` | TEXT | YES | NULL | Profile biography |

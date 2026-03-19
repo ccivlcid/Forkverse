@@ -7,6 +7,7 @@ erDiagram
     users {
         TEXT id PK "UUID v7"
         TEXT username UK "unique handle"
+        TEXT password_hash "bcrypt hash (never exposed)"
         TEXT domain "custom domain (nullable)"
         TEXT display_name "display name (nullable)"
         TEXT bio "profile bio (nullable)"
