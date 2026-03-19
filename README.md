@@ -4,32 +4,19 @@
 
 > Write what you want to say. An AI translates it into a CLI command. Both get posted side by side.
 
-```
-┌─ What you write ────────────────┐  ┌─ What the AI creates ──────────┐
-│                                  │  │                                │
-│  CLI is the new lingua franca.   │  │  post --user=0xmitsuki.sh \   │
-│  Think in any language, post in  │  │    --lang=en \                │
-│  any language — the flags stay   │  │    --message="CLI flags as    │
-│  the same.                       │  │    universal language layer" \ │
-│  #cli-first                      │  │    --tags=cli-first \         │
-│                                  │  │    --visibility=public        │
-│   ↩ reply 9  ◇ fork 3  ★ 31    │  │                                │
-└──────────────────────────────────┘  └────────────────────────────────┘
-```
+<!-- TODO: Add screenshot here -->
 
 ---
 
 ## How It Works
 
-```
-1.  Write anything in natural language         "AI is changing how we code"
-2.  Pick an AI model                           [claude-sonnet ▾]
-3.  Press Cmd+Enter                            ⏎
-4.  AI transforms it into CLI format           post --message="AI is changing..."
-5.  Both versions posted side by side           ✅ Published as dual-format
-```
+1. **Write** anything in natural language
+2. **Pick** an AI model (Claude, GPT-4o, Llama 3, or your own)
+3. **Press** Cmd+Enter
+4. **AI transforms** your text into a structured CLI command
+5. **Both versions** get posted side by side — human-readable and machine-parseable
 
-That's it. Every post lives in two worlds: **human-readable** and **machine-parseable**.
+That's it. Every post lives in two worlds.
 
 ---
 
@@ -53,26 +40,6 @@ Curious how different AIs interpret the same ideas? Filter the feed by model and
 
 ### Terminal Aesthetic
 Dark backgrounds. Monospace fonts. Green text on black. No gradients, no rounded corners, no fluff. Just content.
-
-```
-┌────────────┬─────────────────────────────────────────┐
-│ // navigate │  $ feed --global --dual-format          │
-│ $ feed      │                                         │
-│   following │  @jiyeon_dev · jiyeon.kim · 3m ago  ko  │
-│   explore   │  ┌──────────────┐ ┌──────────────────┐ │
-│             │  │ Natural text │ │ post --user=...  │ │
-│ // by LLM   │  └──────────────┘ └──────────────────┘ │
-│ ● claude    │  ↩ reply 14  ◇ fork 7  ★ star 42      │
-│ ○ gpt-4o    │                                         │
-│ ○ llama-3   │  @0xmitsuki · mitsuki.sh · 11m ago en  │
-│ ○ custom    │  ┌──────────────┐ ┌──────────────────┐ │
-│             │  │ CLI is the   │ │ post --user=...  │ │
-│ // me       │  │ new lingua.. │ │   --lang=en ...  │ │
-│ @you        │  └──────────────┘ └──────────────────┘ │
-│ my posts    │  ↩ reply 9  ◇ fork 3  ★ star 31       │
-│ starred     │                                         │
-└─────────────┴─────────────────────────────────────────┘
-```
 
 ### Multilingual
 Write in any language. The AI handles the translation to CLI format. Every post shows its language tag (`--lang=ko`, `--lang=en`, `--lang=hi`).
