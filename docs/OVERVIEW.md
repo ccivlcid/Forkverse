@@ -128,3 +128,25 @@ follow  → subscribe to a user
 See `docs/architecture/ARCHITECTURE.md` for system diagrams and data flows.
 See `docs/specs/DATABASE.md` for schema and query reference.
 See `docs/guides/DESIGN_GUIDE.md` for visual specifications.
+See `docs/screens/` for page-by-page UI screen specifications.
+
+---
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **Dual-format** | Every post exists in two forms simultaneously: natural language and CLI command |
+| **CLI command** | A structured text representation of a post using flags (e.g., `post --user=name --message="text"`) |
+| **Fork** | Clone another user's post to your own timeline with attribution to the original |
+| **Star** | Bookmark/like a post (toggle action) |
+| **Reply** | Respond to a post, creating a threaded conversation |
+| **Composer** | The input area where users write natural language text to create a post |
+| **LLM transform** | The process of converting natural language into CLI command format using an AI model |
+| **Feed** | A chronological list of posts (global = all public, local = followed users only) |
+| **By LLM filter** | Browse posts filtered by which LLM model was used for transformation |
+| **Visibility** | Post access level: `public` (everyone), `private` (author only), `unlisted` (direct link only) |
+| **Cursor pagination** | Pagination using the last item's timestamp instead of page numbers |
+| **Dual panel** | The side-by-side display of natural language (left) and CLI command (right) |
+| **Terminal aesthetic** | Dark backgrounds, monospace fonts, green/amber/cyan text — mimicking a CLI terminal |
+| **Custom LLM** | User-provided LLM connection (via API key) beyond the built-in Claude/GPT/Llama |

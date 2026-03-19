@@ -115,3 +115,206 @@ interface LlmProvider {
 - **SQL**: Prepared statements only (better-sqlite3 default)
 - **XSS**: React auto-escaping + DOMPurify (for CLI rendering)
 - **Rate limiting**: express-rate-limit (LLM transformation endpoint)
+
+---
+
+## Authentication Flow
+
+```
+1. POST /api/auth/register → Create user → Set session → Redirect to /
+2. POST /api/auth/login    → Verify credentials → Set session → Redirect to /
+3. GET  /api/auth/me       → Return session user (or 401)
+4. POST /api/auth/logout   → Destroy session → Redirect to /login
+5. Protected routes        → auth middleware checks session → 401 if missing
+```
+
+### Flow Diagram
+
+```
+┌──────────┐     POST /auth/register      ┌──────────────┐
+│  Client  │ ──────────────────────────▶  │  Express API  │
+│ (React)  │     { username, password }    │              │
+└──────────┘                               └──────┬───────┘
+     ▲                                            │
+     │                                            ▼
+     │                                     ┌──────────────┐
+     │                                     │  Validate    │
+     │                                     │  (zod)       │
+     │                                     └──────┬───────┘
+     │                                            │
+     │                                            ▼
+     │                                     ┌──────────────┐
+     │                                     │  Hash pwd    │
+     │                                     │  Insert user │
+     │                                     │  (SQLite)    │
+     │                                     └──────┬───────┘
+     │                                            │
+     │                                            ▼
+     │                                     ┌──────────────┐
+     │    Set-Cookie: session=xxx          │  Create      │
+     │ ◀──────────────────────────────────│  Session     │
+     │    200 OK { user }                  └──────────────┘
+     │
+     │         Subsequent requests
+     │    ─────────────────────────▶
+     │    Cookie: session=xxx
+     │                                     ┌──────────────┐
+     │                                     │ Auth         │
+     │                                     │ Middleware   │
+     │                                     │ req.session  │
+     │    ◀────────────────────────────── │ → req.user   │
+     │    200 OK (or 401 Unauthorized)     └──────────────┘
+```
+
+---
+
+## Error Handling Flow
+
+### Client-Side
+
+```
+React Error Boundary (page-level)
+  └─▶ Catches render errors → displays fallback UI
+
+API Call Error Flow:
+  fetch() rejects or non-2xx response
+    └─▶ Store action catch block
+          └─▶ Zustand store: set error state
+                └─▶ Component reads error → shows toast notification
+```
+
+### Server-Side
+
+```
+Route Handler
+  └─▶ try/catch wraps business logic
+        │
+        ├─▶ Success: res.json({ data })
+        │
+        └─▶ Error: next(err)
+              └─▶ Error Middleware
+                    ├─▶ logger.error(err)
+                    └─▶ res.status(code).json({
+                          error: {
+                            code: "NOT_FOUND",
+                            message: "Post not found"
+                          }
+                        })
+
+Unhandled Rejection / Uncaught Exception
+  └─▶ Process crash → process manager restarts
+```
+
+---
+
+## Request Lifecycle
+
+Step-by-step flow from user action to database and back:
+
+```
+┌─────────┐   1. click/submit    ┌──────────────┐
+│  User   │ ──────────────────▶ │ Event Handler │
+│ Action  │                      │ (React)       │
+└─────────┘                      └──────┬────────┘
+                                        │
+                              2. call store action
+                                        │
+                                        ▼
+                                 ┌──────────────┐
+                                 │ Zustand Store │
+                                 │ action()      │
+                                 └──────┬────────┘
+                                        │
+                              3. fetch(/api/...)
+                                        │
+                                        ▼
+                                 ┌──────────────┐
+                                 │ Express Route │
+                                 │ handler       │
+                                 └──────┬────────┘
+                                        │
+                              4. validate with zod
+                                        │
+                                        ▼
+                                 ┌──────────────┐
+                                 │ Zod Schema   │
+                                 │ .parse()     │
+                                 └──────┬────────┘
+                                        │
+                              5. DB query
+                                        │
+                                        ▼
+                                 ┌──────────────┐
+                                 │ SQLite       │
+                                 │ (better-     │
+                                 │  sqlite3)    │
+                                 └──────┬────────┘
+                                        │
+                              6. JSON response
+                                        │
+                                        ▼
+                                 ┌──────────────┐
+                                 │ Store update │
+                                 │ set({ ... }) │
+                                 └──────┬────────┘
+                                        │
+                              7. React re-render
+                                        │
+                                        ▼
+                                 ┌──────────────┐
+                                 │ UI Updated   │
+                                 │ (component)  │
+                                 └──────────────┘
+```
+
+**Summary:**
+1. User action → event handler → store action
+2. Store → `fetch()` → Express route
+3. Route → `validate(zod)` → DB query → response
+4. Store update → React re-render
+
+---
+
+## Environment Configuration
+
+### Client (Vite)
+
+```env
+VITE_API_URL=/api
+```
+
+All client-side environment variables must be prefixed with `VITE_` to be exposed to the browser bundle.
+
+### Server
+
+```env
+# Server
+PORT=3000
+DATABASE_URL=clitoris.db
+SESSION_SECRET=random-secret
+
+# LLM API Keys
+ANTHROPIC_API_KEY=sk-ant-...
+OPENAI_API_KEY=sk-...
+OLLAMA_URL=http://localhost:11434
+
+# Environment
+NODE_ENV=development|production
+LOG_LEVEL=info|debug|error
+```
+
+> Never commit `.env` files. Use `.env.example` as a template.
+
+---
+
+## Development vs Production
+
+| Aspect | Development | Production |
+|--------|------------|------------|
+| Server | `tsx watch` mode (auto-reload) | `tsx` (or compiled JS) |
+| Client | Vite dev server with HMR (`localhost:5173`) | `vite build` → static files served by Express |
+| DB | Local SQLite file (`clitoris.db`) | Local SQLite file (same) |
+| Logging | `debug` level, pretty-printed output | `info` level, JSON format |
+| CORS | `localhost:5173` allowed (Vite dev server) | Same-origin (no CORS needed) |
+| Source maps | Enabled (inline) | Disabled (or external) |
+| API proxy | Vite proxy → `localhost:3000/api` | Direct (same server) |

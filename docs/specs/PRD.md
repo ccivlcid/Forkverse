@@ -69,7 +69,7 @@ Users select an LLM model when composing posts to perform natural language → C
 - **claude-sonnet** (default)
 - **gpt-4o**
 - **llama-3**
-- **connect LLM** (custom LLM connection)
+- **custom** (connect your own LLM via API key)
 
 **Transformation flow:**
 ```

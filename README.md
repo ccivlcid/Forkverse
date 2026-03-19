@@ -73,6 +73,9 @@ All docs live under `docs/` organized by category.
 | `docs/guides/` | [Conventions](./docs/guides/CONVENTIONS.md) | Strict coding rules |
 | `docs/guides/` | [Design Guide](./docs/guides/DESIGN_GUIDE.md) | Visual system |
 | `docs/guides/` | [Prompts](./docs/guides/PROMPTS.md) | Vibe coding templates |
+| `docs/guides/` | [Testing](./docs/guides/TESTING.md) | Testing patterns |
+| `docs/guides/` | [Env](./docs/guides/ENV.md) | Environment variables |
+| `docs/screens/` | 8 screen specs | Page-by-page UI wireframes |
 | `docs/specs/` | [PRD](./docs/specs/PRD.md) | Product requirements |
 | `docs/specs/` | [Database](./docs/specs/DATABASE.md) | DB schema & queries |
 | `docs/specs/` | [API](./docs/specs/API.md) | REST API docs (18 endpoints) |

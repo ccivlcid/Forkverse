@@ -196,7 +196,7 @@
 │ ● claude-sonnet│  ← dot indicator (green = active)
 │ ○ gpt-4o       │  ← dot indicator (gray = inactive)
 │ ○ llama-3      │
-│ ○ connect LLM  │
+│ ○ custom       │
 │                │
 │ // me          │
 │ → @you.local   │
@@ -451,6 +451,336 @@ Do not implement:
 - Color is never the only indicator (always pair with text/icon)
 - Minimum contrast ratio: 4.5:1 (WCAG AA)
 - Tab order must follow visual layout
+
+---
+
+## 12. Loading States
+
+### Skeleton Post Card
+
+When loading posts, display skeleton placeholders with a pulsing opacity animation. Never use shimmer/sweep effects — use simple opacity pulse only.
+
+**Tailwind classes:** `animate-pulse bg-gray-700/50 rounded`
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ██████████  ████████ · ██████                    ████████   │
+├────────────────────────────────┬────────────────────────────┤
+│                                │                            │
+│  ████████████████████████      │  ██████████████████████    │
+│  ██████████████████            │  ████████████████          │
+│  ████████████████████████      │  ██████████████████████    │
+│  ██████████████                │  ████████████              │
+│                                │                            │
+├────────────────────────────────┴────────────────────────────┤
+│  ██████    ██████    ██████                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Each `██` block is a `<div>` with `animate-pulse bg-gray-700/50 rounded` applied.
+
+### Feed Loading
+
+- Display **3 skeleton cards** stacked vertically with `gap-6` spacing
+- Each card uses the skeleton post card wireframe above
+- Cards should have the same dimensions as real post cards
+
+### Single Post Loading
+
+- Display a **full-width skeleton card** matching the single post view layout
+- Include skeleton placeholders for the action bar and any reply section below
+
+---
+
+## 13. Empty States
+
+All empty states use terminal-style messaging with monospace font and muted colors.
+
+### 13.1 Empty Global Feed
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│                                                             │
+│           $ cat /feed/global                                │
+│           No posts yet. Be the first to post.               │
+│                                                             │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- Prompt: `text-orange-400 font-mono`
+- Command: `text-green-400 font-mono`
+- Message: `text-gray-400 font-mono text-sm`
+- Container: `flex items-center justify-center min-h-[200px]`
+
+### 13.2 Empty Local Feed
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│           $ cat /feed/local                                 │
+│           You're not following anyone yet.                   │
+│           Explore the global feed to find people.            │
+│                                                             │
+│           ┌──────────────────────────┐                      │
+│           │  → Explore Global Feed   │                      │
+│           └──────────────────────────┘                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- Message: `text-gray-400 font-mono text-sm`
+- CTA button: `bg-green-400/10 text-green-400 border border-green-400/30 px-4 py-2 font-mono text-sm hover:bg-green-400/20`
+- Copy line 1: "You're not following anyone yet."
+- Copy line 2: "Explore the global feed to find people."
+
+### 13.3 Empty User Profile
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│           $ ls /user/username/posts                         │
+│           This user hasn't posted yet.                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- Message: `text-gray-400 font-mono text-sm`
+- Container: `flex items-center justify-center min-h-[150px]`
+
+### 13.4 Empty Starred
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│           $ cat /starred                                    │
+│           No starred posts yet.                              │
+│           Star posts to save them here.                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- Star icon: `text-yellow-400` (use `☆` symbol)
+- Message: `text-gray-400 font-mono text-sm`
+- Container: `flex items-center justify-center min-h-[200px]`
+
+### 13.5 No Search Results
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│           $ grep "query" /feed                              │
+│           No posts found.                                    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- Message: `text-gray-400 font-mono text-sm`
+- Container: `flex items-center justify-center min-h-[150px]`
+
+---
+
+## 14. Error States
+
+### 14.1 404 Page
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│     $ cat /post/unknown                                     │
+│     Error: Post not found (404)                              │
+│                                                             │
+│     The requested resource does not exist.                   │
+│     $ cd /feed/global                                       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- Style: terminal-style output with monospace font
+- Prompt `$`: `text-orange-400`
+- Command: `text-green-400 font-mono`
+- Error line: `text-red-400 font-mono font-bold`
+- Suggestion: `text-gray-400 font-mono text-sm`
+- Container: `flex flex-col items-center justify-center min-h-screen bg-[#1a1a2e]`
+
+### 14.2 500 Page
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│     $ curl terminal.social                                  │
+│     Error: Internal server error (500)                       │
+│     Try again later.                                        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- Same terminal styling as 404
+- Error line: `text-red-400 font-mono font-bold`
+- Retry message: `text-gray-400 font-mono text-sm`
+
+### 14.3 Network Error Toast
+
+- Border: `border-l-4 border-red-400`
+- Text: `text-red-400`
+- Background: `bg-[#16213e]`
+- Example message: "Network error. Check your connection."
+
+### 14.4 API Error Toast
+
+- Border: `border-l-4 border-amber-400`
+- Text: `text-amber-400`
+- Background: `bg-[#16213e]`
+- Example message: "Failed to load posts. Please try again."
+
+---
+
+## 15. Modals & Dialogs
+
+### Confirmation Dialog
+
+Used for destructive or significant actions (delete post, unfollow user).
+
+```
+┌─────────────── bg-black/60 overlay ───────────────────────┐
+│                                                            │
+│       ┌──────────────────────────────────────┐             │
+│       │  Delete this post?                   │             │
+│       │                                      │             │
+│       │  Are you sure? [y/N]                 │             │
+│       │  This action cannot be undone.        │             │
+│       │                                      │             │
+│       │          [Cancel]   [Delete]          │             │
+│       └──────────────────────────────────────┘             │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Specifications:**
+
+| Property | Value |
+|----------|-------|
+| Overlay | `fixed inset-0 bg-black/60 z-50` |
+| Dialog box | `bg-[#16213e] border border-gray-700` |
+| Width | `max-w-md w-full` |
+| Padding | `p-6` |
+| Title | `text-lg font-mono text-gray-200` |
+| Body text | `text-sm text-gray-400 font-mono` |
+| Terminal prompt | `text-gray-400 font-mono` — "Are you sure? [y/N]" |
+| Cancel button | `text-gray-400 hover:text-gray-200 px-4 py-2 font-mono text-sm` (ghost style) |
+| Confirm (destructive) | `bg-red-400/10 text-red-400 border border-red-400/30 px-4 py-2 font-mono text-sm hover:bg-red-400/20` |
+| Confirm (positive) | `bg-green-400/10 text-green-400 border border-green-400/30 px-4 py-2 font-mono text-sm hover:bg-green-400/20` |
+| Centering | `flex items-center justify-center` |
+
+---
+
+## 16. Toast Notifications
+
+Position: **bottom-right**, fixed (`fixed bottom-4 right-4 z-50`).
+
+### Variants
+
+#### Success Toast
+```
+┌────────────────────────────────┐
+│ ▌ Post published successfully. │
+└────────────────────────────────┘
+```
+- `border-l-4 border-emerald-400 bg-[#16213e] text-gray-200 font-mono text-sm px-4 py-3`
+
+#### Error Toast
+```
+┌────────────────────────────────┐
+│ ▌ Failed to publish post.      │
+└────────────────────────────────┘
+```
+- `border-l-4 border-red-400 bg-[#16213e] text-gray-200 font-mono text-sm px-4 py-3`
+
+#### Info Toast
+```
+┌────────────────────────────────┐
+│ ▌ Post copied to clipboard.    │
+└────────────────────────────────┘
+```
+- `border-l-4 border-sky-400 bg-[#16213e] text-gray-200 font-mono text-sm px-4 py-3`
+
+### Behavior
+
+| Property | Value |
+|----------|-------|
+| Auto-dismiss | 3 seconds |
+| Animation | `transition-opacity duration-300` |
+| Stacking | Multiple toasts stack upward with `gap-2` |
+| Max visible | 3 toasts at a time |
+| Dismiss | Click to dismiss, or auto-dismiss after timeout |
+
+---
+
+## 17. Form Elements (Terminal Style)
+
+All form elements follow terminal aesthetics with monospace font and dark backgrounds.
+
+### Text Input
+
+```
+┌─────────────────────────────────────────────┐
+│ $ username                                  │
+└─────────────────────────────────────────────┘
+```
+
+| Property | Value |
+|----------|-------|
+| Background | `bg-[#0d1117]` |
+| Border | `border border-gray-700` |
+| Text | `text-gray-200 font-mono text-sm` |
+| Prompt prefix | `$` in `text-orange-400 font-mono` (displayed as a label before the input) |
+| Padding | `px-3 py-2` |
+| Placeholder | `text-gray-600` |
+
+### Textarea
+
+```
+┌─────────────────────────────────────────────┐
+│ $ Write your message...                     │
+│                                             │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+- Same styling as text input
+- `min-h-[100px]` minimum height
+- `resize-y` for vertical resizing only
+
+### Select / Dropdown
+
+```
+┌─────────────────────────────────────────────┐
+│ $ claude-sonnet                           ▾ │
+└─────────────────────────────────────────────┘
+```
+
+- Same base styling as text input
+- Dropdown indicator: `▾` in `text-gray-500`
+- `appearance-none` to remove native styling
+- Options dropdown: `bg-[#0d1117] border border-gray-700`
+
+### Focus State (All Form Elements)
+
+| Property | Value |
+|----------|-------|
+| Border | `border-green-400` |
+| Ring | `ring-1 ring-green-400/50` |
+| Outline | `outline-none` |
+
+### Error State (All Form Elements)
+
+| Property | Value |
+|----------|-------|
+| Border | `border-red-400` |
+| Text | `text-red-400` |
+| Error message | `text-red-400 text-xs font-mono mt-1` displayed below the input |
+| Example | "$ Error: Username is required" |
 
 ---
 

@@ -89,19 +89,30 @@ All documentation lives under `docs/` organized by category.
 
 ```
 docs/
-├── OVERVIEW.md                        # Project overview and core concepts
+├── OVERVIEW.md                        # Project overview, core concepts, glossary
 ├── PROGRESS.md                        # Development status and decision log
 ├── guides/                            # Development guides
 │   ├── CONVENTIONS.md                 # Strict coding rules, naming, prohibitions
-│   ├── DESIGN_GUIDE.md                # Visual system, component specs, colors/typography
+│   ├── DESIGN_GUIDE.md                # Visual system, component specs, UI states
+│   ├── TESTING.md                     # Testing patterns (Vitest + Playwright)
+│   ├── ENV.md                         # Environment variables reference
 │   └── PROMPTS.md                     # Vibe coding prompt templates
+├── screens/                           # Page-by-page UI screen specifications
+│   ├── GLOBAL_FEED.md                 # / — Main feed with composer
+│   ├── LOCAL_FEED.md                  # /feed/local — Following feed
+│   ├── EXPLORE.md                     # /explore — Trending/discover
+│   ├── POST_DETAIL.md                 # /post/:id — Single post + replies
+│   ├── USER_PROFILE.md               # /@:username — User profile
+│   ├── LOGIN.md                       # /login — Terminal-style login
+│   ├── REGISTER.md                    # /register — Terminal-style registration
+│   └── SETTINGS.md                    # /settings — User settings
 ├── specs/                             # Technical specifications
 │   ├── PRD.md                         # Product requirements document
 │   ├── DATABASE.md                    # DB schema, queries, migrations, ERD
 │   ├── API.md                         # REST API documentation (18 endpoints)
 │   └── api-schema.json                # OpenAPI 3.1 schema (machine-readable)
 └── architecture/                      # Architecture diagrams
-    ├── ARCHITECTURE.md                # System architecture, data flows, LLM integration
+    ├── ARCHITECTURE.md                # System architecture, data flows, auth, errors
     ├── architecture.json              # Full system config (JSON)
     ├── backend-dependencies.mmd       # Server module dependency graph (Mermaid)
     ├── frontend-imports.mmd           # Client component import graph (Mermaid)
@@ -112,8 +123,11 @@ docs/
 **Required reading (priority order):**
 1. `CLAUDE.md` — Project summary (this file)
 2. `docs/guides/CONVENTIONS.md` — Coding rules, naming, prohibitions
-3. `docs/guides/DESIGN_GUIDE.md` — Visual system, component specs
-4. `docs/architecture/ARCHITECTURE.md` — System architecture, data flows
-5. `docs/specs/DATABASE.md` — DB schema, queries, migrations
-6. `docs/specs/PRD.md` — Full product requirements
+3. `docs/guides/DESIGN_GUIDE.md` — Visual system, component specs, UI states
+4. `docs/screens/*` — Page-by-page UI screen specifications
+5. `docs/architecture/ARCHITECTURE.md` — System architecture, auth, error flows
+6. `docs/specs/DATABASE.md` — DB schema, queries, migrations
 7. `docs/specs/API.md` — REST API documentation
+8. `docs/specs/PRD.md` — Full product requirements
+9. `docs/guides/TESTING.md` — Testing patterns and examples
+10. `docs/guides/ENV.md` — Environment variables reference
