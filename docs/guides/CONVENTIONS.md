@@ -1,5 +1,6 @@
 # CONVENTIONS.md — Strict Coding Rules
 
+> **Source of truth** for all coding patterns, naming conventions, and prohibitions.
 > **Every rule in this document is MANDATORY. Any violation results in immediate code rejection.**
 > AI MUST reference this document before generating any code.
 
@@ -459,3 +460,11 @@ AI-generated code is **immediately rejected** if any of the following apply:
 8. Function missing explicit return type
 9. `.js` file created
 10. Utility function without tests
+
+---
+
+## See Also
+
+- [DESIGN_GUIDE.md](./DESIGN_GUIDE.md) — Visual design tokens and component specs
+- [TESTING.md](./TESTING.md) — Testing patterns and examples
+- [PROMPTS.md](./PROMPTS.md) — Vibe coding prompt templates

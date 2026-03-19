@@ -1,5 +1,7 @@
 # USER_PROFILE Screen Specification
 
+> **Source of truth** for the User Profile screen (`/@:username`).
+
 ---
 
 ## 1. Screen Overview
@@ -438,3 +440,13 @@ Profile header renders normally. Post list area shows:
 - Error: `text-red-400 font-mono`
 - Description: `text-gray-400 font-sans text-sm`
 - Retry / navigation button: `border border-gray-700 text-green-400 font-mono text-sm px-4 py-2 hover:bg-[#1e293b] transition-colors duration-150`
+
+---
+
+## See Also
+
+- [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states
+- [API.md](../specs/API.md) — Endpoint request/response details
+- [CONVENTIONS.md](../guides/CONVENTIONS.md) — Coding rules for implementation
+- [POST_DETAIL.md](./POST_DETAIL.md) — Related screen specification
+- [SETTINGS.md](./SETTINGS.md) — Related screen specification

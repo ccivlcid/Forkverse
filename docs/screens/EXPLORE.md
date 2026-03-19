@@ -1,5 +1,7 @@
 # EXPLORE.md — Explore Screen Specification
 
+> **Source of truth** for the Explore screen (`/explore`).
+
 ---
 
 ## 1. Screen Overview
@@ -478,3 +480,13 @@ If pagination fails while scrolling:
 
 - Existing posts remain visible.
 - Retry button retries only the failed pagination request.
+
+---
+
+## See Also
+
+- [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states
+- [API.md](../specs/API.md) — Endpoint request/response details
+- [CONVENTIONS.md](../guides/CONVENTIONS.md) — Coding rules for implementation
+- [GLOBAL_FEED.md](./GLOBAL_FEED.md) — Related screen specification
+- [POST_DETAIL.md](./POST_DETAIL.md) — Related screen specification

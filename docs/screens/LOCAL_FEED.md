@@ -1,5 +1,7 @@
 # LOCAL_FEED.md — Local Feed Screen Specification
 
+> **Source of truth** for the Local Feed screen (`/feed/local`).
+
 ---
 
 ## 1. Screen Overview
@@ -404,6 +406,7 @@ If the session expires mid-use and a 401 is returned:
 
 ### Inline Error (Infinite Scroll)
 
+
 If an error occurs during pagination, the error appears inline below the last loaded post:
 
 ```
@@ -413,3 +416,13 @@ If an error occurs during pagination, the error appears inline below the last lo
 │  │                                         [$ retry]           │  │
 │  └─────────────────────────────────────────────────────────────┘  │
 ```
+
+---
+
+## See Also
+
+- [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states
+- [API.md](../specs/API.md) — Endpoint request/response details
+- [CONVENTIONS.md](../guides/CONVENTIONS.md) — Coding rules for implementation
+- [GLOBAL_FEED.md](./GLOBAL_FEED.md) — Related screen specification
+- [USER_PROFILE.md](./USER_PROFILE.md) — Related screen specification

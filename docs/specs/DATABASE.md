@@ -1,5 +1,6 @@
 # DATABASE.md — Database Design & Reference
 
+> **Source of truth** for database schema, queries, migrations, and data integrity rules.
 > SQLite with `better-sqlite3`. No ORM. Raw SQL only. Prepared statements only.
 
 ---
@@ -352,3 +353,11 @@ function runMigrations(db: Database.Database): void {
 - Aggregate counts (star_count, reply_count, fork_count) computed via subqueries for now; consider denormalization if slow
 - WAL mode enabled for concurrent reads: `PRAGMA journal_mode = WAL;`
 - JSON columns (`tags`, `mentions`) parsed in TypeScript, not queried via `json_each()` unless needed for search
+
+---
+
+## See Also
+
+- [schema-erd.md](../architecture/schema-erd.md) — Visual ERD diagram (Mermaid)
+- [API.md](./API.md) — How API endpoints map to database queries
+- [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) — System data flows

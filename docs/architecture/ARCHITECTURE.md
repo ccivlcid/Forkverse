@@ -1,5 +1,7 @@
 # ARCHITECTURE.md — System Architecture
 
+> **Source of truth** for system architecture, data flows, authentication, and error handling.
+
 ## Overall Structure
 
 ```
@@ -299,3 +301,13 @@ Never commit `.env` files. Use `.env.example` as a template.
 | CORS | `localhost:5173` allowed (Vite dev server) | Same-origin (no CORS needed) |
 | Source maps | Enabled (inline) | Disabled (or external) |
 | API proxy | Vite proxy → `localhost:3000/api` | Direct (same server) |
+
+---
+
+## See Also
+
+- [architecture.json](./architecture.json) — Machine-readable system configuration
+- [DATABASE.md](../specs/DATABASE.md) — Full database schema and queries
+- [API.md](../specs/API.md) — REST API endpoint documentation
+- [ENV.md](../guides/ENV.md) — Complete environment variable reference
+- [schema-erd.md](./schema-erd.md) — Database entity relationship diagram

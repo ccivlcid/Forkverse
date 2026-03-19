@@ -1,5 +1,7 @@
 # GLOBAL_FEED.md — Global Feed Screen Specification
 
+> **Source of truth** for the Global Feed screen (`/`).
+
 ---
 
 ## 1. Screen Overview
@@ -431,3 +433,13 @@ When the API call to fetch the global feed fails:
 - Retry button: `bg-green-400/10 text-green-400 border border-green-400/30 px-4 py-1.5 font-mono text-sm hover:bg-green-400/20`
 - Clicking `[$ retry]` calls `feedStore.fetchGlobalFeed()` again.
 - If the error occurs during infinite scroll (next page load), the error shows inline below the existing posts with a retry button.
+
+---
+
+## See Also
+
+- [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states
+- [API.md](../specs/API.md) — Endpoint request/response details
+- [CONVENTIONS.md](../guides/CONVENTIONS.md) — Coding rules for implementation
+- [LOCAL_FEED.md](./LOCAL_FEED.md) — Related screen specification
+- [POST_DETAIL.md](./POST_DETAIL.md) — Related screen specification

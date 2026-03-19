@@ -1,5 +1,6 @@
 # API.md — REST API Specification
 
+> **Source of truth** for all REST API endpoints, request/response formats, and error handling.
 > Base URL: `/api`
 > Content-Type: `application/json`
 > Authentication: Session-based (express-session)
@@ -634,3 +635,12 @@ GET /api/posts/feed/global?cursor=2026-03-19T12:15:00Z&limit=20
 | `GET` | `/users/@:username/starred` | No | User starred |
 | `POST` | `/users/@:username/follow` | Yes | Toggle follow |
 | `POST` | `/llm/transform` | Yes | LLM transformation |
+
+---
+
+## See Also
+
+- [api-schema.json](./api-schema.json) — OpenAPI 3.1 machine-readable schema
+- [DATABASE.md](./DATABASE.md) — Database schema backing these endpoints
+- [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) — Request lifecycle and error flows
+- [TESTING.md](../guides/TESTING.md) — API route test patterns

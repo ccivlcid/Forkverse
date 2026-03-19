@@ -1,5 +1,7 @@
 # LOGIN Screen Specification
 
+> **Source of truth** for the Login screen (`/login`).
+
 ---
 
 ## 1. Screen Overview
@@ -325,3 +327,12 @@ Not applicable for the login page. The form is always displayed. There is no dat
 - Appears directly below the password input, above the submit button
 - No border or background on the error line (bare terminal output style)
 - Error clears when user starts typing again or after 5 seconds
+
+---
+
+## See Also
+
+- [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states
+- [API.md](../specs/API.md) — Endpoint request/response details
+- [CONVENTIONS.md](../guides/CONVENTIONS.md) — Coding rules for implementation
+- [REGISTER.md](./REGISTER.md) — Related screen specification

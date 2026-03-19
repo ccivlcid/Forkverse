@@ -1,5 +1,7 @@
 # CLItoris — Product Requirements Document
 
+> **Source of truth** for product requirements, feature specifications, and MVP scope.
+
 ## 1. Product Overview
 
 **CLItoris** is a terminal/CLI-themed social network service (SNS).
@@ -280,3 +282,12 @@ docs/
 - **Responsive**: Dual-format display on mobile (vertical stack)
 - **Security**: XSS prevention, SQL injection prevention, rate limiting
 - **Open source**: All post data structured for forking
+
+---
+
+## See Also
+
+- [API.md](./API.md) — Full REST API documentation
+- [DATABASE.md](./DATABASE.md) — Database schema and queries
+- [Screen specs](../screens/) — Page-by-page UI specifications
+- [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual design system

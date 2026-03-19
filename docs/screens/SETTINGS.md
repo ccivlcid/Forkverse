@@ -1,5 +1,7 @@
 # SETTINGS Screen Specification
 
+> **Source of truth** for the Settings screen (`/settings`).
+
 ---
 
 ## 1. Screen Overview
@@ -500,3 +502,12 @@ Appears inside the confirmation dialog.
 - General errors appear below the form with `mt-4`
 - Errors clear when the user modifies the related field or after 5 seconds
 - Danger zone errors appear inside the confirmation dialog
+
+---
+
+## See Also
+
+- [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states
+- [API.md](../specs/API.md) — Endpoint request/response details
+- [CONVENTIONS.md](../guides/CONVENTIONS.md) — Coding rules for implementation
+- [USER_PROFILE.md](./USER_PROFILE.md) — Related screen specification

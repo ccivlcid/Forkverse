@@ -2,6 +2,8 @@
 
 Guidance for AI assistants working with the CLItoris repository.
 
+> **Source of truth** for project overview, tech stack, and documentation index.
+
 ## Project Overview
 
 **CLItoris** is a terminal/CLI-themed social network service (SNS).

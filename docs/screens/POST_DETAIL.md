@@ -1,5 +1,7 @@
 # POST_DETAIL.md — Post Detail Screen Specification
 
+> **Source of truth** for the Post Detail screen (`/post/:id`).
+
 ---
 
 ## 1. Screen Overview
@@ -480,3 +482,13 @@ When an unauthenticated user clicks star, fork, or attempts to reply:
 - The `[$ login]` button navigates to `/auth/login?redirect=/post/:id`
 - Toast style: `text-orange-400 font-mono text-sm`
 - Login button style: same green CTA as other action buttons
+
+---
+
+## See Also
+
+- [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states
+- [API.md](../specs/API.md) — Endpoint request/response details
+- [CONVENTIONS.md](../guides/CONVENTIONS.md) — Coding rules for implementation
+- [GLOBAL_FEED.md](./GLOBAL_FEED.md) — Related screen specification
+- [USER_PROFILE.md](./USER_PROFILE.md) — Related screen specification

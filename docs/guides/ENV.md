@@ -1,5 +1,6 @@
 # ENV.md — Environment Variables Reference
 
+> **Source of truth** for all environment variable configuration across packages.
 > Never commit `.env` files. Only `.env.example` is tracked in git.
 
 ---
@@ -129,3 +130,11 @@ pnpm dev
 - **Always** use `.env.example` with placeholder values for documentation
 - **Rotate** `SESSION_SECRET` if compromised
 - **Rotate** API keys periodically
+
+---
+
+## See Also
+
+- [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) — How env vars flow through the system
+- [TESTING.md](./TESTING.md) — Test environment setup
+- [CONVENTIONS.md](./CONVENTIONS.md) — Never expose server env vars to client

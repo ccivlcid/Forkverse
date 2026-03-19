@@ -1,5 +1,6 @@
 # DESIGN GUIDE — CLItoris Visual System
 
+> **Source of truth** for all visual design, colors, typography, component specs, and UI states.
 > Every pixel must feel like a terminal. If it looks like a generic web app, it's wrong.
 
 ---
@@ -784,7 +785,7 @@ All form elements follow terminal aesthetics with monospace font and dark backgr
 
 ---
 
-## 12. Do / Don't Quick Reference
+## 18. Do / Don't Quick Reference
 
 | Do | Don't |
 |----|-------|
@@ -798,3 +799,11 @@ All form elements follow terminal aesthetics with monospace font and dark backgr
 | Show information densely | Add excessive whitespace |
 | Use `rounded-none` or `rounded-sm` | Use `rounded-lg` or `rounded-full` |
 | Keep backgrounds under 3 shades | Use many background variations |
+
+---
+
+## See Also
+
+- [CONVENTIONS.md](./CONVENTIONS.md) — Tailwind-only rule, naming conventions
+- [Screen specs](../screens/) — Page-by-page wireframes using these design tokens
+- [PROMPTS.md](./PROMPTS.md) — Component creation prompt templates

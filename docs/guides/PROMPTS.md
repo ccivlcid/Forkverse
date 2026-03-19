@@ -1,5 +1,7 @@
 # PROMPTS.md — Vibe Coding Prompt Guide
 
+> **Source of truth** for vibe coding prompt templates and AI interaction patterns.
+
 A collection of prompt templates for instructing AI during development.
 
 ## Usage
@@ -333,3 +335,12 @@ Round 2: "The star button works but isn't yellow when active. Use text-yellow-40
 Round 3: "Good. Now add a test for the toggle behavior."
 Round 4: "Ship it." ✅
 ```
+
+---
+
+## See Also
+
+- [CONVENTIONS.md](./CONVENTIONS.md) — Rules AI must follow when generating code
+- [TESTING.md](./TESTING.md) — Testing patterns for test-writing prompts
+- [DESIGN_GUIDE.md](./DESIGN_GUIDE.md) — Visual specs for UI component prompts
+- [Screen specs](../screens/) — Page-by-page specifications for screen implementation prompts

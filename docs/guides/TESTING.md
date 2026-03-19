@@ -1,5 +1,6 @@
 # TESTING.md — Testing Patterns & Guidelines
 
+> **Source of truth** for all testing patterns, configurations, and examples.
 > Vitest for unit tests. Playwright for E2E. No exceptions.
 
 ---
@@ -32,6 +33,34 @@ export default defineConfig({
       exclude: ['**/node_modules/**', '**/dist/**'],
     },
   },
+});
+```
+
+### Playwright Configuration
+
+```typescript
+// playwright.config.ts (root)
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests/e2e',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  use: {
+    baseURL: 'http://localhost:5173',
+    trace: 'on-first-retry',
+  },
+  webServer: {
+    command: 'pnpm dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI,
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  ],
 });
 ```
 
@@ -450,3 +479,12 @@ pnpm test:e2e -- --debug     # E2E debug mode
 - No `setTimeout` or `sleep` in tests — use `waitFor` or Playwright auto-waiting
 - Test file lives next to source file: `post-card.tsx` → `post-card.test.tsx`
 - Mock external APIs (LLM providers) — never call real APIs in tests
+
+---
+
+## See Also
+
+- [CONVENTIONS.md](./CONVENTIONS.md) — Coding rules (test file naming, structure)
+- [PROMPTS.md](./PROMPTS.md) — Test writing prompt templates (section 10)
+- [ENV.md](./ENV.md) — Environment variable mocking patterns
+- [API.md](../specs/API.md) — API endpoint specs for integration tests

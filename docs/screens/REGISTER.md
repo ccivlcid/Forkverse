@@ -1,5 +1,7 @@
 # REGISTER Screen Specification
 
+> **Source of truth** for the Register screen (`/register`).
+
 ---
 
 ## 1. Screen Overview
@@ -360,3 +362,12 @@ Appears below all inputs, above the submit button.
 - No border or background on error lines (bare terminal output style)
 - Field errors clear when the user types in the corresponding field
 - General errors clear after 5 seconds or on next submission attempt
+
+---
+
+## See Also
+
+- [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states
+- [API.md](../specs/API.md) — Endpoint request/response details
+- [CONVENTIONS.md](../guides/CONVENTIONS.md) — Coding rules for implementation
+- [LOGIN.md](./LOGIN.md) — Related screen specification
