@@ -26,7 +26,7 @@ erDiagram
         TEXT tags "JSON array of strings"
         TEXT mentions "JSON array of usernames"
         TEXT visibility "public | private | unlisted"
-        TEXT llm_model "claude-sonnet | gpt-4o | llama-3 | custom"
+        TEXT llm_model "claude-sonnet | gpt-4o | gemini-2.5-pro | llama-3 | custom"
         TEXT parent_id FK "reply parent (nullable)"
         TEXT forked_from_id FK "fork source (nullable)"
         TEXT created_at "ISO 8601 timestamp"

@@ -301,7 +301,7 @@ const postSchema = z.object({
   tags: z.array(z.string().max(50)).max(10),
   mentions: z.array(z.string()).max(20),
   visibility: z.enum(['public', 'private', 'unlisted']),
-  llmModel: z.enum(['claude-sonnet', 'gpt-4o', 'llama-3', 'cursor', 'cli', 'api', 'custom']),
+  llmModel: z.enum(['claude-sonnet', 'gpt-4o', 'gemini-2.5-pro', 'llama-3', 'cursor', 'cli', 'api', 'custom']),
 });
 
 async function handleSubmitPost(formData: unknown): Promise<void> {
@@ -715,6 +715,88 @@ function timeAgo(dateString: string): string {
 - Beyond 7 days: show date as `MMM D` (e.g., "Feb 15")
 - Never show seconds (always "just now" for < 60s)
 - Input is always an ISO 8601 string from the API
+
+---
+
+## 11. LLM Transformation Error Handling Pattern
+
+Handles LLM-specific errors: timeout, invalid response, rate limit, provider unavailable.
+
+```typescript
+async function transformWithRetry(
+  input: TransformRequest,
+  maxRetries: number = 1,
+): Promise<TransformResponse> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const provider = createProvider(input.provider);
+      return await provider.transform(input);
+    } catch (err) {
+      if (err instanceof ProviderTimeoutError) {
+        // Timeout: retry once, then give up
+        if (attempt < maxRetries) continue;
+        throw err;
+      }
+      if (err instanceof ParseError && attempt < maxRetries) {
+        // Invalid LLM output: retry once (non-deterministic models)
+        continue;
+      }
+      // All other errors: do not retry
+      throw err;
+    }
+  }
+  throw new Error("Unreachable");
+}
+```
+
+**Error → UI mapping:**
+
+| Error Type | Toast Message | Auto-retry? |
+|-----------|--------------|-------------|
+| `ProviderTimeoutError` | "LLM request timed out. Try again." | Once, then manual |
+| `ProviderConfigError` | "Missing API key for {provider}. Check settings." | No |
+| `ProviderNetworkError` | "Cannot reach {provider}. Check your connection." | Manual retry button |
+| `ParseError` (after retry) | "Could not generate CLI command. Showing raw output." | No (show raw) |
+| `429 Rate Limit` | "Too many requests. Retrying in {n}s..." | Once after delay |
+
+---
+
+## 12. Debounce Pattern
+
+Prevents rapid duplicate actions (e.g., double-click star, rapid form submit).
+
+```typescript
+import { useRef, useCallback } from 'react';
+
+function useDebounce<T extends (...args: unknown[]) => unknown>(
+  fn: T,
+  delayMs: number = 300,
+): T {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  return useCallback(
+    ((...args: unknown[]) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => fn(...args), delayMs);
+    }) as T,
+    [fn, delayMs],
+  );
+}
+
+// Usage: debounce search input
+const debouncedSearch = useDebounce((query: string) => {
+  fetchSearchResults(query);
+}, 300);
+```
+
+**When to use:**
+- Search input (300ms delay)
+- Window resize handlers (150ms delay)
+- Auto-save drafts (1000ms delay)
+
+**When NOT to use (use `isSubmitting` guard instead):**
+- Star/follow toggles (optimistic update handles this)
+- Form submission (use `isSubmitting` flag)
 
 ---
 

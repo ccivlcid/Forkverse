@@ -437,10 +437,36 @@ CREATE INDEX IF NOT EXISTS idx_stars_post_id ON stars(post_id);
 - `user_id` on posts must reference a valid user
 - `parent_id` and `forked_from_id` must reference valid posts or be NULL
 - `visibility` constrained to: `public`, `private`, `unlisted`
-- `llm_model` constrained to: `claude-sonnet`, `gpt-4o`, `llama-3`, `cursor`, `cli`, `api`, `custom`
+- `llm_model` constrained to: `claude-sonnet`, `gpt-4o`, `gemini-2.5-pro`, `llama-3`, `cursor`, `cli`, `api`, `custom`
 - Self-follow prevented at application level
 - Self-star prevented at application level
 - Duplicate follow/star prevented by composite primary keys
+
+### Cascade Delete Rules
+
+| Action | Cascade Behavior |
+|--------|-----------------|
+| Delete user | Delete all user's posts, stars, follows (application-level cascade in transaction) |
+| Delete post | Delete all stars on the post, set `parent_id = NULL` on child replies (orphan replies remain visible) |
+| Delete forked post | Original post unaffected; forked_from_id references become dangling (application handles gracefully) |
+
+```sql
+-- Application-level cascade for user deletion (in a transaction)
+DELETE FROM stars WHERE user_id = ?;
+DELETE FROM follows WHERE follower_id = ? OR following_id = ?;
+DELETE FROM stars WHERE post_id IN (SELECT id FROM posts WHERE user_id = ?);
+DELETE FROM posts WHERE user_id = ?;
+DELETE FROM users WHERE id = ?;
+```
+
+### Reply Threading Rules
+
+| Rule | Value |
+|------|-------|
+| Max reply depth | **1 level** (flat replies only — no nested threads) |
+| Reply to a reply | Creates a new top-level reply to the **original parent** post, not the reply |
+| Reply ordering | Chronological ascending (`ORDER BY created_at ASC`) |
+| Reply pagination | All replies loaded at once (no pagination) — max 100 replies per post |
 
 ---
 

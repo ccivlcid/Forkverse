@@ -24,7 +24,7 @@ All social interactions (post, follow, fork, star) are expressed as CLI commands
 | Logging | pino |
 | Testing | Vitest (frontend + server), Playwright (E2E) |
 | Package manager | pnpm |
-| LLM Integration | Anthropic SDK, OpenAI SDK, Ollama, Cursor, CLI adapter, Generic API |
+| LLM Integration | Anthropic SDK, OpenAI SDK, Google Gemini SDK, Ollama, Cursor, CLI adapter, Generic API |
 
 ## Monorepo Structure
 
@@ -137,8 +137,8 @@ docs/
 ├── specs/                             # Technical specifications
 │   ├── PRD.md                         # Product requirements document
 │   ├── DATABASE.md                    # DB schema, queries, migrations, migration files
-│   ├── API.md                         # REST API documentation (18 endpoints, error formats)
-│   ├── LLM_INTEGRATION.md            # LLM transformation logic, prompts, provider code
+│   ├── API.md                         # REST API documentation (21 endpoints, error formats, rate limits)
+│   ├── LLM_INTEGRATION.md            # LLM transformation logic, prompts, 7 providers, credential auto-detection
 │   └── api-schema.json                # OpenAPI 3.1 schema (machine-readable)
 └── architecture/                      # Architecture diagrams
     ├── ARCHITECTURE.md                # System architecture, data flows, auth, errors

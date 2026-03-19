@@ -87,6 +87,7 @@ Users select an LLM provider when composing posts to perform natural language �
 |----------|------|----------------|-------------|
 | **anthropic** | API | All Anthropic models (claude-sonnet, opus, haiku...) | Anthropic SDK |
 | **openai** | API | All OpenAI models (gpt-4o, gpt-4, o1, o3...) | OpenAI SDK |
+| **gemini** | API | All Gemini models (gemini-2.5-pro, 2.5-flash, 2.0-flash...) | Google GenAI SDK (`@google/genai`) |
 | **ollama** | Local | All installed local models | Ollama REST API |
 | **cursor** | API | Cursor-supported models | Cursor AI |
 | **cli** | CLI | Depends on CLI tool | Claude Code, Codex, Gemini CLI, OpenCode |
@@ -100,6 +101,7 @@ Users select an LLM provider when composing posts to perform natural language �
 - **Local LLM**: Run models locally via Ollama (no API key needed), list installed models
 - **CLI adapter**: Execute CLI coding tools (Claude Code, Codex, Gemini CLI, Cursor, OpenCode)
 - **Generic API**: Connect any OpenAI-compatible endpoint with custom base URL + model name
+- **Auto-detection**: Server scans local env vars, config files (`~/.config/gcloud/`, `~/.anthropic/`), and PATH for available providers. Users already logged into providers on their PC need no additional setup — see `docs/specs/LLM_INTEGRATION.md` section 7
 
 **Transformation flow:**
 ```
@@ -124,6 +126,7 @@ Natural language input → [Cmd+Enter] → Select provider → CLI format conver
 Browse content filtered by the LLM model that generated it:
 - claude-sonnet
 - gpt-4o
+- gemini-2.5-pro
 - llama-3
 
 ## 5. UI/UX Design
@@ -212,25 +215,10 @@ Star   { user_id, post_id }
 Fork   { user_id, original_post_id, forked_post_id }
 ```
 
-## 7. Monorepo Structure
+## 7. Monorepo & Tech Stack
 
-pnpm workspaces monorepo with 4 packages:
-
-| Package | Name | Description |
-|---------|------|-------------|
-| `packages/client` | `@clitoris/client` | React 19 frontend (Vite + Tailwind) |
-| `packages/server` | `@clitoris/server` | Express API server (tsx) |
-| `packages/shared` | `@clitoris/shared` | Shared TypeScript types and constants |
-| `packages/llm` | `@clitoris/llm` | LLM provider integration (Anthropic, OpenAI, Ollama) |
-
-> Full directory tree and file-level breakdown: see `docs/architecture/architecture.json`
-> Visual diagram: see `docs/architecture/org-chart.mmd`
-
-## 8. Tech Stack
-
-> Full tech stack details: see `CLAUDE.md` (Tech Stack section)
-
-Key choices: React 19 + TypeScript + Vite + Tailwind CSS (frontend), Express + tsx (backend), SQLite + better-sqlite3 (database), Zustand (state), pnpm workspaces (monorepo).
+> Monorepo structure, package list, and full tech stack: see `CLAUDE.md` (Tech Stack + Monorepo sections).
+> Directory tree: see `docs/architecture/architecture.json` and `docs/architecture/org-chart.mmd`.
 
 ## 9. API Endpoints
 

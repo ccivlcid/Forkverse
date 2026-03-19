@@ -243,7 +243,7 @@ lang:        string, length 2 (ISO 639-1)
 tags:        string[], max 10 items, each max 50 chars
 mentions:    string[], max 20 items
 visibility:  enum ["public", "private", "unlisted"]
-llmModel:    enum ["claude-sonnet", "gpt-4o", "llama-3", "cursor", "cli", "api", "custom"]
+llmModel:    enum ["claude-sonnet", "gpt-4o", "gemini-2.5-pro", "llama-3", "cursor", "cli", "api", "custom"]
 ```
 
 **Response:** `201 Created`
@@ -510,7 +510,7 @@ Get posts filtered by LLM model.
 **Path Parameters:**
 | Param | Values |
 |-------|--------|
-| `model` | `claude-sonnet`, `gpt-4o`, `llama-3`, `cursor`, `cli`, `api`, `custom` |
+| `model` | `claude-sonnet`, `gpt-4o`, `gemini-2.5-pro`, `llama-3`, `cursor`, `cli`, `api`, `custom` |
 
 **Query Parameters:** Same as global feed (`cursor`, `limit`).
 
@@ -619,7 +619,7 @@ Rate limited: 30 requests per minute per user.
 **Validation (zod):**
 ```
 message:  string, min 1, max 2000
-model:    enum ["claude-sonnet", "gpt-4o", "llama-3", "cursor", "cli", "api", "custom"]
+model:    enum ["claude-sonnet", "gpt-4o", "gemini-2.5-pro", "llama-3", "cursor", "cli", "api", "custom"]
 lang:     string, length 2
 ```
 
@@ -641,6 +641,27 @@ lang:     string, length 2
 | `401` | Not authenticated |
 | `429` | Rate limit exceeded |
 | `500` | LLM API error |
+
+---
+
+### GET `/llm/providers`
+
+Get available LLM providers with auto-detection status. No authentication required.
+
+**Response:** `200 OK`
+```json
+{
+  "data": [
+    { "provider": "anthropic", "source": "env:ANTHROPIC_API_KEY", "isAvailable": true },
+    { "provider": "gemini", "source": "file:~/.config/gcloud/application_default_credentials.json", "isAvailable": true },
+    { "provider": "openai", "source": null, "isAvailable": false },
+    { "provider": "ollama", "source": "localhost:11434", "isAvailable": true },
+    { "provider": "cli:claude", "source": "path:claude", "isAvailable": true }
+  ]
+}
+```
+
+> Credential auto-detection logic: see `docs/specs/LLM_INTEGRATION.md` section 7.
 
 ---
 
@@ -757,6 +778,7 @@ GET /api/posts/feed/global?cursor=2026-03-19T12:15:00Z&limit=20
 | `GET` | `/users/@:username/posts` | No | User posts |
 | `GET` | `/users/@:username/starred` | No | User starred |
 | `POST` | `/users/@:username/follow` | Yes | Toggle follow |
+| `GET` | `/llm/providers` | No | Available LLM providers |
 | `POST` | `/llm/transform` | Yes | LLM transformation |
 
 ---

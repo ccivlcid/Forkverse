@@ -255,7 +255,7 @@ Same as Global Feed. Uses the same `Post`, `PostUser`, and `LlmModel` types defi
 | LLM filter (sidebar) | Click     | Filter local feed by model, reset cursor, refetch       |
 | Nav items (sidebar)  | Click     | Navigate to corresponding route                         |
 | Composer textarea    | Click     | Focus textarea, show blinking cursor                    |
-| Model selector       | Click     | Open dropdown: claude-sonnet, gpt-4o, llama-3, custom   |
+| Model selector       | Click     | Open dropdown: claude-sonnet, gpt-4o, gemini-2.5-pro, llama-3, custom   |
 | [LLM -> CLI] button  | Click     | Transform draft via LLM, show CLI preview               |
 | User menu            | Click     | Open dropdown: profile, settings, logout                |
 

@@ -69,7 +69,7 @@ interface Post {
 }
 
 // ✅ Use type only in these cases
-type LlmModel = 'claude-sonnet' | 'gpt-4o' | 'llama-3' | 'cursor' | 'cli' | 'api' | 'custom';
+type LlmModel = 'claude-sonnet' | 'gpt-4o' | 'gemini-2.5-pro' | 'llama-3' | 'cursor' | 'cli' | 'api' | 'custom';
 type PostWithUser = Post & { user: User };
 
 // ✅ API request/response types MUST be defined in shared package
@@ -233,7 +233,7 @@ const createPostSchema = z.object({
   lang: z.string().length(2),
   tags: z.array(z.string()).max(10),
   visibility: z.enum(['public', 'private', 'unlisted']),
-  llmModel: z.enum(['claude-sonnet', 'gpt-4o', 'llama-3', 'cursor', 'cli', 'api', 'custom']),
+  llmModel: z.enum(['claude-sonnet', 'gpt-4o', 'gemini-2.5-pro', 'llama-3', 'cursor', 'cli', 'api', 'custom']),
 });
 
 // ✅ Validate via middleware

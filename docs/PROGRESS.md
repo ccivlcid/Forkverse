@@ -117,7 +117,7 @@ The project is in the **documentation and scaffolding** phase. No application co
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Multi-LLM support | Not Started | GPT-4o, Llama-3 providers |
+| Multi-LLM support | Not Started | GPT-4o, Gemini, Llama-3 providers |
 | Multilingual auto-translation | Not Started | `--translate=auto` |
 | Explore/trending | Not Started | Algorithm TBD |
 | Custom LLM connections | Not Started | User-provided API keys |
@@ -126,50 +126,14 @@ The project is in the **documentation and scaffolding** phase. No application co
 
 | Feature | Acceptance Criteria |
 |---------|-------------------|
-| Multi-LLM support | OpenAI (gpt-4o) and Ollama (llama-3) providers work end-to-end; model selector shows available models per provider |
+| Multi-LLM support | OpenAI (gpt-4o), Gemini (gemini-2.5-pro), and Ollama (llama-3) providers work end-to-end; model selector shows available models per provider; credential auto-detection badges shown |
 | Multilingual auto-translation | `--translate=auto` flag detects source language and appends translation; dual-language display in post card |
 | Explore/trending | Posts sorted by star count within time window (24h/7d/30d); trending tag cloud updates dynamically |
 | Custom LLM connections | User can configure custom OpenAI-compatible endpoint with base URL + API key; connection test validates before save |
 
 ---
 
-## Document Index
-
-```
-docs/
-├── OVERVIEW.md                          # Project overview & core concepts
-├── PROGRESS.md                          # Development status (this file)
-├── setup/
-│   └── CONFIGS.md                       # All config files (package.json, tsconfig, etc.)
-├── guides/
-│   ├── CONVENTIONS.md                   # Strict coding rules & prohibitions
-│   ├── DESIGN_GUIDE.md                  # Visual system & component specs
-│   ├── PATTERNS.md                      # Implementation patterns (optimistic updates, pagination)
-│   ├── TESTING.md                       # Testing patterns (Vitest + Playwright)
-│   ├── ENV.md                           # Environment variables reference
-│   └── PROMPTS.md                       # Vibe coding prompt templates
-├── screens/
-│   ├── GLOBAL_FEED.md                   # / — Main feed with composer
-│   ├── LOCAL_FEED.md                    # /feed/local — Following feed
-│   ├── EXPLORE.md                       # /explore — Trending/discover
-│   ├── POST_DETAIL.md                   # /post/:id — Single post + replies
-│   ├── USER_PROFILE.md                  # /@:username — User profile
-│   ├── LOGIN.md                         # /login — Terminal-style login
-│   ├── REGISTER.md                      # /register — Terminal-style registration
-│   └── SETTINGS.md                      # /settings — User settings
-├── specs/
-│   ├── PRD.md                           # Full product requirements
-│   ├── DATABASE.md                      # DB schema, queries, migrations
-│   ├── API.md                           # REST API documentation (18 endpoints)
-│   └── api-schema.json                  # OpenAPI 3.1 schema
-└── architecture/
-    ├── ARCHITECTURE.md                  # System architecture & data flows
-    ├── architecture.json                # Full system config (JSON)
-    ├── backend-dependencies.mmd         # Server module dependency graph
-    ├── frontend-imports.mmd             # Client component import graph
-    ├── org-chart.mmd                    # Monorepo folder hierarchy
-    └── schema-erd.md                    # Database ERD + data flow examples
-```
+> Document index: see `CLAUDE.md` (Documentation Map section) — single source of truth for file tree.
 
 ---
 

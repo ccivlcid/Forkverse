@@ -117,20 +117,15 @@ follow  → subscribe to a user
 
 ## Tech Summary
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 19 + TypeScript + Vite + Tailwind CSS |
-| State | Zustand |
-| Backend | Node.js + Express + tsx |
-| Database | SQLite (better-sqlite3) |
-| LLM | Anthropic SDK, OpenAI SDK, Ollama |
-| Testing | Vitest + Playwright |
-| Package manager | pnpm (monorepo with workspaces) |
+> Full tech stack table: see `CLAUDE.md` (Tech Stack section).
 
-See `docs/architecture/ARCHITECTURE.md` for system diagrams and data flows.
-See `docs/specs/DATABASE.md` for schema and query reference.
-See `docs/guides/DESIGN_GUIDE.md` for visual specifications.
-See `docs/screens/` for page-by-page UI screen specifications.
+Key choices: React 19 + TypeScript + Vite + Tailwind CSS (frontend), Express + tsx (backend), SQLite + better-sqlite3 (database), Zustand (state), pnpm workspaces (monorepo). LLM providers: Anthropic, OpenAI, **Google Gemini**, Ollama, Cursor, CLI adapter, Generic API. Credential auto-detection available — see `docs/specs/LLM_INTEGRATION.md` section 7.
+
+**Cross-references:**
+- `docs/architecture/ARCHITECTURE.md` — System diagrams and data flows
+- `docs/specs/DATABASE.md` — Schema and query reference
+- `docs/guides/DESIGN_GUIDE.md` — Visual specifications
+- `docs/screens/` — Page-by-page UI screen specifications
 
 ---
 
@@ -151,7 +146,8 @@ See `docs/screens/` for page-by-page UI screen specifications.
 | **Cursor pagination** | Pagination using the last item's timestamp instead of page numbers |
 | **Dual panel** | The side-by-side display of natural language (left) and CLI command (right) |
 | **Terminal aesthetic** | Dark backgrounds, monospace fonts, green/amber/cyan text — mimicking a CLI terminal |
-| **Custom LLM** | User-provided LLM connection (via API key) beyond the built-in Claude/GPT/Llama |
+| **Custom LLM** | User-provided LLM connection (via API key) beyond the built-in Claude/GPT/Gemini/Llama |
+| **Credential auto-detection** | Server scans local env vars and config files (e.g., `gcloud auth`) to auto-detect available LLM providers without manual API key entry |
 
 ---
 

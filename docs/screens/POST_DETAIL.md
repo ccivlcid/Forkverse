@@ -323,7 +323,7 @@ interface PostDetail extends Post {
 | ◇ fork (reply)           | Click     | Fork the reply                                         |
 | ↩ reply (reply)          | Click     | Focus reply composer (replies are flat, not nested)    |
 | Reply composer textarea | Click     | Focus textarea, show blinking cursor                   |
-| Model selector          | Click     | Open dropdown: claude-sonnet, gpt-4o, llama-3, custom |
+| Model selector          | Click     | Open dropdown: claude-sonnet, gpt-4o, gemini-2.5-pro, llama-3, custom |
 | [LLM -> CLI] button     | Click     | Transform reply via LLM, show CLI preview              |
 
 ### Keyboard Shortcuts

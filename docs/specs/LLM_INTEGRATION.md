@@ -418,7 +418,60 @@ export class CliProvider implements LlmProvider {
 }
 ```
 
-### 4f. api.ts -- Generic OpenAI-Compatible Endpoint
+### 4f. gemini.ts -- Google Gemini SDK
+
+```typescript
+// packages/llm/src/providers/gemini.ts
+import { GoogleGenAI } from "@google/genai";
+import type { LlmProvider, TransformRequest, TransformResponse } from "../types.js";
+import { SYSTEM_PROMPT, buildFewShotMessages } from "../prompt.js";
+import { parseCliCommand } from "../parser.js";
+
+export class GeminiProvider implements LlmProvider {
+  name = "gemini";
+  private client: GoogleGenAI;
+
+  constructor(apiKey: string) {
+    this.client = new GoogleGenAI({ apiKey });
+  }
+
+  async listModels(): Promise<string[]> {
+    return [
+      "gemini-2.5-pro",
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+    ];
+  }
+
+  async transform(input: TransformRequest): Promise<TransformResponse> {
+    const fewShot = buildFewShotMessages(input.username);
+    const historyText = fewShot
+      .map((m) => `${m.role}: ${m.content}`)
+      .join("\n");
+
+    const response = await this.client.models.generateContent({
+      model: input.model,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        maxOutputTokens: 512,
+      },
+      contents: [
+        { role: "user", parts: [{ text: `${historyText}\nuser: ${input.message}` }] },
+      ],
+    });
+
+    const text = response.text ?? "";
+    return {
+      messageCli: parseCliCommand(text),
+      model: input.model,
+      tokensUsed: (response.usageMetadata?.promptTokenCount ?? 0) +
+                  (response.usageMetadata?.candidatesTokenCount ?? 0),
+    };
+  }
+}
+```
+
+### 4g. api.ts -- Generic OpenAI-Compatible Endpoint
 
 For any provider that exposes an OpenAI-compatible `/v1/chat/completions` endpoint (LM Studio, vLLM, Together AI, Groq, etc.).
 
@@ -605,9 +658,186 @@ When `parseCliCommand` throws a `ParseError`, the caller (provider `transform` m
 
 ---
 
+## 7. Credential Auto-Detection
+
+CLItoris detects locally available LLM credentials at server startup. If a provider's credentials are already configured on the user's machine (e.g., via CLI login or config files), no additional API key is needed. The UI displays detected providers with a "ready" badge.
+
+### Detection Logic
+
+```typescript
+// packages/llm/src/credential-detector.ts
+import { existsSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import path from "node:path";
+
+interface DetectedProvider {
+  provider: string;
+  source: string;           // where the credential was found
+  isAvailable: boolean;
+}
+
+/**
+ * Scans the local machine for pre-existing LLM credentials.
+ * Called once at server startup. Results cached in memory.
+ */
+export function detectLocalCredentials(): DetectedProvider[] {
+  const home = homedir();
+  const results: DetectedProvider[] = [];
+
+  // 1. Anthropic — ~/.anthropic/config.json or ANTHROPIC_API_KEY env
+  const anthropicConfig = path.join(home, ".anthropic", "config.json");
+  if (process.env.ANTHROPIC_API_KEY) {
+    results.push({ provider: "anthropic", source: "env:ANTHROPIC_API_KEY", isAvailable: true });
+  } else if (existsSync(anthropicConfig)) {
+    results.push({ provider: "anthropic", source: `file:${anthropicConfig}`, isAvailable: true });
+  }
+
+  // 2. OpenAI — ~/.openai/config or OPENAI_API_KEY env
+  const openaiConfig = path.join(home, ".config", "openai", "auth.json");
+  if (process.env.OPENAI_API_KEY) {
+    results.push({ provider: "openai", source: "env:OPENAI_API_KEY", isAvailable: true });
+  } else if (existsSync(openaiConfig)) {
+    results.push({ provider: "openai", source: `file:${openaiConfig}`, isAvailable: true });
+  }
+
+  // 3. Google Gemini — ~/.config/gcloud/application_default_credentials.json
+  //    or GOOGLE_API_KEY / GEMINI_API_KEY env
+  const gcloudAdc = path.join(home, ".config", "gcloud", "application_default_credentials.json");
+  const geminiConfig = path.join(home, ".config", "gemini", "config.json");
+  if (process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY) {
+    results.push({ provider: "gemini", source: "env:GOOGLE_API_KEY", isAvailable: true });
+  } else if (existsSync(gcloudAdc)) {
+    results.push({ provider: "gemini", source: `file:${gcloudAdc}`, isAvailable: true });
+  } else if (existsSync(geminiConfig)) {
+    results.push({ provider: "gemini", source: `file:${geminiConfig}`, isAvailable: true });
+  }
+
+  // 4. Ollama — check if server is running on localhost:11434
+  // (detected asynchronously at startup via health check)
+
+  // 5. CLI tools — check if binaries exist in PATH
+  const cliTools = ["claude", "codex", "gemini", "opencode"] as const;
+  for (const tool of cliTools) {
+    try {
+      const { execSync } = require("node:child_process");
+      execSync(`which ${tool}`, { stdio: "ignore" });
+      results.push({ provider: `cli:${tool}`, source: `path:${tool}`, isAvailable: true });
+    } catch {
+      // binary not found — skip
+    }
+  }
+
+  return results;
+}
+```
+
+### Detection Sources (Priority Order)
+
+| Provider | Source 1 (env var) | Source 2 (config file) | Source 3 (system) |
+|----------|-------------------|----------------------|-------------------|
+| **Anthropic** | `ANTHROPIC_API_KEY` | `~/.anthropic/config.json` | — |
+| **OpenAI** | `OPENAI_API_KEY` | `~/.config/openai/auth.json` | — |
+| **Gemini** | `GOOGLE_API_KEY` or `GEMINI_API_KEY` | `~/.config/gcloud/application_default_credentials.json` or `~/.config/gemini/config.json` | `gcloud auth` login |
+| **Ollama** | `OLLAMA_URL` | — | `localhost:11434` health check |
+| **CLI tools** | — | — | `which claude/codex/gemini/opencode` |
+
+### API Endpoint for Detection
+
+```
+GET /api/llm/providers
+```
+
+Returns the list of available providers with their detection status:
+
+```json
+{
+  "data": [
+    { "provider": "anthropic", "source": "env:ANTHROPIC_API_KEY", "isAvailable": true },
+    { "provider": "gemini", "source": "file:~/.config/gcloud/application_default_credentials.json", "isAvailable": true },
+    { "provider": "openai", "source": null, "isAvailable": false },
+    { "provider": "ollama", "source": "localhost:11434", "isAvailable": true },
+    { "provider": "cli:claude", "source": "path:claude", "isAvailable": true }
+  ]
+}
+```
+
+### Client UI Integration
+
+The composer's model selector shows a badge for auto-detected providers:
+
+```
+┌─ Model Selector ──────────────────────┐
+│ ● anthropic / claude-sonnet  [ready]  │  ← env var detected
+│ ● gemini / gemini-2.5-pro   [ready]  │  ← gcloud login detected
+│ ○ openai / gpt-4o           [setup]  │  ← no credentials found
+│ ● ollama / llama3            [local]  │  ← running locally
+│ ● cli / claude-code          [path]   │  ← binary in PATH
+└───────────────────────────────────────┘
+```
+
+**Badge meanings:**
+| Badge | Meaning |
+|-------|---------|
+| `[ready]` | API key found (env or config file) — usable immediately |
+| `[local]` | Local server running — usable immediately |
+| `[path]` | CLI binary found in PATH — usable immediately |
+| `[setup]` | No credentials detected — click to configure |
+
+---
+
+## 8. Provider Registration
+
+All providers are registered in a central factory. Adding a new provider requires:
+1. Create `packages/llm/src/providers/{name}.ts` implementing `LlmProvider`
+2. Register in the factory below
+3. Add env var to `docs/guides/ENV.md`
+4. Add to model enum in `@clitoris/shared`
+
+```typescript
+// packages/llm/src/provider-factory.ts
+import type { LlmProvider } from "./types.js";
+import { AnthropicProvider } from "./providers/anthropic.js";
+import { OpenAiProvider } from "./providers/openai.js";
+import { GeminiProvider } from "./providers/gemini.js";
+import { OllamaProvider } from "./providers/ollama.js";
+import { CursorProvider } from "./providers/cursor.js";
+import { CliProvider } from "./providers/cli.js";
+import { GenericApiProvider } from "./providers/api.js";
+
+export function createProvider(name: string): LlmProvider {
+  switch (name) {
+    case "anthropic":
+      return new AnthropicProvider(process.env.ANTHROPIC_API_KEY!);
+    case "openai":
+      return new OpenAiProvider(process.env.OPENAI_API_KEY!);
+    case "gemini":
+      return new GeminiProvider(
+        process.env.GOOGLE_API_KEY ?? process.env.GEMINI_API_KEY!,
+      );
+    case "ollama":
+      return new OllamaProvider();
+    case "cursor":
+      return new CursorProvider();
+    case "cli":
+      return new CliProvider();
+    case "api":
+      return new GenericApiProvider(
+        "custom",
+        process.env.API_CUSTOM_BASE_URL!,
+        process.env.API_CUSTOM_API_KEY!,
+      );
+    default:
+      throw new Error(`Unknown provider: ${name}`);
+  }
+}
+```
+
+---
+
 ## See Also
 
 - [docs/setup/CONFIGS.md](../setup/CONFIGS.md) -- Project configuration files
 - [docs/OVERVIEW.md](../OVERVIEW.md) -- Project overview and goals
 - [docs/specs/API.md](./API.md) -- API specification
 - [docs/specs/PRD.md](./PRD.md) -- Product requirements
+- [docs/guides/ENV.md](../guides/ENV.md) -- Environment variables (API keys)

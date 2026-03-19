@@ -24,6 +24,8 @@
 |----------|------|---------|----------|-------------|
 | `ANTHROPIC_API_KEY` | string | — | **Yes*** | Anthropic API key for Claude |
 | `OPENAI_API_KEY` | string | — | No | OpenAI API key for GPT-4o |
+| `GOOGLE_API_KEY` | string | — | No | Google AI API key for Gemini (alternative: `GEMINI_API_KEY`) |
+| `GEMINI_API_KEY` | string | — | No | Alias for Google AI API key (fallback if `GOOGLE_API_KEY` unset) |
 | `OLLAMA_URL` | string | `http://localhost:11434` | No | Ollama server URL for local LLM |
 | `CURSOR_API_KEY` | string | — | No | Cursor AI API key |
 | `CLI_LLM_COMMAND` | string | `claude` | No | CLI tool command (`claude`, `codex`, `gemini`, `opencode`) |
@@ -31,7 +33,7 @@
 | `API_CUSTOM_API_KEY` | string | — | No | Generic API authentication key |
 | `API_CUSTOM_MODEL` | string | — | No | Generic API model name |
 
-*Required for default LLM provider (claude-sonnet).
+*Required for default LLM provider (claude-sonnet). If unset, credential auto-detection will attempt to find keys from local config files. See `docs/specs/LLM_INTEGRATION.md` section 7.
 
 ### Client (`@clitoris/client`)
 
@@ -54,9 +56,11 @@ SESSION_SECRET=replace-with-random-string-at-least-32-chars
 LOG_LEVEL=info
 CORS_ORIGIN=http://localhost:5173
 
-# LLM Providers
+# LLM Providers (auto-detected from local config if unset — see LLM_INTEGRATION.md §7)
 ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
 OPENAI_API_KEY=sk-your-openai-key-here
+GOOGLE_API_KEY=your-google-ai-key-here
+# GEMINI_API_KEY=alias-for-google-api-key (used if GOOGLE_API_KEY is unset)
 OLLAMA_URL=http://localhost:11434
 CURSOR_API_KEY=your-cursor-key-here
 CLI_LLM_COMMAND=claude

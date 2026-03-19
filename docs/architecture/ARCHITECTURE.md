@@ -19,7 +19,8 @@
 │  │ Routes  │  │Middleware │  │ LLM Module│              │
 │  │ /posts  │  │  auth     │  │ Anthropic  │              │
 │  │ /users  │  │  logger   │  │ OpenAI     │              │
-│  │ /llm    │  │  errors   │  │ Ollama     │              │
+│  │ /llm    │  │  errors   │  │ Gemini     │              │
+│  │         │  │           │  │ Ollama     │              │
 │  └────┬────┘  └──────────┘  └─────┬─────┘              │
 │       │                           │                     │
 │       ▼                           ▼                     │
@@ -66,54 +67,7 @@
 
 ## Query Patterns
 
-### Feed Query (with aggregates)
-
-```sql
-SELECT
-  p.*,
-  u.username, u.domain, u.display_name, u.avatar_url,
-  (SELECT COUNT(*) FROM stars WHERE post_id = p.id) AS star_count,
-  (SELECT COUNT(*) FROM posts WHERE parent_id = p.id) AS reply_count,
-  (SELECT COUNT(*) FROM posts WHERE forked_from_id = p.id) AS fork_count,
-  EXISTS(SELECT 1 FROM stars WHERE post_id = p.id AND user_id = ?) AS is_starred
-FROM posts p
-JOIN users u ON p.user_id = u.id
-WHERE p.visibility = 'public'
-  AND p.parent_id IS NULL
-  AND p.created_at < ?
-ORDER BY p.created_at DESC
-LIMIT 20;
-```
-
-### Insert with Return
-
-```typescript
-const stmt = db.prepare(`
-  INSERT INTO posts (id, user_id, message_raw, message_cli, lang, tags, mentions, visibility, llm_model)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-`);
-
-const getStmt = db.prepare(`
-  SELECT p.*, u.username, u.domain, u.display_name, u.avatar_url
-  FROM posts p JOIN users u ON p.user_id = u.id
-  WHERE p.id = ?
-`);
-
-const createPost = db.transaction((post: CreatePostInput): Post => {
-  stmt.run(post.id, post.userId, post.messageRaw, post.messageCli, post.lang,
-    JSON.stringify(post.tags), JSON.stringify(post.mentions), post.visibility, post.llmModel);
-  return getStmt.get(post.id) as Post;
-});
-```
-
-### Auth Query
-
-```typescript
-const findByUsername = db.prepare('SELECT * FROM users WHERE username = ?');
-const insertUser = db.prepare(
-  'INSERT INTO users (id, username, password_hash, display_name) VALUES (?, ?, ?, ?)'
-);
-```
+> Full SQL queries, indexes, and access patterns: see `docs/specs/DATABASE.md` (sections 5-7).
 
 ---
 
@@ -163,8 +117,8 @@ interface LlmProvider {
 
 interface TransformRequest {
   message: string;
-  provider: string;   // 'anthropic' | 'openai' | 'ollama' | 'cursor' | 'cli' | 'api'
-  model: string;      // e.g. 'claude-sonnet-4', 'gpt-4o', 'llama3:8b'
+  provider: string;   // 'anthropic' | 'openai' | 'gemini' | 'ollama' | 'cursor' | 'cli' | 'api'
+  model: string;      // e.g. 'claude-sonnet-4', 'gpt-4o', 'gemini-2.5-pro', 'llama3:8b'
   lang: string;
 }
 
@@ -204,13 +158,30 @@ Config:
   API_CUSTOM_MODEL=your-model-name
 ```
 
+## Caching Strategy
+
+| Layer | Cache | TTL | Invalidation |
+|-------|-------|-----|-------------|
+| **Browser** | `Cache-Control: no-cache` for API; `max-age=31536000` for static assets | — / 1 year | Vite content-hashed filenames |
+| **Server (in-memory)** | LLM provider detection results | Until server restart | Manual restart |
+| **Server (in-memory)** | Rate limit counters | 1 minute window | Auto-expire |
+| **SQLite WAL** | Page cache (`cache_size = -20000`) | Until eviction | Automatic (LRU) |
+
+No Redis or external cache for MVP. SQLite WAL mode + 20MB page cache is sufficient. If query latency exceeds 50ms (p95), consider denormalizing star_count/reply_count/fork_count into the `posts` table.
+
+---
+
 ## Security Considerations
 
-- **Authentication**: Session-based (express-session + SQLite storage)
+- **Authentication**: Session-based (express-session + SQLite storage, 7-day expiry)
 - **Input validation**: zod schemas (once at API boundary)
 - **SQL**: Prepared statements only (better-sqlite3 default)
 - **XSS**: React auto-escaping + DOMPurify (for CLI rendering)
-- **Rate limiting**: express-rate-limit (LLM transformation endpoint)
+- **CSRF**: SameSite=Lax cookies + httpOnly flag
+- **Rate limiting**: express-rate-limit per endpoint — see `docs/specs/API.md` section 6 for exact values
+- **Password**: bcrypt with cost factor 10
+- **Credential storage**: API keys in env vars only, never in DB or client bundle
+- **Content Security Policy**: `script-src 'self'` in production
 
 ---
 
@@ -373,14 +344,8 @@ Step-by-step flow from user action to database and back:
 
 ## Environment Configuration
 
-> Full env var reference with descriptions, defaults, and security rules: see `docs/guides/ENV.md`
-
-Quick summary:
-- **Server**: PORT, DATABASE_URL, SESSION_SECRET, LOG_LEVEL, CORS_ORIGIN
-- **LLM**: ANTHROPIC_API_KEY, OPENAI_API_KEY, OLLAMA_URL
-- **Client**: VITE_API_URL (must use `VITE_` prefix for Vite exposure)
-
-Never commit `.env` files. Use `.env.example` as a template.
+> Full env var reference: see `docs/guides/ENV.md`.
+> Credential auto-detection: see `docs/specs/LLM_INTEGRATION.md` section 7.
 
 ---
 
