@@ -277,33 +277,14 @@ Step-by-step flow from user action to database and back:
 
 ## Environment Configuration
 
-### Client (Vite)
+> Full env var reference with descriptions, defaults, and security rules: see `docs/guides/ENV.md`
 
-```env
-VITE_API_URL=/api
-```
+Quick summary:
+- **Server**: PORT, DATABASE_URL, SESSION_SECRET, LOG_LEVEL, CORS_ORIGIN
+- **LLM**: ANTHROPIC_API_KEY, OPENAI_API_KEY, OLLAMA_URL
+- **Client**: VITE_API_URL (must use `VITE_` prefix for Vite exposure)
 
-All client-side environment variables must be prefixed with `VITE_` to be exposed to the browser bundle.
-
-### Server
-
-```env
-# Server
-PORT=3000
-DATABASE_URL=clitoris.db
-SESSION_SECRET=random-secret
-
-# LLM API Keys
-ANTHROPIC_API_KEY=sk-ant-...
-OPENAI_API_KEY=sk-...
-OLLAMA_URL=http://localhost:11434
-
-# Environment
-NODE_ENV=development|production
-LOG_LEVEL=info|debug|error
-```
-
-> Never commit `.env` files. Use `.env.example` as a template.
+Never commit `.env` files. Use `.env.example` as a template.
 
 ---
 

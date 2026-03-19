@@ -184,157 +184,34 @@ Fork   { user_id, original_post_id, forked_post_id }
 
 ## 7. Monorepo Structure
 
-pnpm workspaces-based monorepo.
-
-```
-CLItoris/
-├── package.json              # Root — pnpm workspace config
-├── pnpm-workspace.yaml       # Workspace package definitions
-├── tsconfig.base.json        # Shared TypeScript config
-├── .eslintrc.cjs             # Shared ESLint config
-├── .prettierrc               # Shared Prettier config
-├── CLAUDE.md
-├── docs/
-│   └── PRD.md
-│
-├── packages/
-│   ├── client/               # @clitoris/client — React frontend
-│   │   ├── package.json
-│   │   ├── tsconfig.json
-│   │   ├── vite.config.ts
-│   │   ├── tailwind.config.ts
-│   │   ├── index.html
-│   │   └── src/
-│   │       ├── main.tsx       # Entry point
-│   │       ├── App.tsx
-│   │       ├── components/    # Reusable UI components
-│   │       │   ├── feed/      # Feed-related (PostCard, FeedList)
-│   │       │   ├── post/      # Post dual panel
-│   │       │   ├── layout/    # Sidebar, Header, Shell
-│   │       │   └── common/    # Common (Button, Input, Tag)
-│   │       ├── pages/         # Route pages
-│   │       ├── stores/        # Zustand stores
-│   │       ├── hooks/         # Custom React hooks
-│   │       ├── styles/        # Global styles, theme
-│   │       └── utils/         # Client utilities
-│   │
-│   ├── server/               # @clitoris/server — Express backend
-│   │   ├── package.json
-│   │   ├── tsconfig.json
-│   │   └── src/
-│   │       ├── index.ts       # Server entry point
-│   │       ├── app.ts         # Express app setup
-│   │       ├── routes/        # API route handlers
-│   │       │   ├── posts.ts
-│   │       │   ├── users.ts
-│   │       │   └── llm.ts
-│   │       ├── db/
-│   │       │   ├── index.ts   # DB connection (better-sqlite3)
-│   │       │   ├── schema.ts  # Table definitions
-│   │       │   └── migrations/
-│   │       ├── middleware/     # Auth, logging, error handling
-│   │       └── utils/
-│   │
-│   ├── shared/               # @clitoris/shared — Shared code
-│   │   ├── package.json
-│   │   ├── tsconfig.json
-│   │   └── src/
-│   │       ├── types/         # Shared TypeScript types
-│   │       │   ├── post.ts
-│   │       │   ├── user.ts
-│   │       │   └── api.ts
-│   │       └── constants/     # Shared constants (LLM model names, colors, etc.)
-│   │
-│   └── llm/                  # @clitoris/llm — LLM integration module
-│       ├── package.json
-│       ├── tsconfig.json
-│       └── src/
-│           ├── index.ts       # Unified LLM interface
-│           ├── providers/
-│           │   ├── anthropic.ts  # Claude integration
-│           │   ├── openai.ts     # GPT integration
-│           │   └── ollama.ts     # Llama local integration
-│           └── transformer.ts    # Natural language → CLI transformation logic
-│
-├── tests/
-│   ├── unit/                 # Vitest unit tests
-│   └── e2e/                  # Playwright E2E tests
-│       └── playwright.config.ts
-│
-└── scripts/                  # Build/deploy/seed scripts
-```
-
-### Workspace Packages
+pnpm workspaces monorepo with 4 packages:
 
 | Package | Name | Description |
 |---------|------|-------------|
-| `packages/client` | `@clitoris/client` | React frontend app |
-| `packages/server` | `@clitoris/server` | Express API server |
-| `packages/shared` | `@clitoris/shared` | Shared types, constants |
-| `packages/llm` | `@clitoris/llm` | LLM provider integration |
+| `packages/client` | `@clitoris/client` | React 19 frontend (Vite + Tailwind) |
+| `packages/server` | `@clitoris/server` | Express API server (tsx) |
+| `packages/shared` | `@clitoris/shared` | Shared TypeScript types and constants |
+| `packages/llm` | `@clitoris/llm` | LLM provider integration (Anthropic, OpenAI, Ollama) |
 
-### Root Scripts (root package.json)
-
-```json
-{
-  "scripts": {
-    "dev": "pnpm --parallel -r run dev",
-    "dev:client": "pnpm --filter @clitoris/client dev",
-    "dev:server": "pnpm --filter @clitoris/server dev",
-    "build": "pnpm -r run build",
-    "test": "vitest",
-    "test:e2e": "playwright test",
-    "lint": "eslint packages/",
-    "format": "prettier --write packages/"
-  }
-}
-```
-
-### Package Dependencies
-
-```
-@clitoris/client ──→ @clitoris/shared
-                 ──→ @clitoris/llm (API call types)
-
-@clitoris/server ──→ @clitoris/shared
-                 ──→ @clitoris/llm
-
-@clitoris/llm    ──→ @clitoris/shared
-```
+> Full directory tree and file-level breakdown: see `docs/architecture/architecture.json`
+> Visual diagram: see `docs/architecture/org-chart.mmd`
 
 ## 8. Tech Stack
 
-| Area | Technology |
-|------|-----------|
-| Frontend | React 19 + TypeScript + Vite + Tailwind CSS |
-| State management | Zustand |
-| Flow diagrams | `@xyflow/react` v12 |
-| Backend | Node.js + Express + tsx (TypeScript direct execution) |
-| DB | SQLite (`better-sqlite3`) + versioned migrations |
-| Logging | pino |
-| Testing | Vitest (frontend + server), Playwright (E2E) |
-| Package manager | pnpm |
-| LLM integration | Anthropic SDK, OpenAI SDK, Ollama (llama) |
+> Full tech stack details: see `CLAUDE.md` (Tech Stack section)
 
-## 9. API Design (Draft)
+Key choices: React 19 + TypeScript + Vite + Tailwind CSS (frontend), Express + tsx (backend), SQLite + better-sqlite3 (database), Zustand (state), pnpm workspaces (monorepo).
 
-```
-POST   /api/posts              → Create post
-GET    /api/posts/feed/global   → Global feed
-GET    /api/posts/feed/local    → Local feed
-GET    /api/posts/:id           → Single post
-POST   /api/posts/:id/reply     → Reply
-POST   /api/posts/:id/fork      → Fork
-POST   /api/posts/:id/star      → Toggle star
-DELETE /api/posts/:id           → Delete post
+## 9. API Endpoints
 
-GET    /api/users/@:username    → User profile
-POST   /api/users/@:username/follow → Toggle follow
-GET    /api/users/@:username/posts  → User posts
+18 REST endpoints organized into 4 groups:
+- **Auth** (4): register, login, logout, me
+- **Posts** (8): create, feed/global, feed/local, get, reply, fork, star, delete, by-llm
+- **Users** (4): profile, posts, starred, follow
+- **LLM** (1): transform
 
-POST   /api/llm/transform      → Natural language → CLI transformation
-GET    /api/posts/by-llm/:model → Filter by LLM model
-```
+> Full API documentation with request/response examples: see `docs/specs/API.md`
+> OpenAPI 3.1 schema: see `docs/specs/api-schema.json`
 
 ## 10. MVP Scope
 

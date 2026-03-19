@@ -331,32 +331,14 @@ import { something } from '../../../utils/helper';   // forbidden → use packag
 // ❌ Inline styles forbidden (style={{ }})
 ```
 
-### Design Tokens (Terminal Theme)
+### Design Tokens & Fonts
 
-```
-Background (primary)   : bg-[#1a1a2e]
-Background (secondary) : bg-[#16213e]
-Background (surface)   : bg-[#0f3460]
-Text (primary)         : text-gray-200
-Text (muted)           : text-gray-500
-CLI keyword            : text-green-400      (#4ade80)
-Username               : text-amber-400      (#fbbf24)
-Hashtag                : text-cyan-400       (#22d3ee)
-Mention                : text-blue-400       (#60a5fa)
-Language tag           : text-purple-400     (#a78bfa)
-Command prompt         : text-orange-400     (#fb923c)
-Error                  : text-red-400        (#f87171)
-Success                : text-emerald-400    (#34d399)
-Border                 : border-gray-700
-Border (hover)         : border-gray-500
-```
+> Full color system, typography, and spacing: see `docs/guides/DESIGN_GUIDE.md` (sections 2-3).
 
-### Fonts
-
-```
-Code/CLI          : font-mono (JetBrains Mono → Fira Code → monospace)
-Natural language  : font-sans (system sans-serif)
-```
+Quick reference for code reviews:
+- Backgrounds: `bg-[#1a1a2e]` (primary), `bg-[#16213e]` (secondary), `bg-[#0f3460]` (surface)
+- CLI keywords: `text-green-400`, Usernames: `text-amber-400`, Hashtags: `text-cyan-400`
+- Fonts: `font-mono` (CLI/code), `font-sans` (natural language)
 
 ---
 
