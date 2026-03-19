@@ -120,9 +120,15 @@ docs/
 │   └── CONFIGS.md                     # All config files (package.json, tsconfig, vite, tailwind)
 ├── guides/                            # Development guides
 │   ├── CONVENTIONS.md                 # Strict coding rules, naming, prohibitions
-│   ├── DESIGN_GUIDE.md                # Visual system, component specs, UI states
+│   ├── DESIGN_GUIDE.md                # Visual system index — colors, typography, layout
+│   ├── DESIGN_COMPONENTS.md           # Component specs (Post Card, Sidebar, Composer, etc.)
+│   ├── DESIGN_STATES.md               # Interaction states, animations, loading/empty/error
+│   ├── DESIGN_UI.md                   # Icons, responsive, accessibility, modals, forms
 │   ├── PATTERNS.md                    # Implementation patterns (optimistic updates, pagination, auth)
-│   ├── TESTING.md                     # Testing patterns (Vitest + Playwright)
+│   ├── TESTING.md                     # Testing overview, config, commands, coverage, rules
+│   ├── TESTING_PATTERNS.md            # Component/store/API/E2E/LLM test patterns
+│   ├── TESTING_SETUP.md               # Mock patterns, test factories, environment setup
+│   ├── TROUBLESHOOTING.md             # Common issues & solutions for local development
 │   ├── ENV.md                         # Environment variables reference
 │   └── PROMPTS.md                     # Vibe coding prompt templates
 ├── screens/                           # Page-by-page UI screen specifications
@@ -153,12 +159,18 @@ docs/
 1. `CLAUDE.md` — Project summary (this file)
 2. `docs/setup/CONFIGS.md` — Config files to bootstrap the project
 3. `docs/guides/CONVENTIONS.md` — Coding rules, naming, prohibitions
-4. `docs/guides/DESIGN_GUIDE.md` — Visual system, component specs, UI states
-5. `docs/guides/PATTERNS.md` — Implementation patterns (optimistic updates, pagination, auth)
-6. `docs/screens/*` — Page-by-page UI screen specifications
-7. `docs/specs/LLM_INTEGRATION.md` — LLM transformation logic and provider code
-8. `docs/architecture/ARCHITECTURE.md` — System architecture, auth, error flows
-9. `docs/specs/DATABASE.md` — DB schema, queries, migrations
-10. `docs/specs/API.md` — REST API documentation with error formats
-11. `docs/guides/TESTING.md` — Testing patterns and examples
-12. `docs/guides/ENV.md` — Environment variables reference
+4. `docs/guides/DESIGN_GUIDE.md` — Visual system index (colors, typography, layout)
+5. `docs/guides/DESIGN_COMPONENTS.md` — Component specifications
+6. `docs/guides/DESIGN_STATES.md` — Interaction states, loading/empty/error
+7. `docs/guides/DESIGN_UI.md` — Icons, responsive, accessibility, forms
+8. `docs/guides/PATTERNS.md` — Implementation patterns (optimistic updates, pagination, auth)
+9. `docs/screens/*` — Page-by-page UI screen specifications
+10. `docs/specs/LLM_INTEGRATION.md` — LLM transformation logic and provider code
+11. `docs/architecture/ARCHITECTURE.md` — System architecture, auth, error flows
+12. `docs/specs/DATABASE.md` — DB schema, queries, migrations
+13. `docs/specs/API.md` — REST API documentation with error formats
+14. `docs/guides/TESTING.md` — Testing overview, config, rules
+15. `docs/guides/TESTING_PATTERNS.md` — Test code examples
+16. `docs/guides/TESTING_SETUP.md` — Mocks, factories, environment setup
+17. `docs/guides/TROUBLESHOOTING.md` — Common issues & solutions
+18. `docs/guides/ENV.md` — Environment variables reference
