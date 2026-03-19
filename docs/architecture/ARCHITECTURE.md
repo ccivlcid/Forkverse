@@ -398,6 +398,131 @@ Never commit `.env` files. Use `.env.example` as a template.
 
 ---
 
+## Deployment Architecture
+
+### Development
+
+```
+┌──────────────────┐     ┌──────────────────┐
+│ Vite Dev Server  │     │ Express (tsx)     │
+│ localhost:5173   │────▶│ localhost:3000    │
+│ (HMR + proxy)   │     │ (auto-reload)     │
+└──────────────────┘     └────────┬─────────┘
+                                  │
+                          ┌───────▼─────────┐
+                          │ SQLite (WAL)     │
+                          │ clitoris.db      │
+                          └─────────────────┘
+```
+
+- Vite proxies `/api/*` requests to Express (port 3000)
+- `tsx watch` auto-reloads server on file changes
+- SQLite file lives in project root (gitignored)
+
+### Production
+
+```
+┌──────────────────────────────────────┐
+│           Express Server              │
+│     (serves static + API)             │
+│                                       │
+│  ┌───────────────┐  ┌──────────────┐ │
+│  │ Static files  │  │ /api routes  │ │
+│  │ (Vite build)  │  │              │ │
+│  └───────────────┘  └──────┬───────┘ │
+│                            │         │
+│                    ┌───────▼───────┐ │
+│                    │ SQLite (WAL)  │ │
+│                    └───────────────┘ │
+└──────────────────────────────────────┘
+```
+
+- `pnpm build` compiles client to `packages/client/dist/`
+- Express serves static files from `dist/` and handles `/api/*` routes
+- Single process, single server — no reverse proxy needed for MVP
+- SQLite file is the only persistent state
+
+### Build Commands
+
+| Command | Output | Purpose |
+|---------|--------|---------|
+| `pnpm build:client` | `packages/client/dist/` | Vite production build |
+| `pnpm build:server` | — (tsx runs TypeScript directly) | Type-check only |
+| `pnpm build` | Both | Full production build |
+| `pnpm start` | — | Start production server (serves static + API) |
+
+---
+
+## CORS Configuration
+
+### Development
+
+```typescript
+// packages/server/src/app.ts
+import cors from 'cors';
+
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  credentials: true,  // Required for session cookies
+}));
+```
+
+### Production
+
+No CORS middleware needed — client and API are served from the same origin.
+
+```typescript
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors({
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    credentials: true,
+  }));
+}
+```
+
+---
+
+## Session Storage
+
+Sessions are stored in SQLite using `better-sqlite3-session-store`:
+
+```typescript
+import session from 'express-session';
+import SqliteStore from 'better-sqlite3-session-store';
+
+const SqliteSessionStore = SqliteStore(session);
+
+app.use(session({
+  store: new SqliteSessionStore({
+    client: db,             // Same better-sqlite3 instance
+    expired: {
+      clear: true,          // Auto-clear expired sessions
+      intervalMs: 900000,   // Check every 15 minutes
+    },
+  }),
+  secret: process.env.SESSION_SECRET!,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
+  },
+}));
+```
+
+| Setting | Value | Reason |
+|---------|-------|--------|
+| `httpOnly` | `true` | Prevents JavaScript access to session cookie |
+| `secure` | `true` (prod) | Cookie only sent over HTTPS in production |
+| `sameSite` | `lax` | CSRF protection while allowing normal navigation |
+| `maxAge` | 7 days | Session expires after 7 days of inactivity |
+| `resave` | `false` | Don't save session if unmodified |
+| `saveUninitialized` | `false` | Don't create session until data is stored |
+
+---
+
 ## See Also
 
 - [architecture.json](./architecture.json) — Machine-readable system configuration

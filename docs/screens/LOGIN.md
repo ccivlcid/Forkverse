@@ -330,6 +330,33 @@ Not applicable for the login page. The form is always displayed. There is no dat
 
 ---
 
+## 11. Test IDs (`data-testid`)
+
+| Element | `data-testid` | Purpose |
+|---------|---------------|---------|
+| Username input | `username-input` | E2E: type username |
+| Password input | `password-input` | E2E: type password |
+| Submit button | `login-submit` | E2E: submit login form |
+| Error message | `login-error` | E2E: verify error display |
+| Register link | `register-link` | E2E: navigate to register |
+| Login form container | `login-form` | E2E: verify form visible |
+
+---
+
+## 12. Accessibility Notes
+
+| Requirement | Implementation |
+|-------------|---------------|
+| Form | `role="form"` with `aria-label="Login to terminal.social"` |
+| Username input | `aria-label="Username"` with `autocomplete="username"` |
+| Password input | `aria-label="Password"` with `autocomplete="current-password"` |
+| Error message | `role="alert"` with `aria-live="assertive"` for immediate announcement |
+| Submit button | `aria-label="Submit login"`, `aria-disabled="true"` when submitting |
+| Register link | `aria-label="Create a new account"` |
+| Loading state | Submit button text changes to "authenticating..." with `aria-busy="true"` |
+
+---
+
 ## See Also
 
 - [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states

@@ -419,6 +419,31 @@ If an error occurs during pagination, the error appears inline below the last lo
 
 ---
 
+## 11. Test IDs (`data-testid`)
+
+Inherits all test IDs from Global Feed (same components reused). Additional:
+
+| Element | `data-testid` | Purpose |
+|---------|---------------|---------|
+| Auth redirect trigger | `auth-guard` | E2E: verify auth redirect |
+| Empty state "explore" CTA | `local-feed-explore-cta` | E2E: navigate to global feed |
+| Inline scroll error | `scroll-error` | E2E: verify pagination error |
+| Inline retry button | `scroll-retry` | E2E: retry pagination |
+
+---
+
+## 12. Accessibility Notes
+
+Inherits all accessibility requirements from Global Feed. Additional:
+
+| Requirement | Implementation |
+|-------------|---------------|
+| Auth redirect | Screen reader announces "Redirecting to login" via `aria-live="assertive"` |
+| Empty state CTA | `role="link"` with `aria-label="Explore global feed"` |
+| Feed type | `aria-label="Local feed - posts from people you follow"` on feed container |
+
+---
+
 ## See Also
 
 - [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states

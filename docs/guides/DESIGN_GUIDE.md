@@ -821,6 +821,100 @@ All form elements follow terminal aesthetics with monospace font and dark backgr
 
 ---
 
+## 17.5 Z-Index System
+
+All z-index values are pre-defined to avoid conflicts. Never use arbitrary z-index values.
+
+| Token | Value | Tailwind | Usage |
+|-------|-------|----------|-------|
+| `--z-base` | 0 | `z-0` | Default layer (content) |
+| `--z-dropdown` | 10 | `z-10` | Dropdowns, model selector |
+| `--z-sticky` | 20 | `z-20` | Sticky header bar |
+| `--z-sidebar` | 30 | `z-30` | Mobile sidebar overlay |
+| `--z-modal` | 40 | `z-40` | Modal overlay + dialog |
+| `--z-toast` | 50 | `z-50` | Toast notifications (always on top) |
+
+### Rules
+
+- Never use `z-[999]` or arbitrary z-index values
+- Modals always render in a portal (`createPortal`) to avoid stacking context issues
+- Toast notifications stack above everything
+
+---
+
+## 17.6 Scrollbar Styling
+
+Custom scrollbar to maintain terminal aesthetic. Apply to the main content area and any scrollable containers.
+
+```css
+/* Scrollbar — dark terminal style */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155; /* gray-700 */
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569; /* gray-600 */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
+}
+```
+
+### Rules
+
+- Scrollbar track is transparent (blends with background)
+- Scrollbar thumb uses `--border-default` color (`#334155`)
+- Scrollbar width is 6px (thin, terminal feel)
+- Apply to `body` and `.overflow-y-auto` containers
+
+---
+
+## 17.7 Focus Management
+
+Rules for managing keyboard focus across the application.
+
+| Scenario | Behavior |
+|----------|----------|
+| Page navigation | Focus moves to the main content area heading |
+| Modal opens | Focus moves to the first focusable element inside the modal |
+| Modal closes | Focus returns to the element that triggered the modal |
+| Toast appears | Focus does NOT move (toasts are non-intrusive) |
+| Sidebar toggle (mobile) | Focus moves to the first nav item when opened; returns when closed |
+| Post submission | Focus returns to the composer textarea |
+| Reply submission | Focus returns to the reply composer textarea |
+
+### Focus Trap (Modals)
+
+Modals must trap focus within the dialog:
+- `Tab` cycles through focusable elements inside the modal
+- `Shift+Tab` cycles backwards
+- `Escape` closes the modal and returns focus
+- Focus trap implemented via `useEffect` with `keydown` listener
+
+### Skip Navigation Link
+
+```html
+<!-- First element in the DOM, hidden until focused -->
+<a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-[#1a1a2e] focus:text-green-400 focus:p-2 focus:font-mono">
+  Skip to content
+</a>
+```
+
+---
+
 ## 18. Do / Don't Quick Reference
 
 | Do | Don't |

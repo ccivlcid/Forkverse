@@ -497,6 +497,227 @@ async function fetchFeedWithRecovery(): Promise<void> {
 
 ---
 
+## 8. Infinite Scroll Hook Pattern
+
+Reusable hook that connects the IntersectionObserver to the store's `fetchNextPage` action.
+
+```typescript
+import { useEffect, useRef, useCallback } from 'react';
+
+interface UseInfiniteScrollOptions {
+  hasMore: boolean;
+  isLoading: boolean;
+  onLoadMore: () => void;
+  threshold?: number;
+  rootMargin?: string;
+}
+
+function useInfiniteScroll({
+  hasMore,
+  isLoading,
+  onLoadMore,
+  threshold = 0.1,
+  rootMargin = '200px',
+}: UseInfiniteScrollOptions): { sentinelRef: React.RefObject<HTMLDivElement> } {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const onLoadMoreRef = useRef(onLoadMore);
+  onLoadMoreRef.current = onLoadMore;
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasMore || isLoading) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          onLoadMoreRef.current();
+        }
+      },
+      { threshold, rootMargin },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, threshold, rootMargin]);
+
+  return { sentinelRef };
+}
+
+// Usage in a feed component:
+function FeedList(): JSX.Element {
+  const { posts, hasMore, isLoading, fetchNextPage } = useFeedStore();
+  const { sentinelRef } = useInfiniteScroll({
+    hasMore,
+    isLoading,
+    onLoadMore: fetchNextPage,
+  });
+
+  return (
+    <div>
+      {posts.map((post) => (
+        <PostCard key={post.id} post={post} />
+      ))}
+      <div ref={sentinelRef} className="h-1" />
+      {isLoading && <LoadingIndicator />}
+    </div>
+  );
+}
+```
+
+**Key rules:**
+- Use `IntersectionObserver`, not scroll events (better performance)
+- Set `rootMargin: '200px'` to trigger loading before the user reaches the bottom
+- Guard with `hasMore && !isLoading` to prevent duplicate fetches
+- Store `onLoadMore` in a ref to avoid re-creating the observer on every render
+- The sentinel element is a 1px-tall div at the bottom of the list
+
+---
+
+## 9. Toast Notification Pattern
+
+Centralized toast system using a Zustand store and a fixed-position container.
+
+```typescript
+import { create } from 'zustand';
+
+interface Toast {
+  id: string;
+  type: 'success' | 'error' | 'info';
+  message: string;
+  action?: { label: string; onClick: () => void };
+  duration: number;
+}
+
+interface ToastState {
+  toasts: Toast[];
+  addToast: (toast: Omit<Toast, 'id'>) => void;
+  removeToast: (id: string) => void;
+}
+
+export const useToastStore = create<ToastState>((set, get) => ({
+  toasts: [],
+
+  addToast: (toast) => {
+    const id = crypto.randomUUID();
+    const newToast = { ...toast, id };
+
+    set({ toasts: [...get().toasts.slice(-2), newToast] }); // max 3 visible
+
+    if (toast.duration > 0) {
+      setTimeout(() => get().removeToast(id), toast.duration);
+    }
+  },
+
+  removeToast: (id) => {
+    set({ toasts: get().toasts.filter((t) => t.id !== id) });
+  },
+}));
+
+// Convenience functions
+function showToast(toast: Omit<Toast, 'id' | 'duration'> & { duration?: number }): void {
+  useToastStore.getState().addToast({
+    duration: 3000,
+    ...toast,
+  });
+}
+
+function showSuccess(message: string): void {
+  showToast({ type: 'success', message });
+}
+
+function showError(message: string, retryFn?: () => void): void {
+  showToast({
+    type: 'error',
+    message,
+    duration: 8000,
+    ...(retryFn ? { action: { label: 'Retry', onClick: retryFn } } : {}),
+  });
+}
+```
+
+### Toast Container Component
+
+```typescript
+function ToastContainer(): JSX.Element {
+  const { toasts, removeToast } = useToastStore();
+
+  const borderColor: Record<Toast['type'], string> = {
+    success: 'border-emerald-400',
+    error: 'border-red-400',
+    info: 'border-sky-400',
+  };
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
+          role="alert"
+          onClick={() => removeToast(toast.id)}
+          className={`border-l-4 ${borderColor[toast.type]} bg-[#16213e] text-gray-200 font-mono text-sm px-4 py-3 cursor-pointer transition-opacity duration-300`}
+        >
+          {toast.message}
+          {toast.action && (
+            <button
+              onClick={(e) => { e.stopPropagation(); toast.action!.onClick(); }}
+              className="ml-3 text-green-400 hover:text-green-300 underline"
+            >
+              {toast.action.label}
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+**Key rules:**
+- Maximum 3 toasts visible at a time (oldest is removed when 4th is added)
+- Success toasts auto-dismiss after 3 seconds
+- Error toasts auto-dismiss after 8 seconds (longer for reading)
+- All toasts dismiss on click
+- Error toasts with retry action keep the retry button
+- Toast container is positioned `fixed bottom-4 right-4 z-50`
+- Toasts stack upward with `gap-2`
+
+---
+
+## 10. Time Formatting Pattern
+
+Consistent relative time display across the application.
+
+```typescript
+function timeAgo(dateString: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
+
+  if (seconds < 60) return 'just now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+// Examples:
+// timeAgo('2026-03-19T12:30:00Z') → "just now"
+// timeAgo('2026-03-19T12:25:00Z') → "5m ago"
+// timeAgo('2026-03-19T09:00:00Z') → "3h ago"
+// timeAgo('2026-03-17T12:00:00Z') → "2d ago"
+// timeAgo('2026-02-15T12:00:00Z') → "Feb 15"
+```
+
+**Key rules:**
+- Use short format: `5m ago`, `3h ago`, `2d ago`
+- Beyond 7 days: show date as `MMM D` (e.g., "Feb 15")
+- Never show seconds (always "just now" for < 60s)
+- Input is always an ISO 8601 string from the API
+
+---
+
 ## Ownership
 
 This document is maintained alongside the CLItoris codebase. All implementation code must conform to these patterns. When adding a new pattern, include a full TypeScript example, a "When to use" note, and a "Key rules" checklist.

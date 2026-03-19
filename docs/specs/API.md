@@ -150,6 +150,72 @@ Get the currently authenticated user.
 
 ---
 
+### PUT `/auth/me`
+
+Update the current user's profile. Requires authentication.
+
+**Request:**
+```json
+{
+  "displayName": "New Display Name",
+  "domain": "newdomain.dev",
+  "bio": "Updated bio text",
+  "avatarUrl": "https://example.com/avatar.png"
+}
+```
+
+**Validation (zod):**
+```
+displayName:  string, min 1, max 50 (optional)
+domain:       string, valid domain format or null (optional)
+bio:          string, max 300 (optional)
+avatarUrl:    string, valid URL or null (optional)
+```
+
+**Response:** `200 OK`
+```json
+{
+  "data": {
+    "id": "01912345-6789-7abc-def0-123456789abc",
+    "username": "jiyeon_dev",
+    "displayName": "New Display Name",
+    "domain": "newdomain.dev",
+    "bio": "Updated bio text",
+    "avatarUrl": "https://example.com/avatar.png",
+    "createdAt": "2026-03-19T12:00:00Z"
+  }
+}
+```
+
+**Errors:**
+| Code | Condition |
+|------|-----------|
+| `400` | Validation error (invalid domain format, bio too long) |
+| `401` | Not authenticated |
+
+---
+
+### DELETE `/auth/me`
+
+Delete the current user's account permanently. Requires authentication. This action is irreversible — all posts, stars, and follows are deleted.
+
+**Request:** No body required. Server validates session.
+
+**Response:** `200 OK`
+```json
+{
+  "data": { "message": "Account deleted" }
+}
+```
+
+**Errors:**
+| Code | Condition |
+|------|-----------|
+| `401` | Not authenticated |
+| `500` | Deletion failed (server error) |
+
+---
+
 ## 3. Posts
 
 ### POST `/posts`
@@ -676,6 +742,8 @@ GET /api/posts/feed/global?cursor=2026-03-19T12:15:00Z&limit=20
 | `POST` | `/auth/login` | No | Login |
 | `POST` | `/auth/logout` | Yes | Logout |
 | `GET` | `/auth/me` | Yes | Current user |
+| `PUT` | `/auth/me` | Yes | Update profile |
+| `DELETE` | `/auth/me` | Yes | Delete account |
 | `POST` | `/posts` | Yes | Create post |
 | `GET` | `/posts/feed/global` | No | Global feed |
 | `GET` | `/posts/feed/local` | Yes | Local feed |

@@ -406,6 +406,118 @@ Check for:
 
 ---
 
+## 13. Debug / Troubleshoot
+
+```
+Debug the following issue in {file or component}.
+
+Symptom: {what is happening}
+Expected: {what should happen}
+Reproduction: {steps to reproduce}
+
+Investigation checklist:
+1. Check the relevant store state and actions
+2. Check the API call and response
+3. Check component rendering logic
+4. Add console.log or breakpoints as needed
+
+Fix the root cause and add a regression test.
+Follow docs/guides/CONVENTIONS.md and docs/guides/TESTING.md.
+```
+
+### Worked Example
+
+**Prompt:**
+```
+Debug the following issue in packages/client/src/components/post/ActionBar.tsx.
+
+Symptom: Star count shows NaN after toggling star
+Expected: Star count should increment/decrement by 1
+Reproduction:
+1. Open global feed
+2. Click star on any post
+3. Star count shows "NaN" instead of a number
+
+Investigation checklist:
+1. Check feedStore.toggleStar() — is starCount a string from the API?
+2. Check the API response shape for POST /posts/:id/star
+3. Check if PostCard passes starCount as a number or string
+4. Add a regression test for the toggle behavior
+
+Fix the root cause and add a regression test.
+```
+
+---
+
+## 14. Performance Audit
+
+```
+Audit the performance of {target component or route}.
+
+Current issue: {describe the performance problem — slow render, unnecessary re-renders, large bundle}
+
+Check for:
+1. Unnecessary re-renders (missing React.memo, unstable references)
+2. Missing useMemo/useCallback for expensive computations
+3. Large component trees that should be lazy-loaded
+4. Unoptimized database queries (missing indexes, N+1 queries)
+5. Bundle size impact (large dependencies, unused imports)
+
+Provide specific fixes with before/after code examples.
+Follow docs/guides/CONVENTIONS.md.
+```
+
+### Worked Example
+
+**Prompt:**
+```
+Audit the performance of packages/client/src/components/feed/FeedList.tsx.
+
+Current issue: Feed re-renders all post cards when a single post is starred.
+
+Check for:
+1. Is PostCard wrapped in React.memo?
+2. Is toggleStar creating new object references for all posts?
+3. Can we use a Map for O(1) lookups instead of array.map()?
+
+Provide specific fixes with before/after code examples.
+```
+
+---
+
+## 15. Accessibility Review
+
+```
+Review {target component or page} for accessibility compliance.
+
+Check against:
+1. WCAG 2.1 AA compliance
+2. Keyboard navigation (Tab, Enter, Escape, arrow keys)
+3. Screen reader support (aria-labels, roles, live regions)
+4. Color contrast (4.5:1 minimum ratio)
+5. Focus management (focus-visible rings, focus trapping in modals)
+
+Reference: docs/guides/DESIGN_GUIDE.md section 11 (Accessibility).
+Fix any issues found. Add aria attributes where missing.
+```
+
+### Worked Example
+
+**Prompt:**
+```
+Review packages/client/src/components/post/ActionBar.tsx for accessibility compliance.
+
+Check against:
+1. Do star/reply/fork buttons have aria-labels?
+2. Is the star toggle state announced? (aria-pressed)
+3. Can all actions be triggered via keyboard?
+4. Do hover states have sufficient contrast?
+
+Fix any issues found. Add aria attributes where missing.
+```
+
+---
+
 ## Tips for Effective Vibe Coding
 
 ### Do's

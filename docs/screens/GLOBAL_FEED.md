@@ -436,6 +436,46 @@ When the API call to fetch the global feed fails:
 
 ---
 
+## 11. Test IDs (`data-testid`)
+
+| Element | `data-testid` | Purpose |
+|---------|---------------|---------|
+| Composer textarea | `composer-input` | E2E: focus and type in composer |
+| Composer submit button | `composer-submit` | E2E: submit new post |
+| Model selector dropdown | `model-selector` | E2E: select LLM model |
+| Post card container | `post-card` | E2E: count/select posts |
+| Natural language panel | `natural-panel` | E2E: verify dual-panel |
+| CLI panel | `cli-panel` | E2E: verify dual-panel |
+| Star button | `star-button` | E2E: toggle star |
+| Star count | `star-count` | E2E: verify star count |
+| Fork button | `fork-button` | E2E: trigger fork |
+| Reply button | `reply-button` | E2E: navigate to reply |
+| Copy CLI button | `copy-cli-button` | E2E: copy CLI text |
+| Username link | `post-username` | E2E: navigate to profile |
+| Hashtag link | `post-hashtag` | E2E: navigate to explore |
+| Feed loading indicator | `feed-loading` | E2E: wait for load |
+| Empty state container | `feed-empty` | E2E: verify empty state |
+| Error state container | `feed-error` | E2E: verify error state |
+| Retry button | `feed-retry` | E2E: retry failed load |
+| Infinite scroll sentinel | `scroll-sentinel` | E2E: trigger infinite scroll |
+
+---
+
+## 12. Accessibility Notes
+
+| Requirement | Implementation |
+|-------------|---------------|
+| Post card navigation | `j`/`k` keys move `aria-activedescendant` through post list |
+| Star toggle | `aria-pressed="true/false"` on star button |
+| Feed updates | `aria-live="polite"` on feed container for new posts |
+| Composer | `aria-label="Write a new post"` on textarea |
+| Loading state | `aria-busy="true"` on feed container during load |
+| Skeleton cards | `aria-hidden="true"` (decorative, not read by screen readers) |
+| Post card | `role="article"` with `aria-labelledby` pointing to post header |
+| Action buttons | `aria-label="Star post"`, `aria-label="Reply to post"`, `aria-label="Fork post"` |
+
+---
+
 ## See Also
 
 - [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states

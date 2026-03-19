@@ -365,6 +365,37 @@ Appears below all inputs, above the submit button.
 
 ---
 
+## 11. Test IDs (`data-testid`)
+
+| Element | `data-testid` | Purpose |
+|---------|---------------|---------|
+| Username input | `username-input` | E2E: type username |
+| Password input | `password-input` | E2E: type password |
+| Display name input | `displayname-input` | E2E: type display name |
+| Submit button | `register-submit` | E2E: submit registration |
+| Username error | `username-error` | E2E: verify username error |
+| Password error | `password-error` | E2E: verify password error |
+| General error | `register-error` | E2E: verify general error |
+| Login link | `login-link` | E2E: navigate to login |
+| Register form container | `register-form` | E2E: verify form visible |
+
+---
+
+## 12. Accessibility Notes
+
+| Requirement | Implementation |
+|-------------|---------------|
+| Form | `role="form"` with `aria-label="Create account on terminal.social"` |
+| Username input | `aria-label="Username"` with `autocomplete="username"`, `aria-describedby="username-error"` |
+| Password input | `aria-label="Password"` with `autocomplete="new-password"`, `aria-describedby="password-error"` |
+| Display name input | `aria-label="Display name (optional)"` with `autocomplete="name"` |
+| Field errors | `role="alert"` with `aria-live="assertive"` per field |
+| Optional label | `aria-hidden="true"` (visual hint only) |
+| Submit button | `aria-label="Create account"`, `aria-disabled="true"` when submitting |
+| Login link | `aria-label="Go to login page"` |
+
+---
+
 ## See Also
 
 - [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states

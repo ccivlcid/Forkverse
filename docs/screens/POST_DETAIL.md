@@ -485,6 +485,41 @@ When an unauthenticated user clicks star, fork, or attempts to reply:
 
 ---
 
+## 11. Test IDs (`data-testid`)
+
+| Element | `data-testid` | Purpose |
+|---------|---------------|---------|
+| Back button | `back-button` | E2E: navigate back |
+| Forked-from banner | `forked-from-banner` | E2E: verify fork link |
+| Main post card | `main-post-card` | E2E: verify main post |
+| Reply thread container | `reply-thread` | E2E: verify replies section |
+| Reply count label | `reply-count` | E2E: verify reply count |
+| Reply card | `reply-card` | E2E: count/select replies |
+| Reply composer textarea | `reply-composer-input` | E2E: type reply |
+| Reply submit button | `reply-composer-submit` | E2E: submit reply |
+| Reply model selector | `reply-model-selector` | E2E: select model for reply |
+| 404 error state | `post-not-found` | E2E: verify 404 state |
+| Login prompt (unauthenticated) | `login-prompt` | E2E: verify auth required |
+
+Inherits all PostCard test IDs from Global Feed spec for both main post and reply cards.
+
+---
+
+## 12. Accessibility Notes
+
+| Requirement | Implementation |
+|-------------|---------------|
+| Back button | `aria-label="Go back to feed"` |
+| Forked-from banner | `role="link"` with `aria-label="View original post by @author"` |
+| Reply thread | `aria-label="Reply thread with N replies"` on container |
+| Reply composer | `aria-label="Write a reply to @username"` on textarea |
+| Main post | `role="article"` with `aria-labelledby` pointing to post header |
+| Reply cards | `role="article"` nested within reply thread |
+| New reply added | `aria-live="polite"` on reply thread, announces "New reply added" |
+| Keyboard: Backspace | Announced via `aria-keyshortcuts="Backspace"` on back button |
+
+---
+
 ## See Also
 
 - [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states

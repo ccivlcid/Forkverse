@@ -80,6 +80,17 @@ The project is in the **documentation and scaffolding** phase. No application co
 - `@clitoris/server` — Express app, routes (posts, users, llm), DB setup
 - `@clitoris/client` — Shell layout, global feed page, post card, composer
 
+### Phase 1 Acceptance Criteria
+
+| Feature | Acceptance Criteria |
+|---------|-------------------|
+| User registration/login | User can register with username/password, login, and maintain session across page reloads |
+| Post creation (dual format) | User writes natural language, LLM transforms to CLI, both display side by side in a post card |
+| LLM transformation | Anthropic provider works with claude-sonnet; transformation completes in < 3 seconds |
+| Global feed | Feed loads 20 posts with cursor-based pagination; infinite scroll works without duplicates |
+| Star | Toggle star with optimistic update; star count reflects correctly; duplicate stars prevented |
+| Reply | Threaded replies display under parent post; reply count updates correctly |
+
 ---
 
 ## Phase 2 — Social (Not Started)
@@ -90,6 +101,15 @@ The project is in the **documentation and scaffolding** phase. No application co
 | Local feed | Not Started | Posts from followed users |
 | Fork | Not Started | Clone post to own timeline |
 | User profile page | Not Started | `/@:username` route |
+
+### Phase 2 Acceptance Criteria
+
+| Feature | Acceptance Criteria |
+|---------|-------------------|
+| Follow/unfollow | Toggle follow with optimistic update; follower/following counts update; self-follow prevented |
+| Local feed | Shows only posts from followed users; empty state when not following anyone |
+| Fork | Clones post to user's timeline with `forkedFromId` link; fork count updates; duplicate fork prevented |
+| User profile page | Displays user info, stats, posts tab, starred tab; follow button for other users |
 
 ---
 
@@ -102,6 +122,15 @@ The project is in the **documentation and scaffolding** phase. No application co
 | Explore/trending | Not Started | Algorithm TBD |
 | Custom LLM connections | Not Started | User-provided API keys |
 
+### Phase 3 Acceptance Criteria
+
+| Feature | Acceptance Criteria |
+|---------|-------------------|
+| Multi-LLM support | OpenAI (gpt-4o) and Ollama (llama-3) providers work end-to-end; model selector shows available models per provider |
+| Multilingual auto-translation | `--translate=auto` flag detects source language and appends translation; dual-language display in post card |
+| Explore/trending | Posts sorted by star count within time window (24h/7d/30d); trending tag cloud updates dynamically |
+| Custom LLM connections | User can configure custom OpenAI-compatible endpoint with base URL + API key; connection test validates before save |
+
 ---
 
 ## Document Index
@@ -110,10 +139,24 @@ The project is in the **documentation and scaffolding** phase. No application co
 docs/
 ├── OVERVIEW.md                          # Project overview & core concepts
 ├── PROGRESS.md                          # Development status (this file)
+├── setup/
+│   └── CONFIGS.md                       # All config files (package.json, tsconfig, etc.)
 ├── guides/
 │   ├── CONVENTIONS.md                   # Strict coding rules & prohibitions
 │   ├── DESIGN_GUIDE.md                  # Visual system & component specs
+│   ├── PATTERNS.md                      # Implementation patterns (optimistic updates, pagination)
+│   ├── TESTING.md                       # Testing patterns (Vitest + Playwright)
+│   ├── ENV.md                           # Environment variables reference
 │   └── PROMPTS.md                       # Vibe coding prompt templates
+├── screens/
+│   ├── GLOBAL_FEED.md                   # / — Main feed with composer
+│   ├── LOCAL_FEED.md                    # /feed/local — Following feed
+│   ├── EXPLORE.md                       # /explore — Trending/discover
+│   ├── POST_DETAIL.md                   # /post/:id — Single post + replies
+│   ├── USER_PROFILE.md                  # /@:username — User profile
+│   ├── LOGIN.md                         # /login — Terminal-style login
+│   ├── REGISTER.md                      # /register — Terminal-style registration
+│   └── SETTINGS.md                      # /settings — User settings
 ├── specs/
 │   ├── PRD.md                           # Full product requirements
 │   ├── DATABASE.md                      # DB schema, queries, migrations

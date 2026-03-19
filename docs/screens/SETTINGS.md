@@ -505,6 +505,41 @@ Appears inside the confirmation dialog.
 
 ---
 
+## 11. Test IDs (`data-testid`)
+
+| Element | `data-testid` | Purpose |
+|---------|---------------|---------|
+| Display name input | `settings-display-name` | E2E: edit display name |
+| Domain input | `settings-domain` | E2E: edit domain |
+| Bio input | `settings-bio` | E2E: edit bio |
+| Avatar URL input | `settings-avatar-url` | E2E: edit avatar URL |
+| Apply changes button | `settings-submit` | E2E: save settings |
+| Delete account button | `delete-account-button` | E2E: open delete dialog |
+| Delete confirm dialog | `delete-confirm-dialog` | E2E: verify dialog open |
+| Delete confirm input | `delete-confirm-input` | E2E: type username confirmation |
+| Abort button | `delete-abort` | E2E: cancel deletion |
+| Confirm delete button | `delete-confirm` | E2E: confirm account deletion |
+| Success toast | `settings-success-toast` | E2E: verify save success |
+| Settings error | `settings-error` | E2E: verify error display |
+| Settings form | `settings-form` | E2E: verify form visible |
+
+---
+
+## 12. Accessibility Notes
+
+| Requirement | Implementation |
+|-------------|---------------|
+| Settings form | `role="form"` with `aria-label="Profile settings"` |
+| CLI-style inputs | Each has `aria-label` matching the flag name (e.g., `aria-label="Display name"`) |
+| Dirty state | Apply button `aria-disabled="true"` when no changes made |
+| Delete dialog | `role="alertdialog"` with `aria-labelledby` pointing to dialog title |
+| Focus trap | Dialog traps focus; `Escape` closes dialog |
+| Delete confirmation | Input has `aria-label="Type your username to confirm deletion"` |
+| Success toast | `role="status"` with `aria-live="polite"` |
+| Danger zone | `aria-label="Danger zone - account deletion"` on container |
+
+---
+
 ## See Also
 
 - [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states

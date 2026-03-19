@@ -19,6 +19,39 @@
 
 ---
 
+## 1.5 Connection Initialization
+
+Every database connection must set these PRAGMAs before any query:
+
+```typescript
+import Database from 'better-sqlite3';
+
+function createConnection(dbPath: string): Database.Database {
+  const db = new Database(dbPath);
+
+  // Required PRAGMAs — set on every connection
+  db.pragma('journal_mode = WAL');         // Write-Ahead Logging for concurrent reads
+  db.pragma('foreign_keys = ON');          // Enforce foreign key constraints
+  db.pragma('busy_timeout = 5000');        // Wait 5s on lock before throwing
+  db.pragma('synchronous = NORMAL');       // Balance between safety and speed
+  db.pragma('cache_size = -20000');        // 20MB cache (negative = KB)
+  db.pragma('temp_store = MEMORY');        // Store temp tables in memory
+
+  return db;
+}
+```
+
+| PRAGMA | Value | Purpose |
+|--------|-------|---------|
+| `journal_mode` | `WAL` | Enables concurrent reads during writes |
+| `foreign_keys` | `ON` | Enforces FK constraints (OFF by default in SQLite) |
+| `busy_timeout` | `5000` | Waits 5s for locks instead of immediate SQLITE_BUSY |
+| `synchronous` | `NORMAL` | Adequate durability with WAL mode |
+| `cache_size` | `-20000` | 20MB page cache for faster repeated queries |
+| `temp_store` | `MEMORY` | Temp tables in memory for speed |
+
+---
+
 ## 2. Schema
 
 ### 2.1 `users`
@@ -418,6 +451,60 @@ CREATE INDEX IF NOT EXISTS idx_stars_post_id ON stars(post_id);
 - Aggregate counts (star_count, reply_count, fork_count) computed via subqueries for now; consider denormalization if slow
 - WAL mode enabled for concurrent reads: `PRAGMA journal_mode = WAL;`
 - JSON columns (`tags`, `mentions`) parsed in TypeScript, not queried via `json_each()` unless needed for search
+
+---
+
+## 10. Cursor Format
+
+The cursor value used for pagination is the `created_at` ISO 8601 timestamp of the last item in the current page.
+
+### Format
+
+```
+cursor = posts[posts.length - 1].created_at
+// Example: "2026-03-19T12:29:00Z"
+```
+
+### Rules
+
+| Rule | Description |
+|------|-------------|
+| First request | Omit `cursor` parameter — returns latest items |
+| Subsequent requests | Pass `cursor` as the `created_at` of the last item received |
+| `hasMore` flag | `true` if the query returned `limit + 1` rows (fetch `limit + 1`, return `limit`) |
+| Tie-breaking | If two posts share the same `created_at`, `id` (UUID v7) is used as a secondary sort |
+| Direction | Always descending (`ORDER BY created_at DESC`) — newer items first |
+
+### Implementation
+
+```sql
+-- Page 1: no cursor
+SELECT ... FROM posts
+WHERE visibility = 'public' AND parent_id IS NULL
+ORDER BY created_at DESC
+LIMIT 21;  -- fetch limit+1 to determine hasMore
+
+-- Page 2: with cursor
+SELECT ... FROM posts
+WHERE visibility = 'public' AND parent_id IS NULL
+  AND created_at < ?  -- cursor value
+ORDER BY created_at DESC
+LIMIT 21;
+```
+
+```typescript
+// Server-side cursor logic
+const limit = Math.min(Number(req.query.limit) || 20, 50);
+const rows = stmt.all(cursor, limit + 1);
+const hasMore = rows.length > limit;
+const data = hasMore ? rows.slice(0, limit) : rows;
+const nextCursor = data.length > 0 ? data[data.length - 1].created_at : null;
+
+res.json({
+  data,
+  meta: { cursor: nextCursor, hasMore },
+});
+```
 
 ---
 

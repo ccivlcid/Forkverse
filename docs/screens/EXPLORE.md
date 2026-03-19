@@ -483,6 +483,36 @@ If pagination fails while scrolling:
 
 ---
 
+## 11. Test IDs (`data-testid`)
+
+| Element | `data-testid` | Purpose |
+|---------|---------------|---------|
+| LLM filter tab (all) | `llm-tab-all` | E2E: reset model filter |
+| LLM filter tab (model) | `llm-tab-{model}` | E2E: filter by model (e.g., `llm-tab-claude-sonnet`) |
+| Trending tag badge | `tag-badge` | E2E: click tag filter |
+| Active tag filter bar | `active-tag-filter` | E2E: verify active tag |
+| Clear tag button | `clear-tag-button` | E2E: clear tag filter |
+| Clear filters CTA | `clear-filters-cta` | E2E: reset all filters |
+| Trending tags container | `trending-tags` | E2E: verify tag cloud |
+| Explore empty state | `explore-empty` | E2E: verify empty state |
+| Explore error state | `explore-error` | E2E: verify error state |
+
+Inherits all PostCard test IDs from Global Feed spec.
+
+---
+
+## 12. Accessibility Notes
+
+| Requirement | Implementation |
+|-------------|---------------|
+| LLM filter tabs | `role="tablist"` with `role="tab"` per tab, `aria-selected="true/false"` |
+| Active tag filter | `aria-label="Filtering by tag: cli-first"` with close button `aria-label="Remove tag filter"` |
+| Trending tags | `role="list"` with `role="listitem"` per tag badge |
+| Sort order | `aria-label="Posts sorted by popularity"` on feed container |
+| Filter change | `aria-live="polite"` announces "Showing posts filtered by claude-sonnet" |
+
+---
+
 ## See Also
 
 - [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states

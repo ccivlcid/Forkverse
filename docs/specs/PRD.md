@@ -305,11 +305,54 @@ docs/
 
 ## 12. Non-Functional Requirements
 
-- **Performance**: Feed loading < 500ms
-- **Accessibility**: Full keyboard navigation support (terminal UX)
-- **Responsive**: Dual-format display on mobile (vertical stack)
-- **Security**: XSS prevention, SQL injection prevention, rate limiting
-- **Open source**: All post data structured for forking
+### Performance Targets
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Feed loading (global) | < 500ms | Time from request to first post rendered (p95) |
+| Feed loading (local) | < 500ms | Time from request to first post rendered (p95) |
+| LLM transformation | < 5s | Time from submit to CLI preview displayed (p95) |
+| Post creation | < 300ms | Time from confirm to post appearing in feed (p95) |
+| Star toggle | < 100ms | Time from click to UI update (optimistic) |
+| Page initial load | < 2s | Time from navigation to interactive (LCP) |
+| Bundle size (client) | < 500KB | Gzipped JS + CSS total |
+| SQLite query | < 50ms | Any single query execution time (p95) |
+
+### Accessibility
+
+- Full keyboard navigation support (vim-style `j`/`k` for posts)
+- All interactive elements have `focus-visible` ring
+- All icon-only buttons have `aria-label`
+- Minimum contrast ratio 4.5:1 (WCAG AA)
+- Screen reader compatible (semantic HTML, `aria-live` for dynamic updates)
+- Skip navigation link for keyboard users
+
+### Responsive Design
+
+| Breakpoint | Layout |
+|------------|--------|
+| < 640px (mobile) | Sidebar hidden, dual panel stacks vertically, icon-only action bar |
+| 640-1024px (tablet) | Sidebar collapsible, dual panel side by side |
+| > 1024px (desktop) | Full layout with fixed sidebar |
+
+### Security
+
+| Measure | Implementation |
+|---------|---------------|
+| XSS prevention | React auto-escaping + DOMPurify for CLI rendering |
+| SQL injection | Prepared statements only (better-sqlite3) |
+| CSRF protection | Session-based with SameSite cookies |
+| Rate limiting | express-rate-limit per endpoint (see API.md section 6) |
+| Password storage | bcrypt with cost factor 10 |
+| Input validation | zod schemas at API boundary |
+| Session security | httpOnly, secure, SameSite=Lax cookies |
+
+### Open Source Principles
+
+- All post data structured for forking
+- CLI output is plain text, easily parseable
+- API follows REST conventions with OpenAPI schema
+- No vendor lock-in on LLM providers (pluggable architecture)
 
 ---
 

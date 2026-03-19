@@ -443,6 +443,42 @@ Profile header renders normally. Post list area shows:
 
 ---
 
+## 11. Test IDs (`data-testid`)
+
+| Element | `data-testid` | Purpose |
+|---------|---------------|---------|
+| Profile header container | `profile-header` | E2E: verify profile loaded |
+| Username display | `profile-username` | E2E: verify username |
+| Domain display | `profile-domain` | E2E: verify domain |
+| Display name | `profile-display-name` | E2E: verify display name |
+| Bio text | `profile-bio` | E2E: verify bio |
+| Follower count | `profile-followers` | E2E: verify follower count |
+| Following count | `profile-following` | E2E: verify following count |
+| Post count | `profile-post-count` | E2E: verify post count |
+| Follow/unfollow button | `follow-button` | E2E: toggle follow |
+| Tab: posts | `tab-posts` | E2E: switch to posts tab |
+| Tab: starred | `tab-starred` | E2E: switch to starred tab |
+| Tab: posts --raw | `tab-raw` | E2E: switch to raw tab |
+| Load more button | `load-more-button` | E2E: load more posts |
+| Profile 404 error | `profile-not-found` | E2E: verify 404 state |
+| Profile empty state | `profile-empty` | E2E: verify empty state |
+
+---
+
+## 12. Accessibility Notes
+
+| Requirement | Implementation |
+|-------------|---------------|
+| Profile header | `role="banner"` with `aria-label="User profile for @username"` |
+| Follow button | `aria-pressed="true/false"` reflects following state |
+| Profile tabs | `role="tablist"` with `role="tab"` per tab, `aria-selected` |
+| Tab panel | `role="tabpanel"` with `aria-labelledby` pointing to active tab |
+| Follower/following counts | `role="link"` with `aria-label="128 followers"` (future navigation) |
+| Avatar placeholder | `aria-hidden="true"` (decorative) |
+| External domain link | `rel="noopener noreferrer"` with `aria-label="Visit jiyeon.kim (opens in new tab)"` |
+
+---
+
 ## See Also
 
 - [DESIGN_GUIDE.md](../guides/DESIGN_GUIDE.md) — Visual tokens, component specs, UI states
