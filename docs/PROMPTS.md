@@ -1,166 +1,165 @@
-# PROMPTS.md — 바이브코딩 프롬프트 가이드
+# PROMPTS.md — Vibe Coding Prompt Guide
 
-이 문서는 AI에게 작업을 지시할 때 사용할 수 있는 프롬프트 템플릿 모음이다.
+A collection of prompt templates for instructing AI during development.
 
-## 사용법
+## Usage
 
-각 프롬프트를 복사하여 AI에게 전달한다. `{변수}`는 상황에 맞게 수정한다.
-모든 프롬프트는 CONVENTIONS.md와 ARCHITECTURE.md를 컨텍스트로 참조한다.
+Copy each prompt and pass it to the AI. Replace `{variables}` as needed.
+All prompts reference CONVENTIONS.md and ARCHITECTURE.md as context.
 
 ---
 
-## 1. 컴포넌트 생성
+## 1. Create Component
 
 ```
-packages/client/src/components/{폴더}/ 아래에 {컴포넌트명} 컴포넌트를 만들어줘.
+Create a {ComponentName} component under packages/client/src/components/{folder}/.
 
-요구사항:
-- {기능 설명}
-- Props: {필요한 props 나열}
-- Tailwind CSS로 스타일링 (다크 테마, 터미널 미학)
-- CONVENTIONS.md 규칙 준수
+Requirements:
+- {Feature description}
+- Props: {list required props}
+- Style with Tailwind CSS (dark theme, terminal aesthetic)
+- Follow CONVENTIONS.md rules
 ```
 
-### 예시
+### Example
 ```
-packages/client/src/components/post/ 아래에 DualPanel 컴포넌트를 만들어줘.
+Create a DualPanel component under packages/client/src/components/post/.
 
-요구사항:
-- 좌측에 자연어 원문, 우측에 CLI 변환 결과를 나란히 표시
+Requirements:
+- Display natural language text on the left, CLI output on the right, side by side
 - Props: messageRaw, messageCli, lang
-- 모바일에서는 세로 스택
-- CLI 패널은 녹색 텍스트, 모노스페이스 폰트
+- Stack vertically on mobile
+- CLI panel uses green text, monospace font
 ```
 
 ---
 
-## 2. API 라우트 추가
+## 2. Add API Route
 
 ```
-packages/server/src/routes/{파일명}.ts 에 {HTTP메서드} {경로} 라우트를 추가해줘.
+Add a {HTTP_METHOD} {path} route to packages/server/src/routes/{filename}.ts.
 
-요구사항:
-- {기능 설명}
-- 입력: {요청 바디/파라미터}
-- 출력: ApiResponse<{타입}>
-- DB 쿼리: {필요한 쿼리 설명}
-```
-
----
-
-## 3. DB 마이그레이션
-
-```
-packages/server/src/db/migrations/ 에 새 마이그레이션 파일을 만들어줘.
-
-파일명: {번호}_{설명}.sql
-내용: {테이블/컬럼 변경 설명}
+Requirements:
+- {Feature description}
+- Input: {request body/params}
+- Output: ApiResponse<{Type}>
+- DB query: {describe needed query}
 ```
 
 ---
 
-## 4. Zustand 스토어
+## 3. DB Migration
 
 ```
-packages/client/src/stores/{스토어명}.ts 에 Zustand 스토어를 만들어줘.
+Create a new migration file under packages/server/src/db/migrations/.
 
-상태:
-- {상태 필드 나열}
-
-액션:
-- {액션 메서드 나열}
+Filename: {number}_{description}.sql
+Content: {describe table/column changes}
 ```
 
 ---
 
-## 5. LLM 프로바이더
+## 4. Zustand Store
 
 ```
-packages/llm/src/providers/{프로바이더}.ts 에 새 LLM 프로바이더를 추가해줘.
+Create a Zustand store at packages/client/src/stores/{store-name}.ts.
 
-- LlmProvider 인터페이스 구현
-- {SDK/API} 사용
-- transform 메서드: 자연어 → CLI 변환
-```
+State:
+- {list state fields}
 
----
-
-## 6. 페이지 추가
-
-```
-packages/client/src/pages/{페이지명}.tsx 에 새 페이지를 만들어줘.
-
-라우트: {경로}
-기능: {페이지 설명}
-사용 컴포넌트: {필요한 컴포넌트 나열}
-데이터: {필요한 스토어/API 호출}
+Actions:
+- {list action methods}
 ```
 
 ---
 
-## 7. 기능 구현 (풀스택)
+## 5. LLM Provider
 
 ```
-{기능명} 기능을 풀스택으로 구현해줘.
+Add a new LLM provider at packages/llm/src/providers/{provider}.ts.
 
-사용자 스토리: {사용자가 ~하면 ~한다}
-
-구현 범위:
-1. shared: 타입 정의
-2. server: API 라우트 + DB 쿼리
-3. client: UI 컴포넌트 + 스토어 + 페이지 연결
-
-CONVENTIONS.md와 ARCHITECTURE.md 규칙을 따라줘.
+- Implement the LlmProvider interface
+- Use {SDK/API}
+- transform method: natural language → CLI conversion
 ```
 
-### 예시
+---
+
+## 6. Add Page
+
 ```
-포스트 포크 기능을 풀스택으로 구현해줘.
+Create a new page at packages/client/src/pages/{page-name}.tsx.
 
-사용자 스토리: 사용자가 다른 사람의 포스트에서 "fork" 버튼을 누르면,
-해당 포스트가 복제되어 자신의 타임라인에 올라간다.
-원본 포스트 링크가 유지된다.
+Route: {path}
+Feature: {page description}
+Components used: {list required components}
+Data: {required stores/API calls}
+```
 
-구현 범위:
-1. shared: Fork 타입, ForkPostRequest/Response
+---
+
+## 7. Full-Stack Feature
+
+```
+Implement the {feature name} feature full-stack.
+
+User story: When a user {does X}, then {Y happens}.
+
+Scope:
+1. shared: Type definitions
+2. server: API route + DB query
+3. client: UI component + store + page integration
+
+Follow CONVENTIONS.md and ARCHITECTURE.md rules.
+```
+
+### Example
+```
+Implement the post fork feature full-stack.
+
+User story: When a user clicks the "fork" button on another user's post,
+the post is cloned to their own timeline. The link to the original post is preserved.
+
+Scope:
+1. shared: Fork type, ForkPostRequest/Response
 2. server: POST /api/posts/:id/fork + DB insert
-3. client: ForkButton 컴포넌트 + postStore.forkPost() + 피드 업데이트
+3. client: ForkButton component + postStore.forkPost() + feed update
 ```
 
 ---
 
-## 8. 버그 수정
+## 8. Bug Fix
 
 ```
-{증상 설명}
+{Symptom description}
 
-재현 방법: {스텝}
-예상 동작: {올바른 동작}
-실제 동작: {현재 버그 동작}
+Reproduction steps: {steps}
+Expected behavior: {correct behavior}
+Actual behavior: {current buggy behavior}
 
-원인을 파악하고 수정해줘.
-```
-
----
-
-## 9. 테스트 작성
-
-```
-{대상} 에 대한 테스트를 작성해줘.
-
-테스트 도구: Vitest (단위) / Playwright (E2E)
-커버할 케이스:
-- {케이스 1}
-- {케이스 2}
-- {엣지 케이스}
+Identify the root cause and fix it.
 ```
 
 ---
 
-## 팁: 바이브코딩을 잘 하려면
+## 9. Write Tests
 
-1. **구체적으로 지시하라** — "좋은 UI 만들어줘" ❌ → "PostCard에 star 버튼 추가해줘, 클릭하면 노란색으로 토글" ✅
-2. **파일 경로를 명시하라** — AI가 어디에 코드를 놓을지 고민하지 않게
-3. **기존 패턴을 참조시켜라** — "PostCard처럼 만들어줘" 같은 힌트
-4. **한 번에 하나씩** — 여러 기능을 한 프롬프트에 넣지 말 것
-5. **결과를 확인하고 피드백하라** — "동작하는데 CLI 패널 폰트가 너무 작아" 같은 구체적 피드백
+```
+Write tests for {target}.
+
+Test tool: Vitest (unit) / Playwright (E2E)
+Cases to cover:
+- {case 1}
+- {case 2}
+- {edge case}
+```
+
+---
+
+## Tips for Effective Vibe Coding
+
+1. **Be specific** — "Make a nice UI" ❌ → "Add a star button to PostCard that toggles yellow on click" ✅
+2. **Specify file paths** — So the AI doesn't waste time deciding where to put code
+3. **Reference existing patterns** — Hints like "build it like PostCard"
+4. **One thing at a time** — Don't stuff multiple features into one prompt
+5. **Review and give concrete feedback** — "It works but the CLI panel font is too small"

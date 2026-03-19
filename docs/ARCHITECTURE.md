@@ -1,20 +1,20 @@
-# ARCHITECTURE.md — 시스템 아키텍처
+# ARCHITECTURE.md — System Architecture
 
-## 전체 구조
+## Overall Structure
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                      사용자 브라우저                       │
+│                     User Browser                         │
 │                  React 19 + Vite (SPA)                   │
 └──────────────────────┬──────────────────────────────────┘
                        │ HTTP/REST
                        ▼
 ┌─────────────────────────────────────────────────────────┐
-│                   Express API 서버                       │
-│              (tsx — TypeScript 직접 실행)                 │
+│                   Express API Server                     │
+│              (tsx — TypeScript direct execution)          │
 │                                                         │
 │  ┌─────────┐  ┌──────────┐  ┌───────────┐              │
-│  │ Routes  │  │Middleware │  │  LLM 모듈  │              │
+│  │ Routes  │  │Middleware │  │ LLM Module│              │
 │  │ /posts  │  │  auth     │  │ Anthropic  │              │
 │  │ /users  │  │  logger   │  │ OpenAI     │              │
 │  │ /llm    │  │  errors   │  │ Ollama     │              │
@@ -28,31 +28,31 @@
 └─────────────────────────────────────────────────────────┘
 ```
 
-## 데이터 흐름
+## Data Flows
 
-### 포스트 작성 플로우
+### Post Creation Flow
 
 ```
-1. 사용자가 자연어 입력 + LLM 모델 선택
-2. [Cmd+Enter] 클릭
+1. User writes natural language input + selects LLM model
+2. Presses [Cmd+Enter]
 3. Client → POST /api/llm/transform { message, model, lang }
-4. Server → LLM API 호출 (자연어 → CLI 변환)
-5. LLM 응답 수신 → CLI 포맷 생성
-6. Client에 CLI 프리뷰 표시
-7. 사용자 확인 → POST /api/posts { messageRaw, messageCli, ... }
-8. DB 저장 → 피드에 듀얼 포맷으로 표시
+4. Server → Calls LLM API (natural language → CLI transformation)
+5. Receives LLM response → Generates CLI format
+6. Displays CLI preview on client
+7. User confirms → POST /api/posts { messageRaw, messageCli, ... }
+8. Saved to DB → Displayed in feed as dual-format
 ```
 
-### 피드 로딩 플로우
+### Feed Loading Flow
 
 ```
 1. Client → GET /api/posts/feed/global?cursor=X&limit=20
-2. Server → SQLite 쿼리 (커서 기반 페이지네이션)
-3. JSON 응답 → Zustand 스토어 업데이트
-4. React 렌더링 (듀얼 패널 카드)
+2. Server → SQLite query (cursor-based pagination)
+3. JSON response → Zustand store update
+4. React rendering (dual-panel cards)
 ```
 
-## DB 스키마
+## DB Schema
 
 ```sql
 -- 001_create_users.sql
@@ -102,15 +102,15 @@ CREATE TABLE stars (
 );
 ```
 
-## 프론트엔드 상태 관리
+## Frontend State Management
 
 ```typescript
-// Zustand 스토어 구조
+// Zustand store structure
 
 feedStore: {
   posts: Post[]
   cursor: string | null
-  loading: boolean
+  isLoading: boolean
   fetchGlobalFeed()
   fetchLocalFeed()
   fetchByLlm(model)
@@ -126,34 +126,34 @@ postStore: {
   draft: string
   cliPreview: string | null
   selectedModel: LlmModel
-  transformToClip()
+  transformToCli()
   submitPost()
 }
 ```
 
-## LLM 통합 아키텍처
+## LLM Integration Architecture
 
 ```typescript
-// @clitoris/llm 패키지 — 프로바이더 패턴
+// @clitoris/llm package — provider pattern
 
 interface LlmProvider {
   transform(input: TransformRequest): Promise<TransformResponse>;
 }
 
-// 각 프로바이더가 동일 인터페이스 구현
+// Each provider implements the same interface
 // anthropic.ts → Anthropic SDK
 // openai.ts    → OpenAI SDK
 // ollama.ts    → Ollama REST API
 
-// transformer.ts — 프롬프트 구성
-// "다음 자연어 메시지를 terminal.social CLI 명령어로 변환하세요"
-// 시스템 프롬프트 + 예시 포함 (few-shot)
+// transformer.ts — prompt construction
+// "Transform the following natural language message into a terminal.social CLI command"
+// System prompt + examples included (few-shot)
 ```
 
-## 보안 고려사항
+## Security Considerations
 
-- **인증**: 세션 기반 (express-session + SQLite 저장)
-- **입력 검증**: zod 스키마 (API 경계에서 1회)
-- **SQL**: prepared statements only (better-sqlite3 기본 지원)
-- **XSS**: React 자동 이스케이프 + DOMPurify (CLI 렌더링 시)
-- **Rate Limiting**: express-rate-limit (LLM 변환 엔드포인트)
+- **Authentication**: Session-based (express-session + SQLite storage)
+- **Input validation**: zod schemas (once at API boundary)
+- **SQL**: Prepared statements only (better-sqlite3 default)
+- **XSS**: React auto-escaping + DOMPurify (for CLI rendering)
+- **Rate limiting**: express-rate-limit (LLM transformation endpoint)

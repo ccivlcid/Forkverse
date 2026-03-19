@@ -1,168 +1,168 @@
 # CLItoris — Product Requirements Document
 
-## 1. 제품 개요
+## 1. Product Overview
 
-**CLItoris**는 터미널/CLI 인터페이스를 컨셉으로 한 소셜 네트워크 서비스(SNS)다.
-사용자는 자연어로 글을 작성하면, LLM이 이를 CLI 명령어 형태로 변환하여 듀얼 포맷으로 표시한다.
-모든 소셜 인터랙션(포스트, 팔로우, 포크, 스타)이 CLI 명령어로 표현된다.
+**CLItoris** is a terminal/CLI-themed social network service (SNS).
+Users write posts in natural language, and an LLM transforms them into CLI command format, displaying both simultaneously in dual-format.
+All social interactions (post, follow, fork, star) are expressed as CLI commands.
 
-**도메인**: `terminal.social`
+**Domain**: `terminal.social`
 
-## 2. 핵심 컨셉
+## 2. Core Concept
 
-- **"하고 싶은 말을 그냥 쓰세요. LLM이 CLI로 번역하고, 둘 다 올라갑니다."**
-- 자연어 입력 → LLM 변환 → CLI 명령어 + 원문 동시 노출 (듀얼 포맷)
-- 모든 콘텐츠는 오픈소스이며 포크 가능
+- **"Just write what you want to say. The LLM translates to CLI, and both get posted."**
+- Natural language input → LLM transformation → CLI command + original text displayed side by side (dual-format)
+- All content is open source and forkable
 
-## 3. 사용자 페르소나
+## 3. User Personas
 
-| 페르소나 | 설명 |
-|---------|------|
-| 개발자 | CLI에 익숙하고, 터미널 미학을 즐기는 사용자 |
-| AI/LLM 사용자 | 다양한 LLM 모델을 통해 콘텐츠를 생성하는 사용자 |
-| 오픈소스 커뮤니티 | 포크/스타 개념에 친숙한 GitHub 사용자 |
+| Persona | Description |
+|---------|------------|
+| Developers | Users who are comfortable with CLI and enjoy terminal aesthetics |
+| AI/LLM users | Users who create content through various LLM models |
+| Open source community | GitHub users familiar with fork/star concepts |
 
-## 4. 주요 기능
+## 4. Key Features
 
-### 4.1 피드 시스템
+### 4.1 Feed System
 
-- **글로벌 피드** (`feed --global`): 전체 공개 게시물
-- **로컬 피드** (`feed --local`): 팔로잉 기반 게시물
-- **팔로잉** (`following`): 팔로우한 사용자의 게시물
-- **탐색** (`explore`): 트렌딩/추천 게시물
+- **Global feed** (`feed --global`): All public posts
+- **Local feed** (`feed --local`): Posts from followed users
+- **Following** (`following`): Posts from users you follow
+- **Explore** (`explore`): Trending/recommended posts
 
-### 4.2 포스트 (듀얼 포맷)
+### 4.2 Posts (Dual Format)
 
-각 포스트는 두 가지 형태로 동시 표시:
+Each post is displayed in two formats simultaneously:
 
 ```
-┌─ 자연어 ─────────────────────┐  ┌─ CLI — open source ─────────┐
-│ 바이브코딩하다가 느낀건데,     │  │ post --user=jiyeon.kim \    │
-│ 우리가 AI한테 맞춰가는 거     │  │   --lang=ko \               │
-│ 아닐까요?                     │  │   --message="observing AI   │
-│ #vibe-coding #thoughts       │  │   language convergence..." \ │
-│                               │  │   --tags=vibe-coding \      │
-│                               │  │   --visibility=public       │
-└───────────────────────────────┘  └─────────────────────────────┘
+┌─ Natural Language ──────────┐  ┌─ CLI — open source ─────────┐
+│ While vibe-coding, I        │  │ post --user=jiyeon.kim \    │
+│ realized we might be        │  │   --lang=ko \               │
+│ adapting to AI, not the     │  │   --message="observing AI   │
+│ other way around.           │  │   language convergence..." \ │
+│ #vibe-coding #thoughts      │  │   --tags=vibe-coding \      │
+│                              │  │   --visibility=public       │
+└──────────────────────────────┘  └─────────────────────────────┘
 ```
 
-**포스트 속성:**
-- `--user`: 작성자
-- `--lang`: 언어 코드 (ko, en, hi 등)
-- `--message`: 본문 내용
-- `--tags`: 해시태그 (쉼표 구분)
-- `--visibility`: 공개 범위 (public, private, unlisted)
-- `--mention`: 멘션
+**Post attributes:**
+- `--user`: Author
+- `--lang`: Language code (ko, en, hi, etc.)
+- `--message`: Body content
+- `--tags`: Hashtags (comma-separated)
+- `--visibility`: Visibility scope (public, private, unlisted)
+- `--mention`: Mentions
 
-### 4.3 인터랙션
+### 4.3 Interactions
 
-| 액션 | CLI 표현 | 설명 |
-|------|---------|------|
-| 답글 | `reply` | 게시물에 답글 |
-| 포크 | `fork` | 게시물을 복제하여 자신의 타임라인에 재작성 |
-| 스타 | `star` | 좋아요/북마크 |
+| Action | CLI Representation | Description |
+|--------|-------------------|-------------|
+| Reply | `reply` | Reply to a post |
+| Fork | `fork` | Clone a post and rewrite on your own timeline |
+| Star | `star` | Like/bookmark |
 
-### 4.4 LLM 통합
+### 4.4 LLM Integration
 
-사용자는 포스트 작성 시 LLM 모델을 선택하여 자연어 → CLI 변환 수행:
+Users select an LLM model when composing posts to perform natural language → CLI transformation:
 
-- **claude-sonnet** (기본값)
+- **claude-sonnet** (default)
 - **gpt-4o**
 - **llama-3**
-- **connect LLM** (커스텀 LLM 연결)
+- **connect LLM** (custom LLM connection)
 
-**변환 플로우:**
+**Transformation flow:**
 ```
-자연어 입력 → [Cmd+Enter] → LLM 선택 → CLI 포맷 변환 → 듀얼 포맷 저장
+Natural language input → [Cmd+Enter] → Select LLM → CLI format conversion → Save as dual-format
 ```
 
-### 4.5 다국어 지원
+### 4.5 Multilingual Support
 
-- 각 포스트에 `--lang` 태그로 언어 표시
-- `--translate=auto` 옵션으로 자동 번역
-- `--dual-format` 옵션으로 원문 + 번역 동시 표시
+- Each post displays language via `--lang` tag
+- `--translate=auto` option for automatic translation
+- `--dual-format` option for original + translation side by side
 
-### 4.6 사용자 프로필
+### 4.6 User Profiles
 
-- `@username` 형식 (예: `@jiyeon_dev`, `@0xmitsuki`)
-- 도메인 연결 지원 (예: `jiyeon.kim`, `mitsuki.sh`, `arjun.io`, `lena.dev`)
-- 내 포스트 보기 (`my posts`, `my posts --raw`)
-- 스타한 포스트 (`starred`)
+- `@username` format (e.g., `@jiyeon_dev`, `@0xmitsuki`)
+- Custom domain linking (e.g., `jiyeon.kim`, `mitsuki.sh`, `arjun.io`, `lena.dev`)
+- View own posts (`my posts`, `my posts --raw`)
+- Starred posts (`starred`)
 
-### 4.7 "by LLM" 필터
+### 4.7 "by LLM" Filter
 
-LLM 모델별로 생성된 콘텐츠를 필터링하여 탐색 가능:
+Browse content filtered by the LLM model that generated it:
 - claude-sonnet
 - gpt-4o
 - llama-3
 
-## 5. UI/UX 디자인
+## 5. UI/UX Design
 
-### 5.1 디자인 원칙
+### 5.1 Design Principles
 
-- **터미널 미학**: 다크 배경, 모노스페이스 폰트, 녹색/앰버/시안 텍스트
-- **듀얼 패널**: 좌측 자연어, 우측 CLI 명령어
-- **최소 크롬**: 불필요한 UI 장식 제거, 콘텐츠 중심
+- **Terminal aesthetic**: Dark backgrounds, monospace fonts, green/amber/cyan text
+- **Dual panel**: Natural language on the left, CLI command on the right
+- **Minimal chrome**: No unnecessary UI decoration, content-focused
 
-### 5.2 색상 팔레트
+### 5.2 Color Palette
 
-| 요소 | 색상 |
-|------|------|
-| 배경 | `#1a1a2e` (다크 네이비) |
-| 기본 텍스트 | `#e0e0e0` (라이트 그레이) |
-| CLI 키워드 | `#4ade80` (그린) |
-| 사용자명 | `#fbbf24` (앰버) |
-| 해시태그 | `#22d3ee` (시안) |
-| 언어 태그 | `#a78bfa` (퍼플) |
-| 명령어 프롬프트 | `#f97316` (오렌지) |
+| Element | Color |
+|---------|-------|
+| Background | `#1a1a2e` (dark navy) |
+| Primary text | `#e0e0e0` (light gray) |
+| CLI keywords | `#4ade80` (green) |
+| Usernames | `#fbbf24` (amber) |
+| Hashtags | `#22d3ee` (cyan) |
+| Language tags | `#a78bfa` (purple) |
+| Command prompt | `#f97316` (orange) |
 
-### 5.3 레이아웃 구조
+### 5.3 Layout Structure
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ terminal.social / 네비게이션 경로                      │
+│ terminal.social / navigation breadcrumbs             │
 ├──────────┬──────────────────────────────────────────┤
-│ 사이드바  │  메인 피드                                 │
-│          │  ┌─ 입력 바 ─────────────────────────┐    │
-│ // nav   │  │ 자연어 + CLI 프롬프트 저장 [LLM→CLI] │    │
-│ $ feed   │  └───────────────────────────────────┘    │
-│ following│  ┌─ 포스트 ──────────────────────────┐    │
-│ explore  │  │ [자연어 패널]  │  [CLI 패널]        │    │
-│          │  │               │                    │    │
-│ // by LLM│  │ reply · fork · star               │    │
-│ · claude │  └───────────────────────────────────┘    │
-│ · gpt-4o │                                           │
-│ · llama  │  ┌─ 포스트 ──────────────────────────┐    │
-│          │  │ ...                                │    │
-│ // me    │  └───────────────────────────────────┘    │
-│ @you     │                                           │
-│ my posts │                                           │
-│ starred  │                                           │
+│ Sidebar  │  Main Feed                               │
+│          │  ┌─ Composer Bar ───────────────────┐    │
+│ // nav   │  │ Natural + CLI prompt save [LLM→CLI]│   │
+│ $ feed   │  └─────────────────────────────────┘    │
+│ following│  ┌─ Post Card ─────────────────────┐    │
+│ explore  │  │ [Natural panel] │ [CLI panel]    │    │
+│          │  │                 │                 │    │
+│ // by LLM│  │ reply · fork · star              │    │
+│ · claude │  └─────────────────────────────────┘    │
+│ · gpt-4o │                                          │
+│ · llama  │  ┌─ Post Card ─────────────────────┐    │
+│          │  │ ...                               │    │
+│ // me    │  └─────────────────────────────────┘    │
+│ @you     │                                          │
+│ my posts │                                          │
+│ starred  │                                          │
 └──────────┴──────────────────────────────────────────┘
 ```
 
-### 5.4 폰트
+### 5.4 Fonts
 
-- **본문**: `JetBrains Mono`, `Fira Code`, 또는 시스템 모노스페이스
-- **자연어 섹션**: 읽기 편한 sans-serif 허용 (선택적)
+- **Body**: `JetBrains Mono`, `Fira Code`, or system monospace
+- **Natural language section**: Readable sans-serif allowed (optional)
 
-## 6. 정보 아키텍처
+## 6. Information Architecture
 
-### 6.1 네비게이션
+### 6.1 Navigation
 
 ```
-/                       → 글로벌 피드 (기본)
-/feed/local             → 로컬 피드
-/following              → 팔로잉 피드
-/explore                → 탐색
-/by-llm/:model          → LLM별 필터
-/@:username             → 사용자 프로필
-/@:username/posts       → 사용자 게시물
-/@:username/starred     → 스타한 게시물
-/post/:id               → 단일 포스트 + 스레드
+/                       → Global feed (default)
+/feed/local             → Local feed
+/following              → Following feed
+/explore                → Explore
+/by-llm/:model          → Filter by LLM
+/@:username             → User profile
+/@:username/posts       → User posts
+/@:username/starred     → Starred posts
+/post/:id               → Single post + thread
 ```
 
-### 6.2 데이터 모델
+### 6.2 Data Model
 
 ```
 User {
@@ -182,98 +182,98 @@ Star   { user_id, post_id }
 Fork   { user_id, original_post_id, forked_post_id }
 ```
 
-## 7. 모노레포 구조
+## 7. Monorepo Structure
 
-pnpm workspaces 기반 모노레포로 구성한다.
+pnpm workspaces-based monorepo.
 
 ```
 CLItoris/
-├── package.json              # 루트 — pnpm workspace 설정
-├── pnpm-workspace.yaml       # 워크스페이스 패키지 정의
-├── tsconfig.base.json        # 공유 TypeScript 설정
-├── .eslintrc.cjs             # 공유 ESLint 설정
-├── .prettierrc               # 공유 Prettier 설정
+├── package.json              # Root — pnpm workspace config
+├── pnpm-workspace.yaml       # Workspace package definitions
+├── tsconfig.base.json        # Shared TypeScript config
+├── .eslintrc.cjs             # Shared ESLint config
+├── .prettierrc               # Shared Prettier config
 ├── CLAUDE.md
 ├── docs/
 │   └── PRD.md
 │
 ├── packages/
-│   ├── client/               # @clitoris/client — React 프론트엔드
+│   ├── client/               # @clitoris/client — React frontend
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   ├── vite.config.ts
 │   │   ├── tailwind.config.ts
 │   │   ├── index.html
 │   │   └── src/
-│   │       ├── main.tsx       # 엔트리포인트
+│   │       ├── main.tsx       # Entry point
 │   │       ├── App.tsx
-│   │       ├── components/    # 재사용 UI 컴포넌트
-│   │       │   ├── feed/      # 피드 관련 (PostCard, FeedList)
-│   │       │   ├── post/      # 포스트 듀얼 패널
+│   │       ├── components/    # Reusable UI components
+│   │       │   ├── feed/      # Feed-related (PostCard, FeedList)
+│   │       │   ├── post/      # Post dual panel
 │   │       │   ├── layout/    # Sidebar, Header, Shell
-│   │       │   └── common/    # 공통 (Button, Input, Tag)
-│   │       ├── pages/         # 라우트 페이지
-│   │       ├── stores/        # Zustand 스토어
-│   │       ├── hooks/         # 커스텀 React hooks
-│   │       ├── styles/        # 글로벌 스타일, 테마
-│   │       └── utils/         # 클라이언트 유틸리티
+│   │       │   └── common/    # Common (Button, Input, Tag)
+│   │       ├── pages/         # Route pages
+│   │       ├── stores/        # Zustand stores
+│   │       ├── hooks/         # Custom React hooks
+│   │       ├── styles/        # Global styles, theme
+│   │       └── utils/         # Client utilities
 │   │
-│   ├── server/               # @clitoris/server — Express 백엔드
+│   ├── server/               # @clitoris/server — Express backend
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   └── src/
-│   │       ├── index.ts       # 서버 엔트리포인트
-│   │       ├── app.ts         # Express 앱 설정
-│   │       ├── routes/        # API 라우트 핸들러
+│   │       ├── index.ts       # Server entry point
+│   │       ├── app.ts         # Express app setup
+│   │       ├── routes/        # API route handlers
 │   │       │   ├── posts.ts
 │   │       │   ├── users.ts
 │   │       │   └── llm.ts
 │   │       ├── db/
-│   │       │   ├── index.ts   # DB 연결 (better-sqlite3)
-│   │       │   ├── schema.ts  # 테이블 정의
+│   │       │   ├── index.ts   # DB connection (better-sqlite3)
+│   │       │   ├── schema.ts  # Table definitions
 │   │       │   └── migrations/
-│   │       ├── middleware/     # 인증, 로깅, 에러 핸들링
+│   │       ├── middleware/     # Auth, logging, error handling
 │   │       └── utils/
 │   │
-│   ├── shared/               # @clitoris/shared — 공유 코드
+│   ├── shared/               # @clitoris/shared — Shared code
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   └── src/
-│   │       ├── types/         # 공유 TypeScript 타입
+│   │       ├── types/         # Shared TypeScript types
 │   │       │   ├── post.ts
 │   │       │   ├── user.ts
 │   │       │   └── api.ts
-│   │       └── constants/     # 공유 상수 (LLM 모델명, 색상 등)
+│   │       └── constants/     # Shared constants (LLM model names, colors, etc.)
 │   │
-│   └── llm/                  # @clitoris/llm — LLM 통합 모듈
+│   └── llm/                  # @clitoris/llm — LLM integration module
 │       ├── package.json
 │       ├── tsconfig.json
 │       └── src/
-│           ├── index.ts       # 통합 LLM 인터페이스
+│           ├── index.ts       # Unified LLM interface
 │           ├── providers/
-│           │   ├── anthropic.ts  # Claude 연동
-│           │   ├── openai.ts     # GPT 연동
-│           │   └── ollama.ts     # Llama 로컬 연동
-│           └── transformer.ts    # 자연어 → CLI 변환 로직
+│           │   ├── anthropic.ts  # Claude integration
+│           │   ├── openai.ts     # GPT integration
+│           │   └── ollama.ts     # Llama local integration
+│           └── transformer.ts    # Natural language → CLI transformation logic
 │
 ├── tests/
-│   ├── unit/                 # Vitest 단위 테스트
-│   └── e2e/                  # Playwright E2E 테스트
+│   ├── unit/                 # Vitest unit tests
+│   └── e2e/                  # Playwright E2E tests
 │       └── playwright.config.ts
 │
-└── scripts/                  # 빌드/배포/시드 스크립트
+└── scripts/                  # Build/deploy/seed scripts
 ```
 
-### 워크스페이스 패키지
+### Workspace Packages
 
-| 패키지 | 이름 | 설명 |
-|--------|------|------|
-| `packages/client` | `@clitoris/client` | React 프론트엔드 앱 |
-| `packages/server` | `@clitoris/server` | Express API 서버 |
-| `packages/shared` | `@clitoris/shared` | 공유 타입, 상수 |
-| `packages/llm` | `@clitoris/llm` | LLM 프로바이더 통합 |
+| Package | Name | Description |
+|---------|------|-------------|
+| `packages/client` | `@clitoris/client` | React frontend app |
+| `packages/server` | `@clitoris/server` | Express API server |
+| `packages/shared` | `@clitoris/shared` | Shared types, constants |
+| `packages/llm` | `@clitoris/llm` | LLM provider integration |
 
-### 주요 스크립트 (루트 package.json)
+### Root Scripts (root package.json)
 
 ```json
 {
@@ -290,11 +290,11 @@ CLItoris/
 }
 ```
 
-### 패키지 간 의존 관계
+### Package Dependencies
 
 ```
 @clitoris/client ──→ @clitoris/shared
-                 ──→ @clitoris/llm (API 호출용 타입)
+                 ──→ @clitoris/llm (API call types)
 
 @clitoris/server ──→ @clitoris/shared
                  ──→ @clitoris/llm
@@ -302,100 +302,101 @@ CLItoris/
 @clitoris/llm    ──→ @clitoris/shared
 ```
 
-## 8. 기술 스택
+## 8. Tech Stack
 
-| 영역 | 기술 |
-|------|------|
+| Area | Technology |
+|------|-----------|
 | Frontend | React 19 + TypeScript + Vite + Tailwind CSS |
 | State management | Zustand |
 | Flow diagrams | `@xyflow/react` v12 |
-| Backend | Node.js + Express + tsx (TypeScript 직접 실행) |
+| Backend | Node.js + Express + tsx (TypeScript direct execution) |
 | DB | SQLite (`better-sqlite3`) + versioned migrations |
 | Logging | pino |
 | Testing | Vitest (frontend + server), Playwright (E2E) |
 | Package manager | pnpm |
-| LLM 통합 | Anthropic SDK, OpenAI SDK, Ollama (llama) |
+| LLM integration | Anthropic SDK, OpenAI SDK, Ollama (llama) |
 
-## 8. API 설계 (초안)
-
-```
-POST   /api/posts              → 포스트 작성
-GET    /api/posts/feed/global   → 글로벌 피드
-GET    /api/posts/feed/local    → 로컬 피드
-GET    /api/posts/:id           → 단일 포스트
-POST   /api/posts/:id/reply     → 답글
-POST   /api/posts/:id/fork      → 포크
-POST   /api/posts/:id/star      → 스타 토글
-DELETE /api/posts/:id           → 포스트 삭제
-
-GET    /api/users/@:username    → 사용자 프로필
-POST   /api/users/@:username/follow → 팔로우 토글
-GET    /api/users/@:username/posts  → 사용자 게시물
-
-POST   /api/llm/transform      → 자연어 → CLI 변환
-GET    /api/posts/by-llm/:model → LLM별 필터
-```
-
-## 9. MVP 범위
-
-### Phase 1 — 코어
-- [ ] 사용자 등록/로그인
-- [ ] 포스트 작성 (듀얼 포맷)
-- [ ] LLM 변환 (claude-sonnet 우선)
-- [ ] 글로벌 피드
-- [ ] 스타/답글
-
-### Phase 2 — 소셜
-- [ ] 팔로우/팔로잉
-- [ ] 로컬 피드
-- [ ] 포크 기능
-- [ ] 사용자 프로필 페이지
-
-### Phase 3 — 확장
-- [ ] 다중 LLM 지원 (gpt-4o, llama-3)
-- [ ] 다국어 자동 번역
-- [ ] 탐색/트렌딩
-- [ ] 커스텀 LLM 연결
-
-## 10. 바이브코딩 개발 방식
-
-이 프로젝트는 **바이브코딩**(AI 주도 개발)으로 진행한다.
-
-### 핵심 원칙
-
-1. **AI가 코드를 쓴다** — 사람은 방향만 제시하고, AI가 구현한다
-2. **문서가 컨텍스트다** — CLAUDE.md, CONVENTIONS.md, ARCHITECTURE.md가 AI의 기억이다
-3. **한 번에 하나씩** — 한 프롬프트에 한 기능. 작은 단위로 반복한다
-4. **결과 확인 후 피드백** — AI 결과물을 실행하고, 구체적으로 피드백한다
-
-### AI 최적화 문서 체계
+## 9. API Design (Draft)
 
 ```
-CLAUDE.md          → AI가 가장 먼저 읽는 프로젝트 요약
-CONVENTIONS.md     → 코딩 규칙 (네이밍, 패턴, 금지사항)
+POST   /api/posts              → Create post
+GET    /api/posts/feed/global   → Global feed
+GET    /api/posts/feed/local    → Local feed
+GET    /api/posts/:id           → Single post
+POST   /api/posts/:id/reply     → Reply
+POST   /api/posts/:id/fork      → Fork
+POST   /api/posts/:id/star      → Toggle star
+DELETE /api/posts/:id           → Delete post
+
+GET    /api/users/@:username    → User profile
+POST   /api/users/@:username/follow → Toggle follow
+GET    /api/users/@:username/posts  → User posts
+
+POST   /api/llm/transform      → Natural language → CLI transformation
+GET    /api/posts/by-llm/:model → Filter by LLM model
+```
+
+## 10. MVP Scope
+
+### Phase 1 — Core
+- [ ] User registration/login
+- [ ] Post creation (dual format)
+- [ ] LLM transformation (claude-sonnet first)
+- [ ] Global feed
+- [ ] Star/reply
+
+### Phase 2 — Social
+- [ ] Follow/following
+- [ ] Local feed
+- [ ] Fork functionality
+- [ ] User profile page
+
+### Phase 3 — Expansion
+- [ ] Multi-LLM support (gpt-4o, llama-3)
+- [ ] Multilingual auto-translation
+- [ ] Explore/trending
+- [ ] Custom LLM connections
+
+## 11. Vibe Coding Development Approach
+
+This project is built through **vibe coding** (AI-driven development).
+
+### Core Principles
+
+1. **AI writes the code** — Humans set direction, AI implements
+2. **Documentation is context** — CLAUDE.md, CONVENTIONS.md, ARCHITECTURE.md serve as AI's memory
+3. **One thing at a time** — One feature per prompt. Iterate in small units
+4. **Review then feedback** — Run AI output, provide specific feedback
+
+### AI-Optimized Documentation System
+
+```
+CLAUDE.md          → Project summary (first thing AI reads)
+CONVENTIONS.md     → Coding rules (naming, patterns, prohibitions)
 docs/
-├── PRD.md         → 제품 요구사항
-├── ARCHITECTURE.md → 시스템 구조, DB 스키마, 데이터 흐름
-└── PROMPTS.md     → 바이브코딩 프롬프트 템플릿
+├── PRD.md         → Product requirements
+├── ARCHITECTURE.md → System architecture, DB schema, data flows
+├── DESIGN_GUIDE.md → Visual system, component specs
+└── PROMPTS.md     → Vibe coding prompt templates
 ```
 
-### AI에 유리한 기술 선택 이유
+### Why These Tech Choices Favor AI
 
-| 선택 | 이유 |
-|------|------|
-| TypeScript | AI가 가장 잘 생성하는 언어, 타입으로 의도 전달 |
-| React + Tailwind | AI 학습 데이터가 가장 많은 프론트엔드 조합 |
-| Express | 단순하고 보편적, AI가 실수할 여지가 적음 |
-| SQLite | 설정 제로, 파일 하나, 마이그레이션 단순 |
-| Zustand | Redux 대비 보일러플레이트 최소, AI가 깔끔하게 생성 |
-| pnpm workspaces | AI가 패키지 경계를 명확히 인식 |
-| Vitest | Jest 호환이라 AI가 익숙, 속도 빠름 |
-| tsx | ts-node 대비 설정 없이 바로 실행 |
+| Choice | Reason |
+|--------|--------|
+| TypeScript | Language AI generates best; types communicate intent |
+| React + Tailwind | Frontend combo with most AI training data |
+| Express | Simple and universal; minimal room for AI errors |
+| SQLite | Zero config, single file, simple migrations |
+| Zustand | Minimal boilerplate vs Redux; AI generates cleanly |
+| pnpm workspaces | AI clearly recognizes package boundaries |
+| Vitest | Jest-compatible so AI is familiar; fast execution |
+| tsx | Zero config execution unlike ts-node |
 
-## 11. 비기능 요구사항
+## 12. Non-Functional Requirements
 
-- **성능**: 피드 로딩 < 500ms
-- **접근성**: 키보드 네비게이션 완전 지원 (터미널 UX)
-- **반응형**: 모바일에서도 듀얼 포맷 표시 (세로 스택)
-- **보안**: XSS 방지, SQL injection 방지, rate limiting
-- **오픈소스**: 모든 포스트 데이터는 포크 가능한 구조
+- **Performance**: Feed loading < 500ms
+- **Accessibility**: Full keyboard navigation support (terminal UX)
+- **Responsive**: Dual-format display on mobile (vertical stack)
+- **Security**: XSS prevention, SQL injection prevention, rate limiting
+- **Open source**: All post data structured for forking

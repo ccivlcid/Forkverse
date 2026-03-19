@@ -1,14 +1,14 @@
 # CLAUDE.md
 
-This file provides guidance to AI assistants working with the CLItoris repository.
+Guidance for AI assistants working with the CLItoris repository.
 
 ## Project Overview
 
-**CLItoris**는 터미널/CLI 인터페이스를 컨셉으로 한 소셜 네트워크 서비스(SNS)다.
-사용자가 자연어로 글을 쓰면, LLM이 CLI 명령어 형태로 변환하여 듀얼 포맷(자연어 + CLI)으로 표시한다.
-포스트, 팔로우, 포크, 스타 등 모든 소셜 인터랙션이 CLI 명령어로 표현된다.
+**CLItoris** is a terminal/CLI-themed social network service (SNS).
+Users write posts in natural language, and an LLM transforms them into CLI command format, displaying both side by side (dual-format).
+All social interactions (post, follow, fork, star) are expressed as CLI commands.
 
-**도메인**: `terminal.social`
+**Domain**: `terminal.social`
 
 ## Tech Stack
 
@@ -26,66 +26,67 @@ This file provides guidance to AI assistants working with the CLItoris repositor
 
 ## Monorepo Structure
 
-pnpm workspaces 기반 모노레포 구조.
+pnpm workspaces monorepo.
 
 ```
 packages/
-├── client/    # @clitoris/client — React 프론트엔드 (Vite + Tailwind)
-├── server/    # @clitoris/server — Express API 서버 (tsx)
-├── shared/    # @clitoris/shared — 공유 타입, 상수
-└── llm/       # @clitoris/llm — LLM 프로바이더 통합 (Anthropic, OpenAI, Ollama)
-docs/          # 프로젝트 문서 (PRD 등)
+├── client/    # @clitoris/client — React frontend (Vite + Tailwind)
+├── server/    # @clitoris/server — Express API server (tsx)
+├── shared/    # @clitoris/shared — Shared types, constants
+└── llm/       # @clitoris/llm — LLM provider integration (Anthropic, OpenAI, Ollama)
+docs/          # Project documentation
 tests/         # unit (Vitest), e2e (Playwright)
-scripts/       # 빌드/배포 스크립트
+scripts/       # Build/deploy scripts
 ```
 
-### 주요 명령어
+### Commands
 
 ```bash
-pnpm dev              # 전체 개발 서버 실행
-pnpm dev:client       # 프론트엔드만
-pnpm dev:server       # 백엔드만
-pnpm build            # 전체 빌드
-pnpm test             # Vitest 단위 테스트
+pnpm dev              # Run all dev servers
+pnpm dev:client       # Frontend only
+pnpm dev:server       # Backend only
+pnpm build            # Build all packages
+pnpm test             # Vitest unit tests
 pnpm test:e2e         # Playwright E2E
 pnpm lint             # ESLint
 pnpm format           # Prettier
 ```
 
-### 패키지 의존 관계
+### Package Dependencies
 
 ```
-client ──→ shared, llm(타입)
+client ──→ shared, llm (types)
 server ──→ shared, llm
 llm    ──→ shared
 ```
 
 ## Design Conventions
 
-- **UI**: 다크 배경(`#1a1a2e`), 모노스페이스 폰트, 터미널 미학
-- **Colors**: 그린(`#4ade80`) CLI 키워드, 앰버(`#fbbf24`) 사용자명, 시안(`#22d3ee`) 해시태그
-- **Layout**: 좌측 사이드바 네비게이션 + 듀얼 패널 포스트 (자연어 | CLI)
+- **UI**: Dark background (`#1a1a2e`), monospace font, terminal aesthetic
+- **Colors**: Green (`#4ade80`) CLI keywords, Amber (`#fbbf24`) usernames, Cyan (`#22d3ee`) hashtags
+- **Layout**: Left sidebar navigation + dual-panel posts (natural language | CLI)
 
 ## Development Workflow
 
 ### Branch Conventions
 
-- Feature branches should follow the pattern: `claude/<description>-<id>`
-- All development happens on feature branches; avoid pushing directly to `main`
+- Feature branches follow the pattern: `claude/<description>-<id>`
+- All development happens on feature branches; never push directly to `main`
 
 ### Commit Guidelines
 
-- Write clear, descriptive commit messages
-- Use conventional commit style when applicable (e.g., `feat:`, `fix:`, `docs:`, `chore:`)
+- Use conventional commit style: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `test:`, `chore:`
+- Keep subject line under 50 characters
+- No vague messages like "fix bugs" or "update code"
 
-## Vibe Coding (바이브코딩)
+## Vibe Coding
 
-이 프로젝트는 AI 주도 개발로 진행한다. 사람은 방향을 제시하고, AI가 구현한다.
+This project is built through AI-driven development. Humans set direction, AI implements.
 
-**반드시 읽을 문서 (우선순위 순):**
-1. `CLAUDE.md` — 프로젝트 요약 (지금 이 파일)
-2. `CONVENTIONS.md` — 코딩 규칙, 네이밍, 금지사항
-3. `docs/DESIGN_GUIDE.md` — 비주얼 시스템, 컴포넌트 스펙, 색상/타이포/레이아웃
-4. `docs/ARCHITECTURE.md` — 시스템 구조, DB 스키마, 데이터 흐름
-5. `docs/PRD.md` — 전체 제품 요구사항
-6. `docs/PROMPTS.md` — 바이브코딩 프롬프트 템플릿
+**Required reading (priority order):**
+1. `CLAUDE.md` — Project summary (this file)
+2. `CONVENTIONS.md` — Coding rules, naming, prohibitions
+3. `docs/DESIGN_GUIDE.md` — Visual system, component specs, colors/typography/layout
+4. `docs/ARCHITECTURE.md` — System architecture, DB schema, data flows
+5. `docs/PRD.md` — Full product requirements
+6. `docs/PROMPTS.md` — Vibe coding prompt templates
