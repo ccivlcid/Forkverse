@@ -63,17 +63,24 @@ pnpm format           # Format
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [CLAUDE.md](./CLAUDE.md) | AI assistant guide |
-| [CONVENTIONS.md](./CONVENTIONS.md) | Coding rules |
-| [Overview](./docs/OVERVIEW.md) | Project overview |
-| [PRD](./docs/PRD.md) | Product requirements |
-| [Architecture](./docs/ARCHITECTURE.md) | System architecture |
-| [Database](./docs/DATABASE.md) | DB schema & queries |
-| [Design Guide](./docs/DESIGN_GUIDE.md) | Visual system |
-| [Prompts](./docs/PROMPTS.md) | Vibe coding templates |
-| [Progress](./docs/PROGRESS.md) | Development status |
+All docs live under `docs/` organized by category.
+
+| Folder | Document | Description |
+|--------|----------|-------------|
+| root | [CLAUDE.md](./CLAUDE.md) | AI assistant guide |
+| `docs/` | [Overview](./docs/OVERVIEW.md) | Project overview |
+| `docs/` | [Progress](./docs/PROGRESS.md) | Development status |
+| `docs/guides/` | [Conventions](./docs/guides/CONVENTIONS.md) | Strict coding rules |
+| `docs/guides/` | [Design Guide](./docs/guides/DESIGN_GUIDE.md) | Visual system |
+| `docs/guides/` | [Prompts](./docs/guides/PROMPTS.md) | Vibe coding templates |
+| `docs/specs/` | [PRD](./docs/specs/PRD.md) | Product requirements |
+| `docs/specs/` | [Database](./docs/specs/DATABASE.md) | DB schema & queries |
+| `docs/specs/` | [API](./docs/specs/API.md) | REST API docs (18 endpoints) |
+| `docs/specs/` | [api-schema.json](./docs/specs/api-schema.json) | OpenAPI 3.1 schema |
+| `docs/architecture/` | [Architecture](./docs/architecture/ARCHITECTURE.md) | System architecture |
+| `docs/architecture/` | [architecture.json](./docs/architecture/architecture.json) | System config (JSON) |
+| `docs/architecture/` | [ERD](./docs/architecture/schema-erd.md) | Database ERD |
+| `docs/architecture/` | Mermaid diagrams | backend-deps, frontend-imports, org-chart |
 
 ## Status
 

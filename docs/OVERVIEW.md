@@ -125,6 +125,6 @@ follow  → subscribe to a user
 | Testing | Vitest + Playwright |
 | Package manager | pnpm (monorepo with workspaces) |
 
-See `docs/ARCHITECTURE.md` for system diagrams and data flows.
-See `docs/DATABASE.md` for schema and query reference.
-See `docs/DESIGN_GUIDE.md` for visual specifications.
+See `docs/architecture/ARCHITECTURE.md` for system diagrams and data flows.
+See `docs/specs/DATABASE.md` for schema and query reference.
+See `docs/guides/DESIGN_GUIDE.md` for visual specifications.

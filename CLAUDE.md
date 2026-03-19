@@ -34,7 +34,7 @@ packages/
 ├── server/    # @clitoris/server — Express API server (tsx)
 ├── shared/    # @clitoris/shared — Shared types, constants
 └── llm/       # @clitoris/llm — LLM provider integration (Anthropic, OpenAI, Ollama)
-docs/          # Project documentation
+docs/          # All project documentation (organized by subfolder)
 tests/         # unit (Vitest), e2e (Playwright)
 scripts/       # Build/deploy scripts
 ```
@@ -83,27 +83,37 @@ llm    ──→ shared
 
 This project is built through AI-driven development. Humans set direction, AI implements.
 
+## Documentation Map
+
+All documentation lives under `docs/` organized by category.
+
+```
+docs/
+├── OVERVIEW.md                        # Project overview and core concepts
+├── PROGRESS.md                        # Development status and decision log
+├── guides/                            # Development guides
+│   ├── CONVENTIONS.md                 # Strict coding rules, naming, prohibitions
+│   ├── DESIGN_GUIDE.md                # Visual system, component specs, colors/typography
+│   └── PROMPTS.md                     # Vibe coding prompt templates
+├── specs/                             # Technical specifications
+│   ├── PRD.md                         # Product requirements document
+│   ├── DATABASE.md                    # DB schema, queries, migrations, ERD
+│   ├── API.md                         # REST API documentation (18 endpoints)
+│   └── api-schema.json                # OpenAPI 3.1 schema (machine-readable)
+└── architecture/                      # Architecture diagrams
+    ├── ARCHITECTURE.md                # System architecture, data flows, LLM integration
+    ├── architecture.json              # Full system config (JSON)
+    ├── backend-dependencies.mmd       # Server module dependency graph (Mermaid)
+    ├── frontend-imports.mmd           # Client component import graph (Mermaid)
+    ├── org-chart.mmd                  # Monorepo folder hierarchy (Mermaid)
+    └── schema-erd.md                  # Database ERD + data flow examples
+```
+
 **Required reading (priority order):**
 1. `CLAUDE.md` — Project summary (this file)
-2. `CONVENTIONS.md` — Coding rules, naming, prohibitions
-3. `docs/DESIGN_GUIDE.md` — Visual system, component specs, colors/typography/layout
-4. `docs/ARCHITECTURE.md` — System architecture, data flows, LLM integration
-5. `docs/DATABASE.md` — DB schema, queries, migrations, ERD
-6. `docs/PRD.md` — Full product requirements
-7. `docs/PROMPTS.md` — Vibe coding prompt templates
-
-**API specifications:**
-- `specs/API.md` — Full REST API documentation (endpoints, request/response, errors)
-- `specs/api-schema.json` — OpenAPI 3.1 schema (machine-readable)
-
-**Architecture diagrams:**
-- `architecture/architecture.json` — Full system config (layers, packages, ports, security)
-- `architecture/backend-dependencies.mmd` — Server module dependency graph (Mermaid)
-- `architecture/frontend-imports.mmd` — Client component import graph (Mermaid)
-- `architecture/org-chart.mmd` — Monorepo folder hierarchy (Mermaid)
-- `architecture/schema-erd.md` — Database ERD with Mermaid + data flow examples
-
-**Reference documents:**
-- `README.md` — Public-facing project readme
-- `docs/OVERVIEW.md` — Project overview and core concepts
-- `docs/PROGRESS.md` — Current development status and decision log
+2. `docs/guides/CONVENTIONS.md` — Coding rules, naming, prohibitions
+3. `docs/guides/DESIGN_GUIDE.md` — Visual system, component specs
+4. `docs/architecture/ARCHITECTURE.md` — System architecture, data flows
+5. `docs/specs/DATABASE.md` — DB schema, queries, migrations
+6. `docs/specs/PRD.md` — Full product requirements
+7. `docs/specs/API.md` — REST API documentation

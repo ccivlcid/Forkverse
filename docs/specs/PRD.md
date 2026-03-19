@@ -364,20 +364,23 @@ This project is built through **vibe coding** (AI-driven development).
 ### Core Principles
 
 1. **AI writes the code** — Humans set direction, AI implements
-2. **Documentation is context** — CLAUDE.md, CONVENTIONS.md, ARCHITECTURE.md serve as AI's memory
+2. **Documentation is context** — CLAUDE.md and docs/ serve as AI's memory
 3. **One thing at a time** — One feature per prompt. Iterate in small units
 4. **Review then feedback** — Run AI output, provide specific feedback
 
 ### AI-Optimized Documentation System
 
 ```
-CLAUDE.md          → Project summary (first thing AI reads)
-CONVENTIONS.md     → Coding rules (naming, patterns, prohibitions)
+CLAUDE.md                          → Project summary (first thing AI reads)
 docs/
-├── PRD.md         → Product requirements
-├── ARCHITECTURE.md → System architecture, DB schema, data flows
-├── DESIGN_GUIDE.md → Visual system, component specs
-└── PROMPTS.md     → Vibe coding prompt templates
+├── guides/CONVENTIONS.md          → Coding rules (naming, patterns, prohibitions)
+├── guides/DESIGN_GUIDE.md         → Visual system, component specs
+├── guides/PROMPTS.md              → Vibe coding prompt templates
+├── specs/PRD.md                   → Product requirements
+├── specs/DATABASE.md              → DB schema, queries, migrations
+├── specs/API.md                   → REST API documentation
+├── architecture/ARCHITECTURE.md   → System architecture, data flows
+└── architecture/*.mmd             → Mermaid diagrams
 ```
 
 ### Why These Tech Choices Favor AI

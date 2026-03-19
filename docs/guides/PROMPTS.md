@@ -5,7 +5,7 @@ A collection of prompt templates for instructing AI during development.
 ## Usage
 
 Copy each prompt and pass it to the AI. Replace `{variables}` as needed.
-All prompts reference CONVENTIONS.md and ARCHITECTURE.md as context.
+All prompts reference `docs/guides/CONVENTIONS.md` and `docs/architecture/ARCHITECTURE.md` as context.
 
 ---
 
@@ -18,7 +18,7 @@ Requirements:
 - {Feature description}
 - Props: {list required props}
 - Style with Tailwind CSS (dark theme, terminal aesthetic)
-- Follow CONVENTIONS.md rules
+- Follow docs/guides/CONVENTIONS.md rules
 ```
 
 ### Example
@@ -110,7 +110,7 @@ Scope:
 2. server: API route + DB query
 3. client: UI component + store + page integration
 
-Follow CONVENTIONS.md and ARCHITECTURE.md rules.
+Follow docs/guides/CONVENTIONS.md and docs/architecture/ARCHITECTURE.md rules.
 ```
 
 ### Example

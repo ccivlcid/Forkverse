@@ -27,23 +27,23 @@ The project is in the **documentation and scaffolding** phase. No application co
 
 - [x] Repository initialized
 - [x] CLAUDE.md — AI assistant guide
-- [x] CONVENTIONS.md — Strict coding rules
-- [x] docs/OVERVIEW.md — Project overview
-- [x] docs/PRD.md — Product requirements document
-- [x] docs/ARCHITECTURE.md — System architecture
-- [x] docs/DATABASE.md — Database design and reference
-- [x] docs/DESIGN_GUIDE.md — Visual system and component specs
-- [x] docs/PROMPTS.md — Vibe coding prompt templates
-- [x] docs/PROGRESS.md — This file
 - [x] README.md — Public-facing readme
-- [x] specs/API.md — Full REST API documentation
-- [x] specs/api-schema.json — OpenAPI 3.1 schema
-- [x] architecture/architecture.json — Full system configuration
-- [x] architecture/backend-dependencies.mmd — Server dependency graph
-- [x] architecture/frontend-imports.mmd — Client import graph
-- [x] architecture/org-chart.mmd — Monorepo folder hierarchy
-- [x] architecture/schema-erd.md — Database ERD and data flows
 - [x] Monorepo folder structure (`packages/client`, `server`, `shared`, `llm`)
+- [x] `docs/guides/CONVENTIONS.md` — Strict coding rules
+- [x] `docs/guides/DESIGN_GUIDE.md` — Visual system and component specs
+- [x] `docs/guides/PROMPTS.md` — Vibe coding prompt templates
+- [x] `docs/specs/PRD.md` — Product requirements document
+- [x] `docs/specs/DATABASE.md` — Database design and reference
+- [x] `docs/specs/API.md` — Full REST API documentation
+- [x] `docs/specs/api-schema.json` — OpenAPI 3.1 schema
+- [x] `docs/architecture/ARCHITECTURE.md` — System architecture
+- [x] `docs/architecture/architecture.json` — Full system configuration
+- [x] `docs/architecture/backend-dependencies.mmd` — Server dependency graph
+- [x] `docs/architecture/frontend-imports.mmd` — Client import graph
+- [x] `docs/architecture/org-chart.mmd` — Monorepo folder hierarchy
+- [x] `docs/architecture/schema-erd.md` — Database ERD and data flows
+- [x] `docs/OVERVIEW.md` — Project overview
+- [x] `docs/PROGRESS.md` — This file
 
 ### Remaining
 
@@ -105,25 +105,27 @@ The project is in the **documentation and scaffolding** phase. No application co
 
 ## Document Index
 
-| File | Purpose | Status |
-|------|---------|--------|
-| `README.md` | Public-facing project readme | Done |
-| `CLAUDE.md` | AI assistant project guide | Done |
-| `CONVENTIONS.md` | Strict coding rules & prohibitions | Done |
-| `docs/OVERVIEW.md` | Project overview & core concepts | Done |
-| `docs/PRD.md` | Full product requirements | Done |
-| `docs/ARCHITECTURE.md` | System architecture & data flows | Done |
-| `docs/DATABASE.md` | DB schema, queries, migrations | Done |
-| `docs/DESIGN_GUIDE.md` | Visual system & component specs | Done |
-| `docs/PROMPTS.md` | Vibe coding prompt templates | Done |
-| `docs/PROGRESS.md` | Development status (this file) | Done |
-| `specs/API.md` | Full REST API documentation | Done |
-| `specs/api-schema.json` | OpenAPI 3.1 machine-readable schema | Done |
-| `architecture/architecture.json` | Full system configuration (JSON) | Done |
-| `architecture/backend-dependencies.mmd` | Server module dependency graph | Done |
-| `architecture/frontend-imports.mmd` | Client component import graph | Done |
-| `architecture/org-chart.mmd` | Monorepo folder hierarchy | Done |
-| `architecture/schema-erd.md` | Database ERD + data flow examples | Done |
+```
+docs/
+├── OVERVIEW.md                          # Project overview & core concepts
+├── PROGRESS.md                          # Development status (this file)
+├── guides/
+│   ├── CONVENTIONS.md                   # Strict coding rules & prohibitions
+│   ├── DESIGN_GUIDE.md                  # Visual system & component specs
+│   └── PROMPTS.md                       # Vibe coding prompt templates
+├── specs/
+│   ├── PRD.md                           # Full product requirements
+│   ├── DATABASE.md                      # DB schema, queries, migrations
+│   ├── API.md                           # REST API documentation (18 endpoints)
+│   └── api-schema.json                  # OpenAPI 3.1 schema
+└── architecture/
+    ├── ARCHITECTURE.md                  # System architecture & data flows
+    ├── architecture.json                # Full system config (JSON)
+    ├── backend-dependencies.mmd         # Server module dependency graph
+    ├── frontend-imports.mmd             # Client component import graph
+    ├── org-chart.mmd                    # Monorepo folder hierarchy
+    └── schema-erd.md                    # Database ERD + data flow examples
+```
 
 ---
 
@@ -139,3 +141,4 @@ The project is in the **documentation and scaffolding** phase. No application co
 | 2026-03-19 | No light mode | Terminal aesthetic demands dark-only |
 | 2026-03-19 | Unicode icons only | No icon library dependencies; terminal feel |
 | 2026-03-19 | Vibe coding approach | AI-driven development with strict conventions |
+| 2026-03-19 | All docs under docs/ | Single location, organized by category (guides/specs/architecture) |

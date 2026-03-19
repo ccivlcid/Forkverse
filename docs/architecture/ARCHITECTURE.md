@@ -54,7 +54,7 @@
 
 ## DB Schema
 
-> Full database documentation — schema, ERD, queries, migrations, indexes — is in [`docs/DATABASE.md`](./DATABASE.md).
+> Full database documentation — schema, ERD, queries, migrations, indexes — is in [`docs/specs/DATABASE.md`](../specs/DATABASE.md).
 
 **Tables**: `users`, `posts`, `follows`, `stars`
 **Engine**: SQLite 3 via `better-sqlite3` (synchronous API)
