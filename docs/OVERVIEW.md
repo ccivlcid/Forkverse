@@ -1,5 +1,7 @@
 # OVERVIEW.md — Project Overview
 
+> **Source of truth** for project vision, core concepts, and domain glossary.
+
 ## What is CLItoris?
 
 CLItoris is a **terminal-themed social network** where every post exists in two formats simultaneously: natural language and CLI commands.
@@ -150,3 +152,11 @@ See `docs/screens/` for page-by-page UI screen specifications.
 | **Dual panel** | The side-by-side display of natural language (left) and CLI command (right) |
 | **Terminal aesthetic** | Dark backgrounds, monospace fonts, green/amber/cyan text — mimicking a CLI terminal |
 | **Custom LLM** | User-provided LLM connection (via API key) beyond the built-in Claude/GPT/Llama |
+
+---
+
+## See Also
+
+- [PRD.md](./specs/PRD.md) — Full product requirements and MVP scope
+- [ARCHITECTURE.md](./architecture/ARCHITECTURE.md) — System architecture and data flows
+- [DESIGN_GUIDE.md](./guides/DESIGN_GUIDE.md) — Visual design system

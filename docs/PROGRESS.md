@@ -1,5 +1,6 @@
 # PROGRESS.md — Development Status
 
+> **Source of truth** for development status, phase tracking, and decision log.
 > Last updated: 2026-03-19
 
 ---
@@ -142,3 +143,11 @@ docs/
 | 2026-03-19 | Unicode icons only | No icon library dependencies; terminal feel |
 | 2026-03-19 | Vibe coding approach | AI-driven development with strict conventions |
 | 2026-03-19 | All docs under docs/ | Single location, organized by category (guides/specs/architecture) |
+
+---
+
+## See Also
+
+- [CLAUDE.md](../CLAUDE.md) — Project overview and documentation map
+- [PRD.md](./specs/PRD.md) — Product requirements and MVP phases
+- [OVERVIEW.md](./OVERVIEW.md) — Project vision and glossary

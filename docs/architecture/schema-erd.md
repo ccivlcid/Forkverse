@@ -1,5 +1,7 @@
 # Schema ERD — Database Entity Relationship Diagram
 
+> **Source of truth** for database entity relationships, cardinality, and design decisions.
+
 ## Mermaid Diagram
 
 ```mermaid
@@ -149,3 +151,11 @@ graph LR
    ORDER BY p.created_at DESC
    LIMIT 20
 ```
+
+---
+
+## See Also
+
+- [DATABASE.md](../specs/DATABASE.md) — Full schema, indexes, migrations, common queries
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — System data flows
+- [API.md](../specs/API.md) — How endpoints map to these queries
