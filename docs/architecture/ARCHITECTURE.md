@@ -62,6 +62,61 @@
 **Engine**: SQLite 3 via `better-sqlite3` (synchronous API)
 **Migrations**: Sequential `.sql` files in `packages/server/src/db/migrations/`
 
+---
+
+## Query Patterns
+
+### Feed Query (with aggregates)
+
+```sql
+SELECT
+  p.*,
+  u.username, u.domain, u.display_name, u.avatar_url,
+  (SELECT COUNT(*) FROM stars WHERE post_id = p.id) AS star_count,
+  (SELECT COUNT(*) FROM posts WHERE parent_id = p.id) AS reply_count,
+  (SELECT COUNT(*) FROM posts WHERE forked_from_id = p.id) AS fork_count,
+  EXISTS(SELECT 1 FROM stars WHERE post_id = p.id AND user_id = ?) AS is_starred
+FROM posts p
+JOIN users u ON p.user_id = u.id
+WHERE p.visibility = 'public'
+  AND p.parent_id IS NULL
+  AND p.created_at < ?
+ORDER BY p.created_at DESC
+LIMIT 20;
+```
+
+### Insert with Return
+
+```typescript
+const stmt = db.prepare(`
+  INSERT INTO posts (id, user_id, message_raw, message_cli, lang, tags, mentions, visibility, llm_model)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+`);
+
+const getStmt = db.prepare(`
+  SELECT p.*, u.username, u.domain, u.display_name, u.avatar_url
+  FROM posts p JOIN users u ON p.user_id = u.id
+  WHERE p.id = ?
+`);
+
+const createPost = db.transaction((post: CreatePostInput): Post => {
+  stmt.run(post.id, post.userId, post.messageRaw, post.messageCli, post.lang,
+    JSON.stringify(post.tags), JSON.stringify(post.mentions), post.visibility, post.llmModel);
+  return getStmt.get(post.id) as Post;
+});
+```
+
+### Auth Query
+
+```typescript
+const findByUsername = db.prepare('SELECT * FROM users WHERE username = ?');
+const insertUser = db.prepare(
+  'INSERT INTO users (id, username, password_hash, display_name) VALUES (?, ?, ?, ?)'
+);
+```
+
+---
+
 ## Frontend State Management
 
 ```typescript

@@ -60,6 +60,8 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'mobile-chrome', use: { ...devices['Pixel 5'] } },
   ],
 });
 ```
@@ -350,6 +352,112 @@ test.describe('Authentication', () => {
     await expect(page.locator('[data-testid="composer-bar"]')).toBeVisible();
   });
 });
+```
+
+### Authenticated E2E Test Pattern
+
+```typescript
+// tests/e2e/auth-flow.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Authentication Flow', () => {
+  test('register → login → create post → logout', async ({ page }) => {
+    // Register
+    await page.goto('/register');
+    await page.fill('[data-testid="username-input"]', 'e2euser');
+    await page.fill('[data-testid="password-input"]', 'testpass123');
+    await page.fill('[data-testid="displayname-input"]', 'E2E User');
+    await page.click('[data-testid="register-submit"]');
+    await expect(page).toHaveURL('/');
+
+    // Create post
+    await page.fill('[data-testid="composer-input"]', 'Hello from E2E test');
+    await page.click('[data-testid="composer-submit"]');
+    await expect(page.locator('[data-testid="post-card"]').first()).toContainText('Hello from E2E test');
+
+    // Star the post
+    await page.click('[data-testid="star-button"]');
+    await expect(page.locator('[data-testid="star-button"]')).toHaveClass(/active/);
+
+    // Logout
+    await page.click('[data-testid="user-menu"]');
+    await page.click('[data-testid="logout-button"]');
+    await expect(page).toHaveURL('/login');
+  });
+
+  test('redirects to login for protected actions', async ({ page }) => {
+    await page.goto('/');
+    await page.click('[data-testid="composer-input"]');
+    await expect(page).toHaveURL(/\/login/);
+  });
+});
+```
+
+### E2E Helper: Login Utility
+
+```typescript
+// tests/e2e/helpers.ts
+import { Page } from '@playwright/test';
+
+async function loginAs(page: Page, username: string, password: string): Promise<void> {
+  await page.goto('/login');
+  await page.fill('[data-testid="username-input"]', username);
+  await page.fill('[data-testid="password-input"]', password);
+  await page.click('[data-testid="login-submit"]');
+  await page.waitForURL('/');
+}
+```
+
+### E2E Test for Post Interactions
+
+```typescript
+// tests/e2e/post-interactions.spec.ts
+test.describe('Post Interactions', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAs(page, 'testuser', 'testpass123');
+  });
+
+  test('star and unstar a post', async ({ page }) => {
+    await page.goto('/');
+    const starButton = page.locator('[data-testid="star-button"]').first();
+    const starCount = page.locator('[data-testid="star-count"]').first();
+
+    const initialCount = await starCount.textContent();
+    await starButton.click();
+    await expect(starCount).toHaveText(String(Number(initialCount) + 1));
+
+    await starButton.click();
+    await expect(starCount).toHaveText(initialCount!);
+  });
+
+  test('fork a post', async ({ page }) => {
+    await page.goto('/');
+    await page.click('[data-testid="fork-button"]');
+    await expect(page.locator('.toast-success')).toContainText('Forked');
+  });
+});
+```
+
+---
+
+## E2E Test Data Seeding
+
+```typescript
+// tests/e2e/setup.ts
+import Database from 'better-sqlite3';
+import { randomUUID } from 'node:crypto';
+
+function seedTestData(): void {
+  const db = new Database('clitoris-test.db');
+  // Run migrations
+  // Insert test user
+  db.prepare('INSERT INTO users (id, username, password_hash) VALUES (?, ?, ?)').run(randomUUID(), 'testuser', '$2b$10$hashedpassword');
+  // Insert test posts
+  for (let i = 0; i < 5; i++) {
+    db.prepare('INSERT INTO posts (id, user_id, message_raw, message_cli, llm_model) VALUES (?, ?, ?, ?, ?)').run(randomUUID(), userId, `Test post ${i}`, `post --message="Test ${i}"`, 'claude-sonnet');
+  }
+  db.close();
+}
 ```
 
 ---

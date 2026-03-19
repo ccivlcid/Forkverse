@@ -55,13 +55,13 @@ erDiagram
 
 ## Relationships
 
-| Relationship | Type | Description |
-|-------------|------|-------------|
-| `users` → `posts` | One-to-Many | A user creates many posts |
-| `posts` → `posts` (parent_id) | Self-referencing | A post can have many replies |
-| `posts` → `posts` (forked_from_id) | Self-referencing | A post can be forked many times |
-| `users` ↔ `users` (via follows) | Many-to-Many | Users follow each other |
-| `users` ↔ `posts` (via stars) | Many-to-Many | Users star posts |
+| Relationship | Type | Cardinality | Description |
+|-------------|------|-------------|-------------|
+| `users` → `posts` | One-to-Many | 1:N | A user creates many posts |
+| `posts` → `posts` (parent_id) | Self-referencing | 1:N | A post can have many replies |
+| `posts` → `posts` (forked_from_id) | Self-referencing | 1:N | A post can be forked many times |
+| `users` ↔ `users` (via follows) | Many-to-Many | M:N | Users follow each other |
+| `users` ↔ `posts` (via stars) | Many-to-Many | M:N | Users star posts |
 
 ## Cardinality
 

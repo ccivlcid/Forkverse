@@ -24,6 +24,21 @@ All social interactions (post, follow, fork, star) are expressed as CLI commands
 | AI/LLM users | Users who create content through various LLM models |
 | Open source community | GitHub users familiar with fork/star concepts |
 
+### User Stories
+
+| ID | As a... | I want to... | So that... |
+|----|---------|-------------|------------|
+| US-1 | User | Write a post in natural language | I can express myself naturally |
+| US-2 | User | See my post transformed to CLI | Both humans and machines can read it |
+| US-3 | User | Choose which AI model transforms my post | I can compare how different AIs interpret me |
+| US-4 | User | Star posts I like | I can bookmark them for later |
+| US-5 | User | Fork another user's post | I can remix and respond with my own version |
+| US-6 | User | Reply to posts | I can have conversations |
+| US-7 | User | Follow other users | I see their posts in my local feed |
+| US-8 | User | Filter feed by AI model | I can compare Claude vs GPT vs Llama outputs |
+| US-9 | User | Write in any language | The CLI flags work the same regardless of language |
+| US-10 | Developer | Use keyboard shortcuts | I can navigate without a mouse |
+
 ## 4. Key Features
 
 ### 4.1 Feed System

@@ -85,6 +85,29 @@ llm    ──→ shared
 
 This project is built through AI-driven development. Humans set direction, AI implements.
 
+### Quick Start for AI
+
+```bash
+# 1. Bootstrap (copy configs from docs/setup/CONFIGS.md)
+pnpm install
+
+# 2. Set up environment
+cp .env.example .env
+# Add ANTHROPIC_API_KEY, SESSION_SECRET
+
+# 3. Run migrations (see docs/specs/DATABASE.md section 6)
+# Migrations auto-run on server start
+
+# 4. Start development
+pnpm dev
+```
+
+### Implementation Order
+1. `@clitoris/shared` — Types first (Post, User, ApiResponse)
+2. `@clitoris/server` — DB setup + API routes
+3. `@clitoris/llm` — LLM providers + transformer
+4. `@clitoris/client` — Shell layout → pages → components
+
 ## Documentation Map
 
 All documentation lives under `docs/` organized by category.

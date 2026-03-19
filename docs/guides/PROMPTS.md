@@ -130,6 +130,28 @@ Content: {describe table/column changes}
 Follow docs/specs/DATABASE.md migration rules (sequential, append-only).
 ```
 
+### Worked Example
+
+**Prompt:**
+```
+Create a new migration file under packages/server/src/db/migrations/.
+
+Filename: 004_add_sessions.sql
+Content: Create sessions table for express-session SQLite store
+```
+
+**Expected AI output:**
+```sql
+-- 004_add_sessions.sql
+CREATE TABLE IF NOT EXISTS sessions (
+  sid     TEXT PRIMARY KEY,
+  sess    TEXT NOT NULL,
+  expired INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_sessions_expired ON sessions(expired);
+```
+
 ---
 
 ## 5. Zustand Store
@@ -166,6 +188,81 @@ Actions:
 - reset() — clear posts and cursor
 
 Follow the pattern: set isLoading true → fetch → append to posts → set cursor → set isLoading false.
+```
+
+### Worked Example: Auth Store
+
+**Prompt:**
+```
+Create a Zustand store at packages/client/src/stores/auth-store.ts.
+
+State:
+- user: User | null
+- isLoading: boolean
+- error: string | null
+
+Actions:
+- login(username, password) — POST /api/auth/login
+- logout() — POST /api/auth/logout
+- fetchMe() — GET /api/auth/me
+```
+
+**Expected AI output:**
+```typescript
+// packages/client/src/stores/auth-store.ts
+import { create } from 'zustand';
+import type { User } from '@clitoris/shared';
+
+interface AuthState {
+  user: User | null;
+  isLoading: boolean;
+  error: string | null;
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  fetchMe: () => Promise<void>;
+}
+
+export const useAuthStore = create<AuthState>()((set) => ({
+  user: null,
+  isLoading: false,
+  error: null,
+
+  login: async (username, password): Promise<void> => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) {
+        const { error } = await res.json();
+        throw new Error(error.message);
+      }
+      const { data } = await res.json();
+      set({ user: data, isLoading: false });
+    } catch (err) {
+      set({ error: (err as Error).message, isLoading: false });
+    }
+  },
+
+  logout: async (): Promise<void> => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    set({ user: null });
+  },
+
+  fetchMe: async (): Promise<void> => {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (res.ok) {
+        const { data } = await res.json();
+        set({ user: data });
+      }
+    } catch {
+      set({ user: null });
+    }
+  },
+}));
 ```
 
 ---

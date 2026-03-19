@@ -371,6 +371,50 @@ catch (err) {
 
 ---
 
+## 9.5. Edge Case Patterns
+
+### Handling null/undefined safely
+```typescript
+// ✅ Use optional chaining + nullish coalescing
+const username = post?.user?.username ?? 'unknown';
+const tags = post?.tags ?? [];
+const count = response?.data?.length ?? 0;
+
+// ❌ Never use non-null assertion
+const username = post!.user!.username;  // forbidden
+```
+
+### Async error boundary in stores
+```typescript
+// ✅ Pattern for async actions in Zustand stores
+async function fetchData(): Promise<void> {
+  set({ isLoading: true, error: null });
+  try {
+    const res = await fetch('/api/data');
+    if (!res.ok) {
+      const { error } = await res.json();
+      throw new Error(error.message ?? 'Request failed');
+    }
+    const { data } = await res.json();
+    set({ data, isLoading: false });
+  } catch (err) {
+    set({ error: (err as Error).message, isLoading: false });
+  }
+}
+```
+
+### Conditional rendering edge cases
+```typescript
+// ✅ Handle zero correctly (0 is falsy!)
+{starCount > 0 && <span>{starCount}</span>}    // ✅ correct
+{starCount && <span>{starCount}</span>}         // ❌ renders nothing when 0
+
+// ✅ Handle empty arrays
+{posts.length > 0 ? <FeedList posts={posts} /> : <EmptyState />}
+```
+
+---
+
 ## 10. File Structure Rules
 
 ```

@@ -179,6 +179,39 @@
 | Timestamp | `text-gray-500 text-xs` |
 | Lang badge | `text-purple-400 text-[11px] border border-purple-400/30 px-1.5 py-0.5` |
 | Hashtags | `text-cyan-400` |
+
+**JSX Implementation Reference:**
+
+```tsx
+<article className="border border-gray-700 rounded-none overflow-hidden">
+  {/* Header */}
+  <div className="flex items-center justify-between px-4 py-2">
+    <div className="flex items-center gap-2">
+      <span className="text-amber-400 font-mono font-semibold">@{username}</span>
+      {domain && <span className="text-gray-500 text-xs">{domain}</span>}
+      <span className="text-gray-500 text-xs">· {timeAgo}</span>
+    </div>
+    <span className="text-purple-400 text-[11px] border border-purple-400/30 px-1.5 py-0.5">
+      --lang={lang}
+    </span>
+  </div>
+
+  {/* Dual Panel */}
+  <div className="grid grid-cols-1 sm:grid-cols-2">
+    <div className="bg-[#16213e] p-4 text-gray-200 font-sans text-sm">{messageRaw}</div>
+    <div className="bg-[#0d1117] p-4 text-green-400 font-mono text-[13px]">
+      <pre className="whitespace-pre-wrap">{messageCli}</pre>
+    </div>
+  </div>
+
+  {/* Action Bar */}
+  <div className="border-t border-gray-700 px-4 py-2 flex gap-6 text-gray-500 text-xs font-mono">
+    <button className="hover:text-green-400">↩ reply {replyCount}</button>
+    <button className="hover:text-blue-400">◇ fork {forkCount}</button>
+    <button className="hover:text-yellow-400">{isStarred ? '★' : '☆'} {starCount}</button>
+  </div>
+</article>
+```
 | Action bar | `border-t border-gray-700 px-4 py-2 text-gray-500 text-xs` |
 | Action hover | `hover:text-green-400` (reply), `hover:text-blue-400` (fork), `hover:text-yellow-400` (star) |
 | Copy button | `text-gray-600 hover:text-gray-300 text-xs` |
