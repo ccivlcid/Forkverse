@@ -90,25 +90,54 @@ function looksLikeShellNotFound(out: string): boolean {
   );
 }
 
-/** npm global shims are often missing from the PATH of a GUI-started Node process (Windows/macOS) */
-function cliProbeEnv(): NodeJS.ProcessEnv {
-  const env = { ...process.env };
-  const pathKey = process.platform === 'win32' ? 'Path' : 'PATH';
-  const current = env[pathKey] ?? env.PATH ?? '';
+/** Hardcoded fallback directories — covers npm/pnpm/homebrew/nvm globals. */
+const CLI_PATH_FALLBACK_DIRS: string[] = process.platform === 'win32'
+  ? [
+      path.join(os.homedir(), '.local', 'bin'),
+      path.join(process.env['ProgramFiles'] ?? 'C:\\Program Files', 'nodejs'),
+      path.join(process.env['LOCALAPPDATA'] ?? '', 'Programs', 'nodejs'),
+      path.join(process.env['APPDATA'] ?? '', 'npm'),
+    ].filter(Boolean)
+  : [
+      '/opt/homebrew/bin',
+      '/usr/local/bin',
+      '/usr/bin',
+      '/bin',
+      path.join(os.homedir(), '.local', 'bin'),
+      path.join(os.homedir(), 'bin'),
+    ];
+
+/** Augment PATH with well-known CLI binary locations (adapted from agentoffice). */
+function withCliPathFallback(pathValue: string | undefined): string {
+  const parts = (pathValue ?? '')
+    .split(path.delimiter)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const seen = new Set(parts);
+
+  // Also try npm global prefix (may add /opt/node22/bin etc.)
   try {
     const prefix = execSync('npm prefix -g', { encoding: 'utf8', timeout: 5000 }).trim();
-    if (!prefix) return env;
-    const binDir = process.platform === 'win32' ? prefix : path.join(prefix, 'bin');
-    const merged = `${binDir}${path.delimiter}${current}`;
-    if (process.platform === 'win32') {
-      env.Path = merged;
-      env.PATH = merged;
-    } else {
-      env.PATH = merged;
+    if (prefix) {
+      const binDir = process.platform === 'win32' ? prefix : path.join(prefix, 'bin');
+      if (!seen.has(binDir)) { parts.push(binDir); seen.add(binDir); }
     }
-  } catch {
-    /* keep process.env as-is */
+  } catch { /* ignore */ }
+
+  for (const dir of CLI_PATH_FALLBACK_DIRS) {
+    if (!dir || seen.has(dir)) continue;
+    parts.push(dir);
+    seen.add(dir);
   }
+  return parts.join(path.delimiter);
+}
+
+/** Build an env object with augmented PATH for CLI probing. */
+function cliProbeEnv(): NodeJS.ProcessEnv {
+  const env = { ...process.env };
+  const augmented = withCliPathFallback(env['PATH']);
+  env['PATH'] = augmented;
+  if (process.platform === 'win32') env['Path'] = augmented;
   return env;
 }
 
@@ -315,7 +344,19 @@ const CLI_TOOL_CONFIGS: CliDetectConfig[] = [
   },
 ];
 
-/** Per-user: CLI tab reads models from `user_llm_keys` + local Cursor HTTP; never from server LLM env */
+/** Default model lists when only CLI session exists and no DB API key to query. */
+const CLI_DEFAULT_MODELS: Record<string, string[]> = {
+  'claude-code': ['claude-sonnet-4-20250514', 'claude-haiku-4-20250414'],
+  codex: ['gpt-4o', 'gpt-4o-mini', 'o3-mini'],
+  'gemini-cli': ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash'],
+  opencode: ['gpt-4o', 'claude-sonnet-4-20250514'],
+};
+
+/**
+ * Per-user: enrich CLI status with models + auth.
+ * authenticated = localCliSession OR dbApiKey (either path makes the tool usable).
+ * Models are fetched from DB key when available, otherwise default list is used.
+ */
 async function enrichCliStatusForUser(
   statuses: CliToolStatus[],
   db: Database,
@@ -324,33 +365,32 @@ async function enrichCliStatusForUser(
   const out: CliToolStatus[] = [];
   for (const s of statuses) {
     let models: string[] = [];
-    let authenticated = localCliSessionOk(s.id);
+    const hasLocalSession = localCliSessionOk(s.id);
+    let hasDbKey = false;
 
     try {
       if (s.id === 'claude-code') {
         const row = getUserLlmKeyRow(db, userId, 'anthropic');
         if (row?.api_key) {
-          authenticated = true;
+          hasDbKey = true;
           models = await listAnthropicModelsForKey(row.api_key);
         }
       } else if (s.id === 'codex') {
         const row = getUserLlmKeyRow(db, userId, 'openai');
         if (row?.api_key) {
-          authenticated = true;
+          hasDbKey = true;
           models = await listOpenAIModelsForKey(row.api_key, row.base_url);
         }
       } else if (s.id === 'gemini-cli') {
         const row = getUserLlmKeyRow(db, userId, 'gemini');
         if (row?.api_key) {
-          authenticated = true;
+          hasDbKey = true;
           models = await listGeminiModelsForKey(row.api_key);
         }
       } else if (s.id === 'opencode') {
         const openaiRow = getUserLlmKeyRow(db, userId, 'openai');
         const anthRow = getUserLlmKeyRow(db, userId, 'anthropic');
-        if (openaiRow?.api_key || anthRow?.api_key) {
-          authenticated = true;
-        }
+        hasDbKey = !!(openaiRow?.api_key || anthRow?.api_key);
         const parts: string[] = [];
         if (openaiRow?.api_key) {
           try {
@@ -370,6 +410,12 @@ async function enrichCliStatusForUser(
       /* keep models [] */
     }
 
+    // If CLI session exists but no DB key → use default model list so user can select
+    if (models.length === 0 && hasLocalSession && CLI_DEFAULT_MODELS[s.id]) {
+      models = CLI_DEFAULT_MODELS[s.id];
+    }
+
+    const authenticated = hasLocalSession || hasDbKey;
     out.push({ ...s, models, authenticated });
   }
   return out;
@@ -405,47 +451,19 @@ async function execCmd(
   });
 }
 
+/**
+ * Detect a single CLI tool (adapted from agentoffice pattern).
+ * 1. `which`/`where` to confirm binary exists — fast, reliable.
+ * 2. `--version` to parse version string — fallback if format changes.
+ */
 async function detectCliTool(config: CliDetectConfig): Promise<CliToolStatus> {
-  const argSets = config.versionArgSets ?? [config.versionArgs];
   const probeEnv = cliProbeEnv();
-  let installed = false;
-  let version: string | null = null;
-  let lastOut = '';
-  let lastCode: number | null = null;
 
-  for (const args of argSets) {
-    try {
-      const { out, code } = await execCmd(config.bin, args, 8000, probeEnv);
-      lastOut = out;
-      lastCode = code;
-      const parsed = config.parseVersion(out) ?? parseLooseSemver(out);
-      if (parsed) {
-        version = parsed;
-        installed = true;
-        break;
-      }
-      // Exit 0 with real output often means the CLI is there even if the banner format changed
-      if (code === 0 && out.trim() && !looksLikeShellNotFound(out)) {
-        installed = true;
-        version = parseLooseSemver(out);
-        break;
-      }
-    } catch {
-      /* try next probe */
-    }
-  }
-
-  if (!installed && lastOut) {
-    const parsed = config.parseVersion(lastOut) ?? parseLooseSemver(lastOut);
-    if (parsed) {
-      version = parsed;
-      installed = true;
-    } else if (lastCode === 0 && lastOut.trim() && !looksLikeShellNotFound(lastOut)) {
-      installed = true;
-    }
-  }
-
-  if (!installed) {
+  // Step 1: check if binary exists in PATH via which/where
+  const whichCmd = process.platform === 'win32' ? 'where' : 'which';
+  try {
+    await execCmd(whichCmd, [config.bin], 3000, probeEnv);
+  } catch {
     return {
       id: config.id, name: config.name,
       installed: false, version: null, authenticated: false,
@@ -453,10 +471,27 @@ async function detectCliTool(config: CliDetectConfig): Promise<CliToolStatus> {
     };
   }
 
-  // authenticated + models filled in enrichCliStatusForUser (user DB + local CLI session files)
+  // Step 2: binary found — try to get version
+  let version: string | null = null;
+  const argSets = config.versionArgSets ?? [config.versionArgs];
+  for (const args of argSets) {
+    try {
+      const { out, code } = await execCmd(config.bin, args, 8000, probeEnv);
+      const parsed = config.parseVersion(out) ?? parseLooseSemver(out);
+      if (parsed) { version = parsed; break; }
+      if (code === 0 && out.trim() && !looksLikeShellNotFound(out)) {
+        version = parseLooseSemver(out);
+        break;
+      }
+    } catch {
+      /* try next arg set */
+    }
+  }
+
+  // authenticated + models filled in enrichCliStatusForUser
   return {
     id: config.id, name: config.name,
-    installed, version, authenticated: false,
+    installed: true, version, authenticated: false,
     models: [],
     installCmd: config.installCmd,
   };
@@ -479,6 +514,7 @@ export function createLlmRouter(db: Database, logger: Logger): Router {
   const router = Router();
 
   // POST /api/llm/transform — uses key stored by user in settings
+  // Smart fallback: if CLI tool requested but local session missing, fall back to API provider.
   router.post('/transform', requireAuth, async (req, res) => {
     const parsed = transformSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -488,7 +524,32 @@ export function createLlmRouter(db: Database, logger: Logger): Router {
 
     const { message, model, lang, cliTool } = parsed.data;
     const userId = req.session.userId!;
-    const providerName = modelToProvider(model, cliTool);
+    let providerName = modelToProvider(model, cliTool);
+
+    // ── Smart fallback: CLI tool → API provider when local session is missing ──
+    // If user selected a CLI tool but the binary isn't logged in locally,
+    // fall back to the corresponding API provider using the user's saved API key.
+    const CLI_TOOL_TO_API: Record<string, string> = {
+      'claude-code': 'anthropic',
+      codex: 'openai',
+      'gemini-cli': 'gemini',
+    };
+    let fallbackUsed = false;
+
+    if (providerName === 'cli' && cliTool) {
+      const hasLocalSession = localCliSessionOk(cliTool);
+      if (!hasLocalSession) {
+        // For opencode: determine API provider from model name prefix
+        const apiProvider = CLI_TOOL_TO_API[cliTool] ?? modelToProvider(model);
+        const row = getUserLlmKeyRow(db, userId, apiProvider);
+        if (row?.api_key) {
+          logger.info({ cliTool, apiProvider }, 'CLI session missing — falling back to API provider');
+          providerName = apiProvider;
+          fallbackUsed = true;
+        }
+        // else: proceed with CLI anyway (may work or fail with descriptive error)
+      }
+    }
 
     // Ollama and CLI tools don't need a user key
     const keylessProviders = new Set(['ollama', 'cursor', 'cli']);
@@ -500,11 +561,11 @@ export function createLlmRouter(db: Database, logger: Logger): Router {
         .get(userId, providerName) as LlmKeyRow | undefined;
 
       if (!row) {
+        const hint = cliTool
+          ? `CLI tool "${cliTool}" requires local login or an API key in Settings.`
+          : `No API key configured for provider: ${providerName}. Add it in Settings.`;
         res.status(400).json({
-          error: {
-            code: 'KEY_NOT_CONFIGURED',
-            message: `No API key configured for provider: ${providerName}. Add it in Settings.`,
-          },
+          error: { code: 'KEY_NOT_CONFIGURED', message: hint },
         });
         return;
       }
@@ -517,8 +578,9 @@ export function createLlmRouter(db: Database, logger: Logger): Router {
     try {
       const provider = createProvider(providerName, credentials);
       const userRow = db.prepare('SELECT username FROM users WHERE id = ?').get(userId) as { username: string };
-      // CliProvider keys tools by id (claude-code, codex, …), not by sub-model from the settings UI
+
       let transformModel = model;
+      // CliProvider keys tools by id (claude-code, codex, …), not by sub-model from the settings UI
       if (providerName === 'cli') {
         if (cliTool && CLI_TRANSFORM_TOOLS.includes(cliTool as (typeof CLI_TRANSFORM_TOOLS)[number])) {
           transformModel = cliTool;
@@ -535,16 +597,20 @@ export function createLlmRouter(db: Database, logger: Logger): Router {
           return;
         }
       }
+
       const result = await provider.transform({
         message,
         model: transformModel,
         lang,
         username: userRow.username,
       });
-      res.json({ data: result });
+      res.json({ data: { ...result, fallback: fallbackUsed ? providerName : undefined } });
     } catch (err) {
-      logger.error({ err, model, providerName }, 'LLM transform failed');
-      res.status(500).json({ error: { code: 'LLM_ERROR', message: 'LLM transformation failed' } });
+      logger.error({ err, model, providerName, cliTool }, 'LLM transform failed');
+      const detail = providerName === 'cli'
+        ? `CLI tool failed. Run "${CLI_TOOL_CONFIGS.find((c) => c.id === cliTool)?.bin ?? cliTool} login" or add an API key in Settings.`
+        : 'LLM transformation failed';
+      res.status(500).json({ error: { code: 'LLM_ERROR', message: detail } });
     }
   });
 
