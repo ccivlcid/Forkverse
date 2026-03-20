@@ -95,7 +95,7 @@
       },
       "LlmModel": {
         "type": "string",
-        "enum": ["claude-sonnet", "gpt-4o", "gemini-2.5-pro", "llama-3", "cursor", "cli", "api", "custom"]
+        "enum": ["claude-sonnet", "gpt-4o", "gemini-2.5-pro", "llama-3", "cursor", "api", "custom"]
       },
       "ApiResponse": {
         "type": "object",
@@ -199,19 +199,6 @@
           "provider": { "type": "string" },
           "source": { "type": "string", "nullable": true },
           "isAvailable": { "type": "boolean" }
-        }
-      },
-      "CliToolStatus": {
-        "type": "object",
-        "required": ["id", "name", "installed", "version", "authenticated", "models", "installCmd"],
-        "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "installed": { "type": "boolean" },
-          "version": { "type": "string", "nullable": true },
-          "authenticated": { "type": "boolean" },
-          "models": { "type": "array", "items": { "type": "string" } },
-          "installCmd": { "type": "string", "nullable": true }
         }
       },
       "LocalModel": {
@@ -851,40 +838,6 @@
                     "data": {
                       "type": "array",
                       "items": { "$ref": "#/components/schemas/LlmProvider" }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "description": "Not authenticated" }
-        }
-      }
-    },
-    "/llm/cli/status": {
-      "get": {
-        "summary": "CLI binary detection plus per-user auth/models from Settings keys and local CLI sessions",
-        "tags": ["LLM"],
-        "security": [{ "session": [] }],
-        "parameters": [
-          {
-            "name": "refresh",
-            "in": "query",
-            "schema": { "type": "string", "enum": ["1"] },
-            "description": "Set to 1 to bypass cache"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "CLI tool statuses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": { "$ref": "#/components/schemas/CliToolStatus" }
                     }
                   }
                 }

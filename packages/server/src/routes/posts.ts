@@ -61,6 +61,7 @@ interface PostRow {
   repo_stars: number | null;
   repo_forks: number | null;
   repo_language: string | null;
+  updated_at: string | null;
   quoted_post_id: string | null;
   qp_id: string | null;
   qp_message_raw: string | null;
@@ -140,6 +141,7 @@ function mapPost(row: PostRow, _userId: string | undefined, db?: Database): Post
         avatarUrl: row.qp_avatar_url ?? null,
       },
     } : null,
+    updatedAt: row.updated_at ?? null,
   };
 }
 
@@ -621,7 +623,7 @@ export function createPostsRouter(db: Database, logger: Logger): Router {
 
   router.post('/:id/star', requireAuth, (req, res) => {
     const userId = req.session.userId!;
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const post = db.prepare('SELECT id FROM posts WHERE id = ?').get(id);
     if (!post) {
@@ -773,7 +775,7 @@ export function createPostsRouter(db: Database, logger: Logger): Router {
   // POST /:id/react — toggle a reaction
   router.post('/:id/react', requireAuth, (req, res) => {
     const userId = req.session.userId!;
-    const { id } = req.params;
+    const id = req.params.id as string;
     const parsed = reactSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: parsed.error.message } });
@@ -808,6 +810,59 @@ export function createPostsRouter(db: Database, logger: Logger): Router {
     ).all(id, userId) as Array<{ emoji: string }>).map(r => r.emoji as ReactionEmoji);
 
     res.json({ data: { toggled: !existing, emoji, reactions: { counts, mine } } });
+  });
+
+  // ── Edit post ──
+  const updatePostSchema = z.object({
+    messageRaw: z.string().min(1).max(2000),
+    messageCli: z.string().min(1).max(4000),
+    lang: z.string().length(2),
+    tags: z.array(z.string().max(50)).max(10).default([]),
+    mentions: z.array(z.string()).max(20).default([]),
+    llmModel: z.string().min(1).max(200),
+    intent: z.enum(['casual', 'formal', 'question', 'announcement', 'reaction']).default('casual'),
+    emotion: z.enum(['neutral', 'happy', 'surprised', 'frustrated', 'excited', 'sad', 'angry']).default('neutral'),
+  });
+
+  router.put('/:id', requireAuth, (req, res) => {
+    const userId = req.session.userId!;
+    const parsed = updatePostSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: parsed.error.message } });
+      return;
+    }
+
+    const post = db.prepare('SELECT user_id FROM posts WHERE id = ?').get(req.params.id) as { user_id: string } | undefined;
+    if (!post) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Post not found' } });
+      return;
+    }
+    if (post.user_id !== userId) {
+      res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Not the author' } });
+      return;
+    }
+
+    const { messageRaw, messageCli, lang, tags, mentions, llmModel, intent, emotion } = parsed.data;
+    db.prepare(`
+      UPDATE posts SET message_raw = ?, message_cli = ?, lang = ?, tags = ?, mentions = ?,
+        llm_model = ?, intent = ?, emotion = ?, updated_at = datetime('now')
+      WHERE id = ?
+    `).run(messageRaw, messageCli, lang, JSON.stringify(tags), JSON.stringify(mentions), llmModel, intent, emotion, req.params.id);
+
+    db.prepare('DELETE FROM translations WHERE post_id = ?').run(req.params.id);
+
+    const starred = starredSubquery(userId);
+    const row = db.prepare(`
+      SELECT p.*, u.username, u.domain, u.display_name, u.avatar_url,
+        ${countsFragment()}
+        ${starred.sql}
+        ${repoFragment()}
+        ${quotedPostFragment()}
+      FROM posts p JOIN users u ON p.user_id = u.id ${repoJoin()} ${quotedPostJoin()}
+      WHERE p.id = ?
+    `).get(...starred.params, req.params.id) as PostRow;
+
+    res.json({ data: mapPost(row, userId, db) });
   });
 
   router.delete('/:id', requireAuth, (req, res) => {

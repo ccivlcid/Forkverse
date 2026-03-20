@@ -2,7 +2,7 @@
   "layouts": {
     "AppShell": {
       "file": "packages/client/src/components/layout/AppShell.tsx",
-      "children": ["HeaderBar", "Sidebar", "MainContent"]
+      "children": ["HeaderBar", "Sidebar", "MainContent", "ToastContainer", "KeyboardHelpModal"]
     },
     "AuthLayout": {
       "file": "packages/client/src/components/layout/AuthLayout.tsx",
@@ -10,28 +10,44 @@
     },
     "HeaderBar": {
       "file": "packages/client/src/components/layout/HeaderBar.tsx",
-      "children": ["Logo", "Breadcrumbs", "UserMenu"]
+      "children": ["Logo", "Breadcrumbs", "NotificationBell", "UserMenu"]
     },
     "Sidebar": {
       "file": "packages/client/src/components/layout/Sidebar.tsx",
-      "children": ["NavSection", "LlmFilterSection", "MeSection"]
+      "children": ["NavSection", "LlmFilterSection", "SuggestedUsers"]
+    },
+    "ToastContainer": {
+      "file": "packages/client/src/components/layout/ToastContainer.tsx",
+      "children": []
+    },
+    "KeyboardHelpModal": {
+      "file": "packages/client/src/components/layout/KeyboardHelpModal.tsx",
+      "children": []
+    },
+    "NotificationBell": {
+      "file": "packages/client/src/components/layout/NotificationBell.tsx",
+      "children": []
+    },
+    "SuggestedUsers": {
+      "file": "packages/client/src/components/layout/SuggestedUsers.tsx",
+      "children": []
     }
   },
   "pages": {
     "GlobalFeedPage": {
       "file": "packages/client/src/pages/GlobalFeedPage.tsx",
       "layout": "AppShell",
-      "children": ["ComposerBar", "FeedList"]
+      "children": ["FeedList"]
     },
     "LocalFeedPage": {
       "file": "packages/client/src/pages/LocalFeedPage.tsx",
       "layout": "AppShell",
-      "children": ["ComposerBar", "FeedList"]
+      "children": ["FeedList"]
     },
     "ExplorePage": {
       "file": "packages/client/src/pages/ExplorePage.tsx",
       "layout": "AppShell",
-      "children": ["LlmFilterTabs", "TrendingTags", "TrendingRepos", "FeedList"]
+      "children": ["TrendingTags", "TrendingRepos", "FeedList"]
     },
     "PostDetailPage": {
       "file": "packages/client/src/pages/PostDetailPage.tsx",
@@ -41,7 +57,7 @@
     "UserProfilePage": {
       "file": "packages/client/src/pages/UserProfilePage.tsx",
       "layout": "AppShell",
-      "children": ["ProfileHeader", "ProfileTabs", "PostList"]
+      "children": ["ProfileHeader", "ContributionGraph", "GithubFollowSync", "ProfileTabs", "PostList", "SettingsTabs"]
     },
     "LoginPage": {
       "file": "packages/client/src/pages/LoginPage.tsx",
@@ -56,73 +72,140 @@
     "SettingsPage": {
       "file": "packages/client/src/pages/SettingsPage.tsx",
       "layout": "AppShell",
-      "children": ["SettingsForm", "GitHubConnection", "DangerZone"]
+      "note": "Redirects to /@{username}?tab=cli"
     },
     "AnalyzePage": {
       "file": "packages/client/src/pages/AnalyzePage.tsx",
       "layout": "AppShell",
       "children": ["AnalyzerForm", "AnalysisProgress", "AnalysisResult", "RecentAnalyses"]
+    },
+    "GitHubFeedPage": {
+      "file": "packages/client/src/pages/GitHubFeedPage.tsx",
+      "layout": "AppShell",
+      "children": ["StarsList", "NotificationsList", "IssuesList"]
+    },
+    "ActivityFeedPage": {
+      "file": "packages/client/src/pages/ActivityFeedPage.tsx",
+      "layout": "AppShell",
+      "children": ["ActivityList", "GitHubSyncButton"]
+    },
+    "SearchPage": {
+      "file": "packages/client/src/pages/SearchPage.tsx",
+      "layout": "AppShell",
+      "children": ["SearchInput", "PostCard", "UserResults", "TagResults"]
     }
   },
   "composer": {
-    "ComposerBar": {
-      "file": "packages/client/src/components/composer/ComposerBar.tsx",
-      "children": ["ComposerTextarea", "ModelSelector", "SubmitButton", "RepoAttachButton", "RepoAttachPreview"]
+    "ComposerModal": {
+      "file": "packages/client/src/components/composer/ComposerModal.tsx",
+      "note": "Opened via [+ post] button in HeaderBar or '/' hotkey",
+      "children": []
     }
   },
   "post": {
     "PostCard": {
       "file": "packages/client/src/components/post/PostCard.tsx",
-      "children": ["PostHeader", "DualPanel", "ActionBar"]
+      "children": ["PostHeader", "DualPanel", "ActionBar", "ReactionBar", "QuotedPost", "RepoCard", "LangBadge"]
     },
     "DualPanel": {
       "file": "packages/client/src/components/post/DualPanel.tsx",
-      "children": ["NaturalPanel", "CliPanel"]
+      "children": ["NaturalPanel", "CliHighlighter"]
     },
-    "CliPanel": {
-      "file": "packages/client/src/components/post/CliPanel.tsx",
-      "children": ["CliHighlighter"]
+    "ActionBar": {
+      "file": "packages/client/src/components/post/ActionBar.tsx",
+      "children": []
+    },
+    "ReactionBar": {
+      "file": "packages/client/src/components/post/ReactionBar.tsx",
+      "children": []
+    },
+    "CliHighlighter": {
+      "file": "packages/client/src/components/post/CliHighlighter.tsx",
+      "children": []
+    },
+    "QuotedPost": {
+      "file": "packages/client/src/components/post/QuotedPost.tsx",
+      "children": []
+    },
+    "RepoCard": {
+      "file": "packages/client/src/components/post/RepoCard.tsx",
+      "children": []
+    },
+    "LangBadge": {
+      "file": "packages/client/src/components/post/LangBadge.tsx",
+      "children": []
     }
   },
   "auth": {
     "ConnectForm": {
       "file": "packages/client/src/components/auth/ConnectForm.tsx",
       "children": ["SshPrompt", "ConnectionStatus", "GitHubConnectButton", "ScopeInfo"]
-    },
-    "SetupForm": {
-      "file": "packages/client/src/components/auth/SetupForm.tsx",
-      "children": ["GitHubImportSummary", "CliInput", "SubmitButton"]
     }
   },
   "profile": {
-    "ProfileHeader": {
-      "file": "packages/client/src/components/profile/ProfileHeader.tsx",
-      "children": ["AvatarPlaceholder", "UserIdentity", "UserBio", "UserStats", "GitHubInfo", "FollowButton"]
+    "ContributionGraph": {
+      "file": "packages/client/src/components/profile/ContributionGraph.tsx",
+      "children": []
+    },
+    "GithubFollowSync": {
+      "file": "packages/client/src/components/profile/GithubFollowSync.tsx",
+      "children": []
     }
   },
-  "analyze": {
-    "AnalyzerForm": {
-      "file": "packages/client/src/components/analyze/AnalyzerForm.tsx",
-      "children": ["RepoInput", "OutputTypeSelector", "ModelSelector", "OutputOptions", "SubmitButton"]
+  "settings": {
+    "ProfileTab": {
+      "file": "packages/client/src/components/settings/ProfileTab.tsx",
+      "children": []
     },
-    "AnalysisProgress": {
-      "file": "packages/client/src/components/analyze/AnalysisProgress.tsx",
-      "children": ["ProgressStep", "ElapsedTimer"]
+    "LanguageTab": {
+      "file": "packages/client/src/components/settings/LanguageTab.tsx",
+      "children": []
     },
-    "AnalysisResult": {
-      "file": "packages/client/src/components/analyze/AnalysisResult.tsx",
-      "children": ["ReportResult", "PptxResult", "VideoResult", "DownloadButton", "PostAttachButton"]
+    "ApiTab": {
+      "file": "packages/client/src/components/settings/ApiTab.tsx",
+      "children": []
+    },
+    "OAuthTab": {
+      "file": "packages/client/src/components/settings/OAuthTab.tsx",
+      "children": []
+    },
+    "ChannelTab": {
+      "file": "packages/client/src/components/settings/ChannelTab.tsx",
+      "children": []
+    },
+    "GithubTab": {
+      "file": "packages/client/src/components/settings/GithubTab.tsx",
+      "children": []
     }
+  },
+  "feed": {
+    "FeedList": {
+      "file": "packages/client/src/components/feed/FeedList.tsx",
+      "children": ["PostCard", "InfiniteScrollTrigger"]
+    },
+    "InfiniteScrollTrigger": {
+      "file": "packages/client/src/components/feed/InfiniteScrollTrigger.tsx",
+      "children": []
+    }
+  },
+  "hooks": {
+    "useKeyboardShortcuts": "packages/client/src/hooks/useKeyboardShortcuts.ts"
+  },
+  "i18n": {
+    "en": "packages/client/src/i18n/en.ts",
+    "ko": "packages/client/src/i18n/ko.ts",
+    "zh": "packages/client/src/i18n/zh.ts",
+    "ja": "packages/client/src/i18n/ja.ts"
   },
   "stores": {
     "authStore": "packages/client/src/stores/authStore.ts",
     "feedStore": "packages/client/src/stores/feedStore.ts",
     "postStore": "packages/client/src/stores/postStore.ts",
     "postDetailStore": "packages/client/src/stores/postDetailStore.ts",
-    "replyStore": "packages/client/src/stores/replyStore.ts",
-    "profileStore": "packages/client/src/stores/profileStore.ts",
-    "exploreStore": "packages/client/src/stores/exploreStore.ts",
-    "settingsStore": "packages/client/src/stores/settingsStore.ts",
-    "analyzeStore": "packages/client/src/stores/analyzeStore.ts"
+    "uiStore": "packages/client/src/stores/uiStore.ts",
+    "toastStore": "packages/client/src/stores/toastStore.ts",
+    "notificationStore": "packages/client/src/stores/notificationStore.ts",
+    "searchStore": "packages/client/src/stores/searchStore.ts",
+    "activityStore": "packages/client/src/stores/activityStore.ts"
   }
 }

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { useAuthStore } from '../../stores/authStore.js';
 import { useFeedStore } from '../../stores/feedStore.js';
-import { useUiStore } from '../../stores/uiStore.js';
 import { toastError } from '../../stores/toastStore.js';
 import type { ApiResponse, PostReactions, ReactionEmoji } from '@clitoris/shared';
 import { REACTION_DISPLAY } from '@clitoris/shared';
@@ -16,6 +15,8 @@ interface ActionBarProps {
   isStarred: boolean;
   reactions?: PostReactions;
   onReactionUpdate?: (reactions: PostReactions) => void;
+  isAuthor?: boolean;
+  onEdit?: () => void;
 }
 
 export default function ActionBar({
@@ -26,14 +27,25 @@ export default function ActionBar({
   isStarred,
   reactions,
   onReactionUpdate,
+  isAuthor,
+  onEdit,
 }: ActionBarProps) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
   const { starPost } = useFeedStore();
-  const { t } = useUiStore();
-  const [localForkCount, setLocalForkCount] = useState(forkCount);
   const starBusy = useRef(false);
   const forkBusy = useRef(false);
+  const [localForkCount, setLocalForkCount] = useState(forkCount);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/post/${postId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    });
+  };
 
   const handleStar = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -95,70 +107,86 @@ export default function ActionBar({
   };
 
   return (
-    <div className="flex gap-6 px-5 py-3 border-t border-[var(--border)]">
+    <div className="flex items-center gap-5 px-5 py-2.5">
+      {/* Reply */}
       <button
         data-testid="reply-button"
         onClick={handleReply}
-        className="font-mono text-[12px] text-[var(--text-muted)] hover:text-[var(--accent-green)] transition-colors"
-        aria-label="Reply to post"
+        className="font-mono text-[11px] text-[var(--text-faint)] hover:text-[var(--text-muted)] transition-colors"
       >
-        {t('post.action.reply')}
-        {replyCount > 0 && <span className="ml-1.5 text-[var(--text-muted)]">{replyCount}</span>}
+        reply{replyCount > 0 && <span className="ml-1 text-[var(--text-faint)]/60">{replyCount}</span>}
       </button>
+
+      {/* Fork */}
       <button
         data-testid="fork-button"
         onClick={handleFork}
-        className="font-mono text-[12px] text-[var(--text-muted)] hover:text-[var(--accent-blue)] transition-colors"
-        aria-label="Fork post"
+        className="font-mono text-[11px] text-[var(--text-faint)] hover:text-[var(--text-muted)] transition-colors"
       >
-        {t('post.action.fork')}
-        {localForkCount > 0 && <span className="ml-1.5 text-[var(--text-muted)]">{localForkCount}</span>}
+        fork{localForkCount > 0 && <span className="ml-1 text-[var(--text-faint)]/60">{localForkCount}</span>}
       </button>
+
+      {/* Star */}
       <button
         data-testid="star-button"
         onClick={handleStar}
-        className={`font-mono text-[12px] transition-colors ${
-          isStarred ? 'text-[var(--accent-amber)]' : 'text-[var(--text-muted)] hover:text-[var(--accent-amber)]'
+        className={`font-mono text-[11px] transition-colors ${
+          isStarred
+            ? 'text-[var(--accent-amber)]/80'
+            : 'text-[var(--text-faint)] hover:text-[var(--accent-amber)]/60'
         }`}
         aria-pressed={isStarred}
-        aria-label="Star post"
       >
-        {isStarred ? t('post.action.star') : t('post.action.unstar')}
+        {isStarred ? 'starred' : 'star'}
         {starCount > 0 && (
-          <span
-            data-testid="star-count"
-            className={`ml-1.5 ${isStarred ? 'text-[var(--accent-amber)]/70' : 'text-[var(--text-muted)]'}`}
-          >
-            {starCount}
-          </span>
+          <span data-testid="star-count" className="ml-1 opacity-60">{starCount}</span>
         )}
       </button>
 
-      {/* Quick react */}
+      {/* Edit (author only) */}
+      {isAuthor && onEdit && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onEdit(); }}
+          className="font-mono text-[11px] text-[var(--text-faint)] hover:text-[var(--text-muted)] transition-colors"
+        >
+          edit
+        </button>
+      )}
+
+      {/* Share */}
+      <button
+        onClick={handleShare}
+        className={`font-mono text-[11px] transition-colors ${
+          shareCopied ? 'text-[var(--accent-green)]' : 'text-[var(--text-faint)] hover:text-[var(--text-muted)]'
+        }`}
+      >
+        {shareCopied ? 'copied' : 'share'}
+      </button>
+
+      {/* React */}
       {reactions && onReactionUpdate && (
         <div className="relative ml-auto">
           <button
             onClick={(e) => { e.stopPropagation(); setReactPickerOpen((o) => !o); }}
-            className="font-mono text-[12px] text-[var(--text-muted)] hover:text-[var(--accent-green)] transition-colors"
-            aria-label="Add reaction"
+            className="font-mono text-[11px] text-[var(--text-faint)] hover:text-[var(--text-muted)] transition-colors"
           >
-            [react]
+            +
           </button>
           {reactPickerOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setReactPickerOpen(false)} aria-hidden="true" />
-              <div className="absolute bottom-full right-0 mb-1 bg-[var(--bg-surface)] border border-[var(--border)] z-50 flex gap-1 p-1.5 shadow-lg shadow-black/40">
+              <div className="absolute bottom-full right-0 mb-1 bg-[var(--bg-surface)] border border-[var(--border)]/40 z-50 flex gap-0.5 p-1 shadow-lg shadow-black/40">
                 {(['lgtm', 'ship_it', 'fire', 'bug', 'thinking', 'rocket', 'eyes', 'heart'] as ReactionEmoji[]).map((emoji) => (
                   <button
                     key={emoji}
                     onClick={(e) => handleQuickReact(e, emoji)}
-                    className={`font-mono text-[10px] px-1 py-0.5 transition-colors ${
+                    className={`font-mono text-[10px] px-1.5 py-0.5 transition-colors ${
                       reactions.mine.includes(emoji)
                         ? 'text-[var(--accent-green)]'
-                        : 'text-[var(--text-muted)] hover:text-[var(--accent-green)]'
+                        : 'text-[var(--text-faint)] hover:text-[var(--text-muted)]'
                     }`}
                   >
-                    [{REACTION_DISPLAY[emoji]}]
+                    {REACTION_DISPLAY[emoji]}
                   </button>
                 ))}
               </div>

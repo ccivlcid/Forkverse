@@ -59,7 +59,7 @@
 
 > Full database documentation — schema, ERD, queries, migrations, indexes — is in [`docs/specs/DATABASE.md`](../specs/DATABASE.md).
 
-**Tables**: `users`, `posts`, `follows`, `stars`
+**Tables**: `users`, `posts`, `follows`, `stars`, `user_llm_keys`, `translations`, `repo_attachments`, `analyses`, `github_synced_events`, `webhook_deliveries`, `activity_feed`, `notifications`, `reactions`, `posts_fts` (FTS5)
 **Engine**: SQLite 3 via `better-sqlite3` (synchronous API)
 **Migrations**: Sequential `.sql` files in `packages/server/src/db/migrations/`
 
@@ -74,30 +74,48 @@
 ## Frontend State Management
 
 ```typescript
-// Zustand store structure
-
-feedStore: {
-  posts: Post[]
-  cursor: string | null
-  isLoading: boolean
-  fetchGlobalFeed()
-  fetchLocalFeed()
-  fetchByLlm(model)
-}
+// Zustand store structure (9 stores)
 
 authStore: {
-  user: User | null
-  loginWithGitHub()
-  logout()
-  fetchMe()
+  user, isAuthenticated, isLoading, error, connectionStatus
+  → checkSession(), initiateGitHubOAuth(), logout(), updateProfile()
+}
+
+feedStore: {
+  posts, cursor, hasMore, isLoading, activeFilter, focusedPostId
+  → fetchFeed(), fetchNextPage(), setFilter(), starPost(), focusPost(), focusNext(), focusPrev()
 }
 
 postStore: {
-  draft: string
-  cliPreview: string | null
-  selectedModel: LlmModel
-  transformToCli()
-  submitPost()
+  draft, cliPreview, selectedModel, attachedRepo, transformedTags/intent/emotion
+  → setDraft(), selectModel(), attachRepo(), transformToCli(), submitPost()
+}
+
+postDetailStore: {
+  post, replies, forkedFrom, draft, cliPreview, selectedModel
+  → fetchPost(), addReply(), starPost(), transformReply(), submitReply()
+}
+
+uiStore: {
+  lang → setLang(), t()   // i18n translation, persisted to localStorage
+}
+
+toastStore: {
+  toasts[] → addToast(), removeToast(), toast(), toastError(), toastSuccess()
+}
+
+notificationStore: {
+  notifications[], unreadCount, cursor, hasMore
+  → fetchNotifications(), fetchNextPage(), fetchUnreadCount(), markRead(), markAllRead()
+}
+
+searchStore: {
+  query, results, isLoading → setQuery(), search(), clear()   // 300ms debounce
+}
+
+activityStore: {
+  events[], cursor, hasMore, feedType
+  → fetchActivity(type), fetchNextPage(), syncGithub()
 }
 ```
 
@@ -124,25 +142,6 @@ interface TransformRequest {
 }
 
 // createProvider(provider) → returns the correct LlmProvider implementation
-```
-
-### CLI Provider Architecture
-
-```
-User input → CliProvider.transform()
-               → spawn child process
-               → pipe prompt to stdin
-               → read stdout as CLI output
-               → parse and return TransformResponse
-
-Supported CLI tools:
-  $ claude          # Claude Code (Anthropic CLI)
-  $ codex           # OpenAI Codex CLI
-  $ gemini          # Google Gemini CLI
-  $ cursor          # Cursor CLI
-  $ opencode        # OpenCode CLI
-  $ ollama run      # Ollama local models
-  $ any-tool        # Any tool that reads stdin/args and outputs text
 ```
 
 ### Generic API Provider
@@ -370,12 +369,12 @@ Step-by-step flow from user action to database and back:
 | Aspect | Development | Production |
 |--------|------------|------------|
 | Server | `tsx watch` mode (auto-reload) | `tsx` (or compiled JS) |
-| Client | Vite dev server with HMR (`localhost:5173`) | `vite build` → static files served by Express |
+| Client | Vite dev server with HMR (`localhost:7878`, strict port) | `vite build` → static files served by Express |
 | DB | Local SQLite file (`clitoris.db`) | Local SQLite file (same) |
 | Logging | `debug` level, pretty-printed output | `info` level, JSON format |
-| CORS | `localhost:5173` allowed (Vite dev server) | Same-origin (no CORS needed) |
+| CORS | `localhost:7878` allowed (Vite dev server) | Same-origin (no CORS needed) |
 | Source maps | Enabled (inline) | Disabled (or external) |
-| API proxy | Vite proxy → `localhost:3000/api` | Direct (same server) |
+| API proxy | Vite proxy → `localhost:3771/api` | Direct (same server) |
 
 ---
 
@@ -386,7 +385,7 @@ Step-by-step flow from user action to database and back:
 ```
 ┌──────────────────┐     ┌──────────────────┐
 │ Vite Dev Server  │     │ Express (tsx)     │
-│ localhost:5173   │────▶│ localhost:3000    │
+│ localhost:7878   │────▶│ localhost:3771    │
 │ (HMR + proxy)   │     │ (auto-reload)     │
 └──────────────────┘     └────────┬─────────┘
                                   │
@@ -443,7 +442,7 @@ Step-by-step flow from user action to database and back:
 import cors from 'cors';
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN || 'http://localhost:7878',
   credentials: true,  // Required for session cookies
 }));
 ```
@@ -455,7 +454,7 @@ No CORS middleware needed — client and API are served from the same origin.
 ```typescript
 if (process.env.NODE_ENV !== 'production') {
   app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:7878',
     credentials: true,
   }));
 }

@@ -383,6 +383,144 @@ CREATE INDEX IF NOT EXISTS idx_github_synced_events_user ON github_synced_events
 
 **Usage**: Before creating a post from a GitHub event, `POST /api/users/sync-activity` checks `SELECT 1 FROM github_synced_events WHERE event_id = ?`. If found, the event is skipped. After creation, the `event_id` is inserted here.
 
+### 2.11 `webhook_deliveries`
+
+Tracks GitHub webhook delivery IDs for idempotency (prevents processing the same webhook twice).
+
+```sql
+-- 013_create_webhook_deliveries.sql
+CREATE TABLE IF NOT EXISTS webhook_deliveries (
+  delivery_id  TEXT PRIMARY KEY,
+  received_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+```
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| delivery_id | TEXT | PK | GitHub webhook delivery UUID (`X-GitHub-Delivery` header) |
+| received_at | TEXT | NOT NULL | When the webhook was received |
+
+### 2.12 `activity_feed`
+
+Stores platform-wide activity events (follows, stars, forks, replies, GitHub events).
+
+```sql
+-- 014_create_activity_feed.sql
+CREATE TABLE IF NOT EXISTS activity_feed (
+  id              TEXT PRIMARY KEY,
+  actor_id        TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  event_type      TEXT NOT NULL,
+  target_user_id  TEXT REFERENCES users(id) ON DELETE SET NULL,
+  target_post_id  TEXT REFERENCES posts(id) ON DELETE SET NULL,
+  metadata        TEXT DEFAULT '{}',
+  github_event_id TEXT,
+  created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_activity_feed_actor ON activity_feed(actor_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activity_feed_created ON activity_feed(created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_activity_feed_github_event ON activity_feed(github_event_id) WHERE github_event_id IS NOT NULL;
+```
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | TEXT | PK | UUID v7 |
+| actor_id | TEXT | FK→users ON DELETE CASCADE | User who performed the action |
+| event_type | TEXT | NOT NULL | `follow`, `star_post`, `fork_post`, `reply`, `github_push`, `github_pr_merge`, etc. |
+| target_user_id | TEXT | FK→users (nullable) | User being acted upon |
+| target_post_id | TEXT | FK→posts (nullable) | Post being acted upon |
+| metadata | TEXT | DEFAULT '{}' | JSON metadata for the event |
+| github_event_id | TEXT | UNIQUE (where not null) | GitHub event ID for dedup |
+| created_at | TEXT | NOT NULL | When the activity occurred |
+
+### 2.13 `notifications`
+
+Stores user notifications for social interactions.
+
+```sql
+-- 015_create_notifications.sql
+CREATE TABLE IF NOT EXISTS notifications (
+  id         TEXT PRIMARY KEY,
+  user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  type       TEXT NOT NULL,
+  actor_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  post_id    TEXT REFERENCES posts(id) ON DELETE SET NULL,
+  message    TEXT,
+  read       INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, read, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_actor ON notifications(actor_id);
+```
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | TEXT | PK | UUID v7 |
+| user_id | TEXT | FK→users ON DELETE CASCADE | User receiving the notification |
+| type | TEXT | NOT NULL | `reply`, `mention`, `quote`, `star`, `fork`, `follow`, `reaction` |
+| actor_id | TEXT | FK→users ON DELETE CASCADE | User who triggered the notification |
+| post_id | TEXT | FK→posts (nullable) | Related post |
+| message | TEXT | nullable | Notification preview text |
+| read | INTEGER | NOT NULL, DEFAULT 0 | 0=unread, 1=read |
+| created_at | TEXT | NOT NULL | When the notification was created |
+
+### 2.14 `reactions`
+
+Stores emoji reactions on posts. Each user can add multiple different emoji reactions per post.
+
+```sql
+-- 016_create_reactions.sql
+CREATE TABLE IF NOT EXISTS reactions (
+  user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  post_id    TEXT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  emoji      TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (user_id, post_id, emoji)
+);
+
+CREATE INDEX IF NOT EXISTS idx_reactions_post ON reactions(post_id);
+```
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| user_id | TEXT | PK, FK→users | User who reacted |
+| post_id | TEXT | PK, FK→posts | Post being reacted to |
+| emoji | TEXT | PK, NOT NULL | Reaction emoji from REACTION_EMOJIS: `lgtm`, `ship_it`, `fire`, `bug`, `thinking`, `rocket`, `eyes`, `heart` |
+| created_at | TEXT | NOT NULL | When reaction was added |
+
+### 2.15 `posts_fts` (Full-Text Search)
+
+FTS5 virtual table for full-text search on posts. Auto-synced via triggers.
+
+```sql
+-- 017_create_posts_fts.sql
+CREATE VIRTUAL TABLE IF NOT EXISTS posts_fts USING fts5(
+  message_raw,
+  tags,
+  content='posts',
+  content_rowid='rowid'
+);
+
+-- Auto-sync triggers on INSERT/UPDATE/DELETE
+```
+
+### 2.16 `quoted_post_id` on `posts`
+
+Added via migrations 018 and 019 to support quote posts.
+
+```sql
+-- 018_add_quoted_post_id.sql
+ALTER TABLE posts ADD COLUMN quoted_post_id TEXT REFERENCES posts(id) ON DELETE SET NULL;
+
+-- 019_add_quoted_post_index.sql
+CREATE INDEX IF NOT EXISTS idx_posts_quoted_post_id ON posts(quoted_post_id);
+```
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| quoted_post_id | TEXT | FK→posts ON DELETE SET NULL | ID of quoted post (for quote-posts) |
+
 ---
 
 ## 3. Entity Relationship Diagram
@@ -458,6 +596,13 @@ CREATE INDEX IF NOT EXISTS idx_github_synced_events_user ON github_synced_events
 | `analyses` | `idx_analyses_user_id` | `user_id` | User's analysis history |
 | `analyses` | `idx_analyses_status` | `status` | Filter by processing status |
 | `analyses` | `idx_analyses_repo` | `repo_owner, repo_name` | Repo analysis lookup |
+| `activity_feed` | `idx_activity_feed_actor` | `actor_id, created_at DESC` | User's activity history |
+| `activity_feed` | `idx_activity_feed_created` | `created_at DESC` | Global activity feed |
+| `activity_feed` | `idx_activity_feed_github_event` | `github_event_id` (UNIQUE, partial) | GitHub event dedup |
+| `notifications` | `idx_notifications_user` | `user_id, read, created_at DESC` | User's notifications |
+| `notifications` | `idx_notifications_actor` | `actor_id` | Notifications by actor |
+| `reactions` | `idx_reactions_post` | `post_id` | Reactions per post |
+| `posts` | `idx_posts_quoted_post_id` | `quoted_post_id` | Quote post lookup |
 
 ---
 
@@ -805,6 +950,44 @@ ALTER TABLE users ADD COLUMN github_token_scope TEXT;
 ALTER TABLE users ADD COLUMN top_languages TEXT NOT NULL DEFAULT '[]';
 ```
 
+```sql
+-- 013_create_webhook_deliveries.sql
+CREATE TABLE IF NOT EXISTS webhook_deliveries (
+  delivery_id  TEXT PRIMARY KEY,
+  received_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+```
+
+```sql
+-- 014_create_activity_feed.sql
+-- (see section 2.12 above for full content)
+```
+
+```sql
+-- 015_create_notifications.sql
+-- (see section 2.13 above for full content)
+```
+
+```sql
+-- 016_create_reactions.sql
+-- (see section 2.14 above for full content)
+```
+
+```sql
+-- 017_create_posts_fts.sql
+-- (see section 2.15 above for full content)
+```
+
+```sql
+-- 018_add_quoted_post_id.sql
+ALTER TABLE posts ADD COLUMN quoted_post_id TEXT REFERENCES posts(id) ON DELETE SET NULL;
+```
+
+```sql
+-- 019_add_quoted_post_index.sql
+CREATE INDEX IF NOT EXISTS idx_posts_quoted_post_id ON posts(quoted_post_id);
+```
+
 ---
 
 ## 7. Access Patterns
@@ -827,6 +1010,14 @@ ALTER TABLE users ADD COLUMN top_languages TEXT NOT NULL DEFAULT '[]';
 | Filter analyses by status | `analyses` | Low | `idx_analyses_status` |
 | Check GitHub event dedup | `github_synced_events` | Medium | PK (`event_id`) |
 | List user's synced events | `github_synced_events` | Low | `idx_github_synced_events_user` |
+| Webhook dedup check | `webhook_deliveries` | Medium | PK (`delivery_id`) |
+| User's activity feed | `activity_feed` + `follows` | High | `idx_activity_feed_actor`, `idx_activity_feed_created` |
+| Global activity feed | `activity_feed` | Medium | `idx_activity_feed_created` |
+| User notifications | `notifications` + `users` | High | `idx_notifications_user` |
+| Unread notification count | `notifications` | Very high | `idx_notifications_user` |
+| Post reactions | `reactions` | High | `idx_reactions_post` |
+| Full-text search | `posts_fts` | Medium | FTS5 index |
+| Quote post lookup | `posts` | Medium | `idx_posts_quoted_post_id` |
 
 ---
 
@@ -836,7 +1027,7 @@ ALTER TABLE users ADD COLUMN top_languages TEXT NOT NULL DEFAULT '[]';
 - `user_id` on posts must reference a valid user
 - `parent_id` and `forked_from_id` must reference valid posts or be NULL
 - `visibility` constrained to: `public`, `private`, `unlisted`
-- `llm_model` constrained to: `claude-sonnet`, `gpt-4o`, `gemini-2.5-pro`, `llama-3`, `cursor`, `cli`, `api`, `custom`
+- `llm_model` is a free-form string (any LLM model identifier, e.g. `claude-sonnet-4-20250514`, `gpt-4o`, `gemini-2.5-pro`)
 - `output_type` in analyses constrained to: `report`, `pptx`, `video`
 - `status` in analyses constrained to: `pending`, `processing`, `completed`, `failed`
 - `github_id` on users must be unique (GitHub OAuth identity)

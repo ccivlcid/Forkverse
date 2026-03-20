@@ -4,7 +4,6 @@ import { OpenAiProvider } from './providers/openai.js';
 import { GeminiProvider } from './providers/gemini.js';
 import { OllamaProvider } from './providers/ollama.js';
 import { CursorProvider } from './providers/cursor.js';
-import { CliProvider } from './providers/cli.js';
 import { GenericApiProvider } from './providers/api.js';
 import { ProviderConfigError } from './errors.js';
 
@@ -35,8 +34,6 @@ export function createProvider(name: string, credentials: ProviderCredentials = 
       return new OllamaProvider();
     case 'cursor':
       return new CursorProvider();
-    case 'cli':
-      return new CliProvider();
     case 'api': {
       if (!credentials.baseUrl) throw new ProviderConfigError('api', 'baseUrl');
       return new GenericApiProvider('custom', credentials.baseUrl, credentials.apiKey ?? '');

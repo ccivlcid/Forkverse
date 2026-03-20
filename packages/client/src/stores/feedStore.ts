@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { api } from '../api/client.js';
 import { toastError } from './toastStore.js';
 import type { Post, ApiResponse, LlmModel } from '@clitoris/shared';
+import { GLOBAL_FEED_MOCK } from '../mocks/globalFeedMock.js';
 
 type FeedEndpoint = 'global' | 'local' | 'explore';
 
@@ -22,6 +23,7 @@ interface FeedState {
   setFilter: (model: LlmModel | 'all') => void;
   starPost: (postId: string, isStarred: boolean) => void;
   prependPost: (post: Post) => void;
+  updatePost: (postId: string, updated: Post) => void;
   focusPost: (id: string | null) => void;
   focusNext: () => void;
   focusPrev: () => void;
@@ -57,10 +59,11 @@ export const useFeedStore = create<FeedState>((set, get) => ({
     set({ isLoading: true, error: null, posts: [], cursor: null, hasMore: true, feedEndpoint: endpoint });
     try {
       const res = await api.get<FeedApiResponse>(buildPath(endpoint, get().activeFilter));
+      const posts = res.data.length > 0 ? res.data : (endpoint === 'global' ? GLOBAL_FEED_MOCK : []);
       set({
-        posts: res.data,
+        posts,
         cursor: res.meta?.cursor ?? null,
-        hasMore: res.meta?.hasMore ?? false,
+        hasMore: res.data.length > 0 ? (res.meta?.hasMore ?? false) : false,
         isLoading: false,
       });
     } catch {
@@ -108,6 +111,12 @@ export const useFeedStore = create<FeedState>((set, get) => ({
 
   prependPost: (post) => {
     set((state) => ({ posts: [post, ...state.posts] }));
+  },
+
+  updatePost: (postId, updated) => {
+    set((state) => ({
+      posts: state.posts.map((p) => p.id === postId ? updated : p),
+    }));
   },
 
   focusPost: (id) => set({ focusedPostId: id }),

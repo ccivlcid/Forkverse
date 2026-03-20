@@ -4,38 +4,40 @@ import AppShell from '../components/layout/AppShell.js';
 import PostCard from '../components/post/PostCard.js';
 import { usePostDetailStore } from '../stores/postDetailStore.js';
 import { useAuthStore } from '../stores/authStore.js';
-import { useUiStore } from '../stores/uiStore.js';
 import { api } from '../api/client.js';
 import type { ApiResponse } from '@clitoris/shared';
 
 // ── Skeleton ─────────────────────────────────────────────────
 
-function SkeletonBlock({ lines }: { lines: number }) {
+function SkeletonPost() {
   return (
-    <div className="border border-gray-700 animate-pulse">
-      <div className="flex items-center justify-between px-4 py-2 bg-[#16213e]">
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-20 bg-gray-700 rounded" />
-          <div className="h-3 w-12 bg-gray-700 rounded" />
-        </div>
-        <div className="h-3 w-14 bg-gray-700 rounded" />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2">
-        <div className="bg-[#16213e] p-4 space-y-2">
-          {Array.from({ length: lines }).map((_, i) => (
-            <div key={i} className="h-3 bg-gray-700 rounded" style={{ width: `${70 + (i % 3) * 10}%` }} />
-          ))}
-        </div>
-        <div className="bg-[#0d1117] p-4 space-y-2">
-          {Array.from({ length: lines }).map((_, i) => (
-            <div key={i} className="h-3 bg-gray-800 rounded" style={{ width: `${60 + (i % 3) * 12}%` }} />
-          ))}
+    <div className="animate-pulse space-y-4 py-8">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-white/[0.04]" />
+        <div className="space-y-2">
+          <div className="h-3 w-24 bg-white/[0.06] rounded" />
+          <div className="h-2.5 w-16 bg-white/[0.04] rounded" />
         </div>
       </div>
-      <div className="border-t border-gray-700 px-4 py-2 flex gap-6">
-        <div className="h-3 w-12 bg-gray-700 rounded" />
-        <div className="h-3 w-10 bg-gray-700 rounded" />
-        <div className="h-3 w-10 bg-gray-700 rounded" />
+      <div className="space-y-2.5 pt-2">
+        <div className="h-3 w-full bg-white/[0.05] rounded" />
+        <div className="h-3 w-4/5 bg-white/[0.05] rounded" />
+        <div className="h-3 w-3/5 bg-white/[0.04] rounded" />
+      </div>
+    </div>
+  );
+}
+
+function SkeletonReply() {
+  return (
+    <div className="animate-pulse py-5">
+      <div className="flex items-center gap-2.5 mb-3">
+        <div className="w-7 h-7 rounded-full bg-white/[0.04]" />
+        <div className="h-2.5 w-20 bg-white/[0.05] rounded" />
+      </div>
+      <div className="space-y-2 pl-[38px]">
+        <div className="h-2.5 w-full bg-white/[0.04] rounded" />
+        <div className="h-2.5 w-2/3 bg-white/[0.04] rounded" />
       </div>
     </div>
   );
@@ -45,11 +47,10 @@ function SkeletonBlock({ lines }: { lines: number }) {
 
 function ReplyComposer({ parentId, parentUsername }: { parentId: string; parentUsername: string }) {
   const { isAuthenticated } = useAuthStore();
-  const { draft, cliPreview, isTransforming, isSubmitting, transformError, setDraft, transformReply, submitReply } =
+  const { draft, cliPreview, isTransforming, isSubmitting, transformError, setDraft, transformReply, submitReply, clearTransformError } =
     usePostDetailStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
-  const { t } = useUiStore();
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -60,72 +61,72 @@ function ReplyComposer({ parentId, parentUsername }: { parentId: string; parentU
 
   if (!isAuthenticated) {
     return (
-      <div
-        data-testid="login-prompt"
-        className="border border-gray-700 bg-[#16213e] p-6 text-center"
-      >
-        <p className="text-orange-400 font-mono text-sm mb-3">
-          &gt; Login to reply.
+      <div className="py-8 text-center">
+        <p className="text-[var(--text-faint)] font-mono text-[12px] mb-4">
+          reply requires authentication
         </p>
         <button
           onClick={() => navigate(`/login?redirect=/post/${parentId}`)}
-          className="bg-green-400/10 text-green-400 border border-green-400/30 px-4 py-1.5 font-mono text-sm hover:bg-green-400/20 transition-colors"
+          className="text-[var(--accent-green)] font-mono text-[12px] hover:text-[var(--accent-green)]/80 transition-colors"
         >
-          $ login
+          $ ssh connect
         </button>
       </div>
     );
   }
 
   return (
-    <div className="border border-gray-700 bg-[#16213e] p-4">
-      <p className="text-gray-500 text-xs font-mono mb-3">
-        &gt; {t('post.action.reply')} --to=@{parentUsername}
-      </p>
+    <div className="py-6">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-[var(--text-faint)] font-mono text-[11px]">
+          <span className="text-[var(--accent-green)]">$</span> reply --to=<span className="text-[var(--accent-amber)]">@{parentUsername}</span>
+        </span>
+      </div>
 
       <textarea
         ref={textareaRef}
         data-testid="reply-composer-input"
-        aria-label={`Write a reply to @${parentUsername}`}
+        aria-label={`Reply to @${parentUsername}`}
         value={draft}
-        onChange={(e) => setDraft(e.target.value)}
+        onChange={(e) => { setDraft(e.target.value); if (transformError) clearTransformError(); }}
         onKeyDown={handleKeyDown}
         placeholder="Write your reply..."
         rows={3}
-        className="w-full bg-[#0d1117] border border-gray-700 text-gray-200 font-sans text-sm px-3 py-2 placeholder-gray-600 resize-none focus:outline-none focus:border-gray-500"
+        className="w-full bg-transparent text-[var(--text)] text-[14px] leading-[1.7] resize-none outline-none placeholder:text-[var(--text-faint)]/40 border-b border-[var(--border)]/30 focus:border-[var(--accent-green)]/20 pb-3 transition-colors"
+        style={{ fontFamily: 'var(--font-sans)' }}
       />
 
       {cliPreview && (
-        <pre className="mt-2 px-3 py-2 bg-[#0d1117] text-green-400 font-mono text-xs whitespace-pre-wrap border border-gray-700">
-          {cliPreview}
-        </pre>
+        <div className="mt-3 pl-4 border-l-2 border-[var(--accent-green)]/20">
+          <pre className="text-[var(--accent-green)]/70 font-mono text-[11px] whitespace-pre-wrap">{cliPreview}</pre>
+        </div>
       )}
 
       {transformError && (
-        <p className="mt-2 px-3 py-2 bg-red-400/5 text-red-400 font-mono text-xs border border-red-400/20">
-          error: {transformError}
+        <p className="mt-2 text-[var(--color-error)] font-mono text-[11px]">
+          {transformError}
         </p>
       )}
 
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-3">
-          <span className="text-gray-500 text-xs font-mono">Cmd+Enter · reply</span>
-        </div>
+      <div className="flex items-center justify-between mt-4">
+        <span className="text-[var(--text-faint)] text-[10px] font-mono">
+          ctrl+enter to reply
+        </span>
         <div className="flex gap-2">
           <button
             onClick={() => transformReply(parentId)}
             disabled={!draft.trim() || isTransforming}
-            className="bg-[#0d1117] text-gray-300 border border-gray-700 px-3 py-1.5 font-mono text-xs hover:border-gray-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="text-[var(--text-muted)] hover:text-[var(--text)] font-mono text-[11px] disabled:opacity-30 transition-colors"
           >
-            {isTransforming ? 'transforming...' : 'LLM → CLI'}
+            {isTransforming ? 'transforming...' : 'preview'}
           </button>
           <button
             data-testid="reply-composer-submit"
             onClick={() => submitReply(parentId)}
             disabled={!draft.trim() || isSubmitting}
-            className="bg-green-400/10 text-green-400 border border-green-400/30 px-4 py-1.5 font-mono text-sm hover:bg-green-400/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="text-[var(--accent-green)] font-mono text-[12px] hover:text-[var(--accent-green)]/80 disabled:opacity-30 transition-colors"
           >
-            {isSubmitting ? 'replying...' : 'reply'}
+            {isSubmitting ? 'sending...' : 'reply'}
           </button>
         </div>
       </div>
@@ -142,25 +143,19 @@ export default function PostDetailPage() {
   const replyThreadRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (id) {
-      void fetchPost(id);
-    }
+    if (id) void fetchPost(id);
     return () => reset();
   }, [id, fetchPost, reset]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === 'Backspace' || e.key === 'ArrowLeft') {
-        navigate(-1);
-      }
-      if (e.key === 'r' || e.key === '/') {
+      if (e.key === 'Backspace' || e.key === 'ArrowLeft') navigate(-1);
+      if ((e.key === 'r' || e.key === '/') && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
         replyThreadRef.current?.querySelector('textarea')?.focus();
       }
-      if (e.key === 's' && post) {
-        void handleStar(post.id, !post.isStarred);
-      }
+      if (e.key === 's' && post) void handleStar(post.id, !post.isStarred);
     };
     window.addEventListener('keydown', handle);
     return () => window.removeEventListener('keydown', handle);
@@ -171,39 +166,36 @@ export default function PostDetailPage() {
     try {
       await api.post<ApiResponse<{ starred: boolean; starCount: number }>>(`/posts/${postId}/star`);
     } catch {
-      starPost(postId, !starred); // revert
+      starPost(postId, !starred);
     }
   };
 
-  const shortId = id ? id.slice(0, 8) : '';
-  const breadcrumb = `post --id=${shortId}`;
-
+  // ── Error state ──
   if (error) {
     return (
-      <AppShell breadcrumb={breadcrumb}>
-        <div className="max-w-2xl mx-auto p-4 space-y-4">
-          <button
-            data-testid="back-button"
-            aria-label="Go back to feed"
-            onClick={() => navigate(-1)}
-            className="text-gray-500 hover:text-gray-300 font-mono text-sm transition-colors"
-          >
-            ← back to feed
-          </button>
-          <div
-            data-testid="post-not-found"
-            className="border border-red-400/30 bg-[#16213e] p-8 text-center space-y-3"
-          >
-            <p className="text-green-400 font-mono text-sm">$ post --id={shortId}</p>
-            <p className="text-red-400 font-mono text-sm">error: 404 not found</p>
-            <p className="text-gray-400 font-sans text-sm">
-              This post doesn&apos;t exist or has been deleted.
-            </p>
+      <AppShell>
+        <div className="max-w-[600px] mx-auto px-5 py-16 text-center space-y-6">
+          <p className="text-[var(--text-faint)] font-mono text-[12px]">
+            <span className="text-[var(--accent-green)]">$</span> post --id={id?.slice(0, 8)}
+          </p>
+          <p className="text-[var(--color-error)] font-mono text-[13px]">
+            404: not found
+          </p>
+          <p className="text-[var(--text-muted)] text-[13px]" style={{ fontFamily: 'var(--font-sans)' }}>
+            This post doesn&apos;t exist or has been deleted.
+          </p>
+          <div className="flex justify-center gap-4 pt-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-[var(--text-muted)] hover:text-[var(--text)] font-mono text-[12px] transition-colors"
+            >
+              back
+            </button>
             <button
               onClick={() => navigate('/')}
-              className="mt-2 bg-green-400/10 text-green-400 border border-green-400/30 px-4 py-1.5 font-mono text-sm hover:bg-green-400/20 transition-colors"
+              className="text-[var(--accent-green)] hover:text-[var(--accent-green)]/80 font-mono text-[12px] transition-colors"
             >
-              $ feed --global
+              feed
             </button>
           </div>
         </div>
@@ -211,114 +203,85 @@ export default function PostDetailPage() {
     );
   }
 
+  // ── Main ──
   return (
-    <AppShell breadcrumb={breadcrumb}>
-      <div className="max-w-2xl mx-auto p-4 space-y-4">
+    <AppShell>
+      <div className="max-w-[600px] mx-auto">
 
-        {/* Back button */}
-        <button
-          data-testid="back-button"
-          aria-label="Go back to feed"
-          aria-keyshortcuts="Backspace"
-          onClick={() => navigate(-1)}
-          className="text-gray-500 hover:text-gray-300 font-mono text-sm transition-colors"
-        >
-          ← back to feed
-        </button>
+        {/* Navigation — minimal, out of the way */}
+        <div className="px-5 pt-5 pb-2">
+          <button
+            data-testid="back-button"
+            onClick={() => navigate(-1)}
+            className="text-[var(--text-faint)] hover:text-[var(--text-muted)] font-mono text-[11px] transition-colors"
+          >
+            <span className="text-[var(--accent-green)]">$</span> cd ..
+          </button>
+        </div>
 
-        {/* Forked-from banner */}
+        {/* Forked-from — quiet context, not a visual block */}
         {!isLoading && forkedFrom && (
           <Link
             data-testid="forked-from-banner"
-            role="link"
-            aria-label={`View original post by @${forkedFrom.user.username}`}
             to={`/post/${forkedFrom.id}`}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-700 bg-[#16213e] text-gray-400 text-xs font-mono hover:border-gray-600 hover:text-gray-300 transition-colors"
+            className="block px-5 py-2 text-[var(--text-faint)] text-[11px] font-mono hover:text-[var(--text-muted)] transition-colors"
             onClick={(e) => e.stopPropagation()}
           >
-            <span className="text-blue-400">◇</span>
-            <span>forked from</span>
-            <span className="text-amber-400">@{forkedFrom.user.username}</span>
-            <span className="text-gray-600 truncate">· {forkedFrom.messageRaw.slice(0, 60)}</span>
+            forked from <span className="text-[var(--accent-amber)]">@{forkedFrom.user.username}</span>
           </Link>
         )}
 
-        {/* Main post */}
+        {/* Main post — the hero, given full breathing room */}
         {isLoading ? (
-          <SkeletonBlock lines={6} />
+          <div className="px-5"><SkeletonPost /></div>
         ) : post ? (
           <div data-testid="main-post-card">
             <PostCard post={post} focused />
           </div>
         ) : null}
 
+        {/* Divider — a single breath between post and thread */}
+        <div className="mx-5 border-t border-[var(--border)]/20 my-1" />
+
         {/* Reply thread */}
         <div
           ref={replyThreadRef}
           data-testid="reply-thread"
-          aria-label={`Reply thread with ${replies.length} replies`}
+          aria-label={`${replies.length} replies`}
           aria-live="polite"
-          className="space-y-3"
+          className="px-5"
         >
-          {/* Reply count header */}
-          <div className="border-b border-gray-700 pb-2">
-            <span
-              data-testid="reply-count"
-              className="text-gray-600 text-xs font-mono"
-            >
-              // {isLoading ? '…' : replies.length} replies
+          {/* Reply count — information, not decoration */}
+          <div className="py-3">
+            <span data-testid="reply-count" className="text-[var(--text-faint)] text-[11px] font-mono">
+              {isLoading ? '...' : replies.length === 0 ? 'no replies yet' : `${replies.length} ${replies.length === 1 ? 'reply' : 'replies'}`}
             </span>
           </div>
 
-          {/* Skeleton replies */}
+          {/* Loading skeletons */}
           {isLoading && (
-            <>
-              <SkeletonBlock lines={2} />
-              <SkeletonBlock lines={2} />
-              <SkeletonBlock lines={2} />
-            </>
-          )}
-
-          {/* Empty state */}
-          {!isLoading && replies.length === 0 && post && (
-            <div className="border border-gray-700 bg-[#16213e] p-6 text-center space-y-2">
-              <p className="text-green-400 font-mono text-sm">
-                $ reply --to=@{post.user.username}
-              </p>
-              <p className="text-orange-400 font-mono text-sm">&gt; No replies yet.</p>
-              <p className="text-gray-400 font-sans text-sm">
-                Be the first to reply. Use the composer below.
-              </p>
+            <div className="divide-y divide-[var(--border)]/10">
+              <SkeletonReply />
+              <SkeletonReply />
             </div>
           )}
 
-          {/* Reply cards */}
-          {!isLoading &&
-            replies.map((reply) => (
-              <div key={reply.id} data-testid="reply-card">
-                <PostCard post={reply} />
-              </div>
-            ))}
-        </div>
+          {/* Reply cards — clean separation, no boxes */}
+          {!isLoading && replies.length > 0 && (
+            <div className="divide-y divide-[var(--border)]/10">
+              {replies.map((reply) => (
+                <div key={reply.id} data-testid="reply-card">
+                  <PostCard post={reply} />
+                </div>
+              ))}
+            </div>
+          )}
 
-        {/* Reply composer */}
-        {post && (
-          <ReplyComposer
-            parentId={post.id}
-            parentUsername={post.user.username}
-          />
-        )}
-        {/* Disabled composer placeholder while loading */}
-        {isLoading && !post && (
-          <div className="border border-gray-700 bg-[#16213e] p-4 opacity-40 cursor-not-allowed">
-            <textarea
-              disabled
-              placeholder="Write your reply..."
-              rows={3}
-              className="w-full bg-[#0d1117] border border-gray-700 text-gray-600 font-sans text-sm px-3 py-2 placeholder-gray-700 resize-none"
-            />
-          </div>
-        )}
+          {/* Reply composer — always present, inviting */}
+          {post && (
+            <ReplyComposer parentId={post.id} parentUsername={post.user.username} />
+          )}
+        </div>
 
       </div>
     </AppShell>

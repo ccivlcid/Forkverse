@@ -33,7 +33,9 @@ export default function AppShell({ children }: AppShellProps) {
       <HeaderBar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-3xl mx-auto">{children}</div>
+        </main>
       </div>
       <ToastContainer />
       {showHelp && <KeyboardHelpModal onClose={() => setShowHelp(false)} />}

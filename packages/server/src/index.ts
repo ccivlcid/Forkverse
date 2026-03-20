@@ -15,6 +15,8 @@ import { createGithubRouter } from './routes/github.js';
 import { createWebhookRouter } from './routes/webhook.js';
 import { createActivityRouter } from './routes/activity.js';
 import { createNotificationRouter } from './routes/notifications.js';
+import { createInfluenceRouter } from './routes/influence.js';
+import { createMessagesRouter } from './routes/messages.js';
 import { createErrorHandler } from './middleware/error.js';
 
 const logger = pino({
@@ -52,6 +54,8 @@ app.use('/api/github', createGithubRouter(db));
 app.use('/api/webhook', createWebhookRouter(db, logger));
 app.use('/api/activity', createActivityRouter(db));
 app.use('/api/notifications', createNotificationRouter(db));
+app.use('/api/influence', createInfluenceRouter(db));
+app.use('/api/messages', createMessagesRouter(db));
 
 app.get('/api/health', (_req, res) => {
   res.json({ data: { status: 'ok', timestamp: new Date().toISOString() } });

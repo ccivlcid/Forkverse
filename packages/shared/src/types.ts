@@ -57,6 +57,7 @@ export interface Post {
   reactions: PostReactions;
   quotedPostId: string | null;
   quotedPost: { id: string; messageRaw: string; messageCli: string; user: PostUser } | null;
+  updatedAt: string | null;
 }
 
 export interface PostUser {
@@ -331,3 +332,68 @@ export interface SuggestedUser {
   reason: string;
   topLanguages: string[];
 }
+
+// ============================================
+// Influence Score
+// ============================================
+export interface InfluenceBreakdown {
+  ghRepos: number;
+  ghStars: number;
+  ghFollowers: number;
+  cliPosts: number;
+  cliFollowers: number;
+  cliStars: number;
+  cliForks: number;
+}
+
+export interface InfluenceScore {
+  userId: string;
+  score: number;
+  tier: number;
+  tierLabel: string;
+  breakdown: InfluenceBreakdown;
+  ghTotalStars: number;
+  ghFollowers: number;
+  calculatedAt: string;
+  stale?: boolean;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+  githubUsername: string;
+  score: number;
+  tier: number;
+  tierLabel: string;
+}
+
+// ============================================
+// Direct Messages
+// ============================================
+export interface DirectMessage {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  sender: PostUser;
+}
+
+export interface Conversation {
+  otherUser: PostUser & { username: string };
+  lastMessage: string;
+  lastMessageAt: string;
+  unreadCount: number;
+}
+
+export const INFLUENCE_TIERS = [
+  { min: 0,  tier: 1, label: 'guest',       color: '#6b7280' },
+  { min: 10, tier: 2, label: 'user',        color: '#d1d5db' },
+  { min: 25, tier: 3, label: 'contributor',  color: '#3fb950' },
+  { min: 40, tier: 4, label: 'maintainer',   color: '#76e3ea' },
+  { min: 60, tier: 5, label: 'admin',        color: '#d29922' },
+  { min: 80, tier: 6, label: 'root',         color: '#f85149' },
+] as const;

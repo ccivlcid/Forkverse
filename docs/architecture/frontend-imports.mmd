@@ -4,136 +4,192 @@
 graph TD
     subgraph "@clitoris/client"
         MAIN["main.tsx<br/>(entry point)"]
-        APP_C["App.tsx<br/>(router setup)"]
+        APP_C["App.tsx<br/>(ErrorBoundary + Router)"]
 
-        subgraph Pages
-            FEED_PAGE["pages/feed.tsx"]
-            PROFILE_PAGE["pages/profile.tsx"]
-            POST_PAGE["pages/post.tsx"]
-            EXPLORE_PAGE["pages/explore.tsx"]
-            LOGIN_PAGE["pages/login.tsx"]
+        subgraph "Pages (12)"
+            GLOBAL_FEED["GlobalFeedPage"]
+            LOCAL_FEED["LocalFeedPage"]
+            EXPLORE_PAGE["ExplorePage"]
+            POST_PAGE["PostDetailPage"]
+            PROFILE_PAGE["UserProfilePage"]
+            LOGIN_PAGE["LoginPage"]
+            SETUP_PAGE["SetupPage"]
+            SETTINGS_PAGE["SettingsPage"]
+            ANALYZE_PAGE["AnalyzePage"]
+            GITHUB_PAGE["GitHubFeedPage"]
+            ACTIVITY_PAGE["ActivityFeedPage"]
+            SEARCH_PAGE["SearchPage"]
         end
 
         subgraph "Components — Layout"
-            SHELL["layout/shell.tsx"]
-            SIDEBAR["layout/sidebar.tsx"]
-            HEADER["layout/header.tsx"]
-        end
-
-        subgraph "Components — Feed"
-            FEED_LIST["feed/feed-list.tsx"]
-            POST_CARD["feed/post-card.tsx"]
+            SHELL["AppShell"]
+            SIDEBAR["Sidebar"]
+            HEADER["HeaderBar"]
+            TOAST["ToastContainer"]
+            KEYBOARD["KeyboardHelpModal"]
+            NOTIF_BELL["NotificationBell"]
+            SUGGESTED["SuggestedUsers"]
         end
 
         subgraph "Components — Post"
-            DUAL_PANEL["post/dual-panel.tsx"]
-            CLI_HIGHLIGHT["post/cli-highlight.tsx"]
-            COMPOSER["post/composer.tsx"]
-            ACTION_BAR["post/action-bar.tsx"]
+            POST_CARD["PostCard"]
+            DUAL_PANEL["DualPanel"]
+            CLI_HL["CliHighlighter"]
+            ACTION_BAR["ActionBar"]
+            REACTION_BAR["ReactionBar"]
+            QUOTED_POST["QuotedPost"]
+            REPO_CARD["RepoCard"]
+            LANG_BADGE["LangBadge"]
         end
 
-        subgraph "Components — Common"
-            BUTTON["common/button.tsx"]
-            INPUT["common/input.tsx"]
-            TAG["common/tag.tsx"]
-            SPINNER["common/spinner.tsx"]
-            LANG_BADGE["common/lang-badge.tsx"]
-            MODEL_SELECT["common/model-select.tsx"]
+        subgraph "Components — Composer"
+            COMPOSER["ComposerModal"]
         end
 
-        subgraph Stores
-            FEED_STORE["stores/feed-store.ts"]
-            AUTH_STORE["stores/auth-store.ts"]
-            POST_STORE["stores/post-store.ts"]
+        subgraph "Components — Feed"
+            FEED_LIST["FeedList"]
+            SCROLL_TRIGGER["InfiniteScrollTrigger"]
+        end
+
+        subgraph "Components — Profile"
+            CONTRIB_GRAPH["ContributionGraph"]
+            GH_FOLLOW_SYNC["GithubFollowSync"]
+        end
+
+        subgraph "Components — Settings"
+            PROFILE_TAB["ProfileTab"]
+            LANG_TAB["LanguageTab"]
+            API_TAB["ApiTab"]
+            OAUTH_TAB["OAuthTab"]
+            CHANNEL_TAB["ChannelTab"]
+            GITHUB_TAB["GithubTab"]
+        end
+
+        subgraph "Stores (9)"
+            AUTH_STORE["authStore"]
+            FEED_STORE["feedStore"]
+            POST_STORE["postStore"]
+            DETAIL_STORE["postDetailStore"]
+            UI_STORE["uiStore"]
+            TOAST_STORE["toastStore"]
+            NOTIF_STORE["notificationStore"]
+            SEARCH_STORE["searchStore"]
+            ACTIVITY_STORE["activityStore"]
         end
 
         subgraph Hooks
-            USE_FEED["hooks/use-feed.ts"]
-            USE_AUTH["hooks/use-auth.ts"]
-            USE_POST["hooks/use-post.ts"]
+            USE_KB["useKeyboardShortcuts"]
+        end
+
+        subgraph API
+            API_CLIENT["api/client.ts"]
         end
     end
 
     subgraph "@clitoris/shared"
-        TYPES["types/<br/>user.ts, post.ts, api.ts"]
-        CONSTANTS["constants/<br/>models.ts, limits.ts"]
+        TYPES["types.ts"]
     end
 
     %% Entry flow
     MAIN --> APP_C
-    APP_C --> SHELL
-    APP_C --> FEED_PAGE
-    APP_C --> PROFILE_PAGE
-    APP_C --> POST_PAGE
+    APP_C --> GLOBAL_FEED
+    APP_C --> LOCAL_FEED
     APP_C --> EXPLORE_PAGE
+    APP_C --> POST_PAGE
+    APP_C --> PROFILE_PAGE
     APP_C --> LOGIN_PAGE
+    APP_C --> SETUP_PAGE
+    APP_C --> SETTINGS_PAGE
+    APP_C --> ANALYZE_PAGE
+    APP_C --> GITHUB_PAGE
+    APP_C --> ACTIVITY_PAGE
+    APP_C --> SEARCH_PAGE
 
-    %% Shell layout
+    %% Layout
+    GLOBAL_FEED --> SHELL
     SHELL --> SIDEBAR
     SHELL --> HEADER
+    SHELL --> TOAST
+    SHELL --> KEYBOARD
+    HEADER --> NOTIF_BELL
+    SIDEBAR --> SUGGESTED
 
-    %% Pages use components
-    FEED_PAGE --> FEED_LIST
-    FEED_PAGE --> COMPOSER
-    PROFILE_PAGE --> FEED_LIST
-    POST_PAGE --> DUAL_PANEL
-    POST_PAGE --> ACTION_BAR
+    %% Feed pages
+    HEADER --> COMPOSER
+    GLOBAL_FEED --> FEED_LIST
+    GLOBAL_FEED --> USE_KB
+    LOCAL_FEED --> FEED_LIST
+    EXPLORE_PAGE --> FEED_LIST
 
     %% Feed components
     FEED_LIST --> POST_CARD
+    FEED_LIST --> SCROLL_TRIGGER
     POST_CARD --> DUAL_PANEL
     POST_CARD --> ACTION_BAR
+    POST_CARD --> REACTION_BAR
+    POST_CARD --> QUOTED_POST
+    POST_CARD --> REPO_CARD
     POST_CARD --> LANG_BADGE
-    POST_CARD --> TAG
+    DUAL_PANEL --> CLI_HL
 
-    %% Post components
-    DUAL_PANEL --> CLI_HIGHLIGHT
-    COMPOSER --> MODEL_SELECT
-    COMPOSER --> BUTTON
-    COMPOSER --> INPUT
+    %% Detail page
+    POST_PAGE --> POST_CARD
 
-    %% Sidebar
-    SIDEBAR --> BUTTON
-    HEADER --> BUTTON
+    %% Profile page
+    PROFILE_PAGE --> FEED_LIST
+    PROFILE_PAGE --> CONTRIB_GRAPH
+    PROFILE_PAGE --> GH_FOLLOW_SYNC
+    PROFILE_PAGE --> PROFILE_TAB
+    PROFILE_PAGE --> LANG_TAB
+    PROFILE_PAGE --> API_TAB
+    PROFILE_PAGE --> OAUTH_TAB
+    PROFILE_PAGE --> CHANNEL_TAB
+    PROFILE_PAGE --> GITHUB_TAB
 
-    %% Stores used by hooks
-    USE_FEED --> FEED_STORE
-    USE_AUTH --> AUTH_STORE
-    USE_POST --> POST_STORE
+    %% Search page
+    SEARCH_PAGE --> POST_CARD
 
-    %% Pages use hooks
-    FEED_PAGE --> USE_FEED
-    PROFILE_PAGE --> USE_FEED
-    POST_PAGE --> USE_POST
-    LOGIN_PAGE --> USE_AUTH
-    COMPOSER --> USE_POST
-    ACTION_BAR --> USE_POST
-    SIDEBAR --> USE_AUTH
-    HEADER --> USE_AUTH
+    %% Stores ← API client
+    AUTH_STORE --> API_CLIENT
+    FEED_STORE --> API_CLIENT
+    POST_STORE --> API_CLIENT
+    DETAIL_STORE --> API_CLIENT
+    NOTIF_STORE --> API_CLIENT
+    SEARCH_STORE --> API_CLIENT
+    ACTIVITY_STORE --> API_CLIENT
+
+    %% Pages use stores
+    GLOBAL_FEED --> FEED_STORE
+    GLOBAL_FEED --> AUTH_STORE
+    POST_PAGE --> DETAIL_STORE
+    SEARCH_PAGE --> SEARCH_STORE
+    ACTIVITY_PAGE --> ACTIVITY_STORE
+    COMPOSER --> POST_STORE
+    ACTION_BAR --> FEED_STORE
+    NOTIF_BELL --> NOTIF_STORE
+    TOAST --> TOAST_STORE
+    SIDEBAR --> UI_STORE
 
     %% Shared types
     FEED_STORE --> TYPES
     AUTH_STORE --> TYPES
     POST_STORE --> TYPES
-    POST_CARD --> TYPES
-    DUAL_PANEL --> TYPES
-    MODEL_SELECT --> CONSTANTS
 
     %% Styling
-    classDef page fill:#0f3460,stroke:#4ade80,color:#e2e8f0
-    classDef layout fill:#16213e,stroke:#fb923c,color:#e2e8f0
-    classDef feed fill:#16213e,stroke:#22d3ee,color:#e2e8f0
-    classDef post fill:#16213e,stroke:#fbbf24,color:#e2e8f0
-    classDef common fill:#1a1a2e,stroke:#64748b,color:#94a3b8
-    classDef store fill:#0f3460,stroke:#a78bfa,color:#e2e8f0
-    classDef hook fill:#1a1a2e,stroke:#a78bfa,color:#e2e8f0
-    classDef shared fill:#16213e,stroke:#a78bfa,color:#e2e8f0
+    classDef page fill:#161b22,stroke:#3fb950,color:#e6edf3
+    classDef layout fill:#161b22,stroke:#f0883e,color:#e6edf3
+    classDef feed fill:#161b22,stroke:#76e3ea,color:#e6edf3
+    classDef post fill:#161b22,stroke:#d29922,color:#e6edf3
+    classDef settings fill:#161b22,stroke:#bc8cff,color:#e6edf3
+    classDef store fill:#0d1117,stroke:#bc8cff,color:#e6edf3
+    classDef hook fill:#0d1117,stroke:#bc8cff,color:#e6edf3
+    classDef shared fill:#161b22,stroke:#bc8cff,color:#e6edf3
 
-    class MAIN,APP_C,FEED_PAGE,PROFILE_PAGE,POST_PAGE,EXPLORE_PAGE,LOGIN_PAGE page
-    class SHELL,SIDEBAR,HEADER layout
-    class FEED_LIST,POST_CARD feed
-    class DUAL_PANEL,CLI_HIGHLIGHT,COMPOSER,ACTION_BAR post
-    class BUTTON,INPUT,TAG,SPINNER,LANG_BADGE,MODEL_SELECT common
-    class FEED_STORE,AUTH_STORE,POST_STORE store
-    class USE_FEED,USE_AUTH,USE_POST hook
-    class TYPES,CONSTANTS shared
+    class GLOBAL_FEED,LOCAL_FEED,EXPLORE_PAGE,POST_PAGE,PROFILE_PAGE,LOGIN_PAGE,SETUP_PAGE,SETTINGS_PAGE,ANALYZE_PAGE,GITHUB_PAGE,ACTIVITY_PAGE,SEARCH_PAGE,MAIN,APP_C page
+    class SHELL,SIDEBAR,HEADER,TOAST,KEYBOARD,NOTIF_BELL,SUGGESTED layout
+    class FEED_LIST,SCROLL_TRIGGER feed
+    class POST_CARD,DUAL_PANEL,CLI_HL,ACTION_BAR,REACTION_BAR,QUOTED_POST,REPO_CARD,LANG_BADGE,COMPOSER post
+    class PROFILE_TAB,LANG_TAB,API_TAB,OAUTH_TAB,CHANNEL_TAB,GITHUB_TAB,CONTRIB_GRAPH,GH_FOLLOW_SYNC settings
+    class AUTH_STORE,FEED_STORE,POST_STORE,DETAIL_STORE,UI_STORE,TOAST_STORE,NOTIF_STORE,SEARCH_STORE,ACTIVITY_STORE,API_CLIENT store
+    class USE_KB hook
+    class TYPES shared

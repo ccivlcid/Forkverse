@@ -125,7 +125,7 @@ When `parseCliCommand` throws a `ParseError`, the caller (provider `transform` m
 
 ## 3. Local Runtime Detection
 
-CLItoris detects locally running LLM runtimes at server startup. This covers Ollama and CLI tools in PATH — **not API keys** (those are user-managed, see below).
+CLItoris detects locally running LLM runtimes at server startup. This covers Ollama — **not API keys** (those are user-managed, see below).
 
 > **Key policy change**: API keys (Anthropic, OpenAI, Gemini, etc.) are NOT read from environment variables. Each user enters their own keys in Settings. Keys are stored in the `user_llm_keys` database table and looked up per-request.
 
@@ -134,7 +134,7 @@ CLItoris detects locally running LLM runtimes at server startup. This covers Oll
 ```typescript
 // packages/llm/src/credential-detector.ts
 export function detectLocalRuntimes(): DetectedProvider[] {
-  // Checks: Ollama health endpoint + CLI tool binaries in PATH
+  // Checks: Ollama health endpoint
   // Does NOT check process.env for API keys
 }
 ```
@@ -142,9 +142,6 @@ export function detectLocalRuntimes(): DetectedProvider[] {
 | Runtime | Detection Method | Key Required? |
 |---------|-----------------|---------------|
 | Ollama | `curl localhost:11434/api/tags` health check | No |
-| claude (CLI) | `which claude` PATH check | No |
-| codex | `which codex` PATH check | No |
-| opencode | `which opencode` PATH check | No |
 | Anthropic API | User-provided in Settings | **Yes** (user's own key) |
 | OpenAI API | User-provided in Settings | **Yes** (user's own key) |
 | Gemini API | User-provided in Settings | **Yes** (user's own key) |
@@ -166,7 +163,6 @@ Requires a logged-in session. Returns local runtimes (e.g. Ollama) plus rows wit
 {
   "data": [
     { "provider": "ollama", "source": "localhost:11434", "isAvailable": true },
-    { "provider": "cli:claude", "source": "path:claude", "isAvailable": true },
     { "provider": "anthropic", "source": "user-settings", "isAvailable": true },
     { "provider": "openai", "source": "user-settings", "isAvailable": true }
   ]
@@ -185,7 +181,6 @@ The composer's model selector shows availability based on combined detection:
 │ ○ openai / gpt-4o           [add key →]           │  ← no key saved
 │ ● gemini / gemini-2.5-pro   [configured]          │  ← user saved key
 │ ● ollama / llama3            [local]              │  ← running locally
-│ ● cli / claude-code          [path]               │  ← binary in PATH
 └───────────────────────────────────────────────────┘
 ```
 
@@ -194,7 +189,6 @@ The composer's model selector shows availability based on combined detection:
 |-------|---------|
 | `[configured]` | User saved an API key in Settings |
 | `[local]` | Local server running (Ollama) — no key needed |
-| `[path]` | CLI binary found in PATH — no key needed |
 | `[add key →]` | No key saved — click to go to Settings |
 
 ---
@@ -202,6 +196,6 @@ The composer's model selector shows availability based on combined detection:
 ## See Also
 
 - [LLM_INTEGRATION.md](./LLM_INTEGRATION.md) -- Overview, system prompt, provider interface, execution modes
-- [LLM_PROVIDERS.md](./LLM_PROVIDERS.md) -- All 7 provider implementations
+- [LLM_PROVIDERS.md](./LLM_PROVIDERS.md) -- All 6 provider implementations
 - [docs/specs/API.md](./API.md) -- API specification
 - [docs/guides/ENV.md](../guides/ENV.md) -- Server environment variables (API keys are user-managed, not env vars)

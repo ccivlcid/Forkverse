@@ -15,7 +15,6 @@ export default function ComposerBar() {
     draft,
     cliPreview,
     selectedLang,
-    selectedCliTool,
     selectedModel,
     isTransforming,
     isSubmitting,
@@ -85,12 +84,12 @@ export default function ComposerBar() {
   };
 
   const isBusy = isTransforming || isSubmitting;
-  const noModel = !selectedCliTool && !selectedModel;
+  const noModel = !selectedModel;
 
   return (
     <div className="bg-[var(--bg-surface)] border-b border-[var(--border)]">
       {/* Textarea */}
-      <div className="px-5 pt-4 pb-2">
+      <div className="px-5 pt-5 pb-3">
         <textarea
           ref={textareaRef}
           data-testid="composer-input"
@@ -101,8 +100,8 @@ export default function ComposerBar() {
           rows={3}
           disabled={isBusy}
           aria-label="Write a new post"
-          className="w-full bg-transparent text-[var(--text)] text-[14px] leading-relaxed resize-none outline-none placeholder:text-[var(--text-faint)] disabled:opacity-40"
-          style={{ fontFamily: '"Inter", system-ui, sans-serif' }}
+          className="w-full bg-transparent text-[var(--text)] text-[15px] leading-[1.7] resize-none outline-none placeholder:text-[var(--text-faint)]/60 disabled:opacity-40"
+          style={{ fontFamily: 'var(--font-sans)' }}
         />
       </div>
 
@@ -178,9 +177,9 @@ export default function ComposerBar() {
         </span>
 
         <div className="flex items-center gap-2 ml-auto">
-          {(selectedCliTool || selectedModel) && (
+          {selectedModel && (
             <span className="text-[var(--text-muted)] font-mono text-[10px] border border-[var(--border-hover)] px-2 py-0.5">
-              {selectedCliTool ?? selectedModel}
+              {selectedModel}
             </span>
           )}
 

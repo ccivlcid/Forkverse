@@ -19,15 +19,14 @@
 ## 2. Tab Structure
 
 ```
-$ settings --tab=[profile | language | cli | oauth | api | channel | github]
-                    ────────  ────────  ───  ─────  ───  ───────   ──────
+$ settings --tab=[profile | language | oauth | api | channel | github]
+                    ────────  ────────  ─────  ───  ───────   ──────
 ```
 
 | Tab | Label | Contents | Badge |
 |-----|-------|----------|-------|
 | `profile` | profile | Display name, domain, bio, avatar, danger zone | — |
 | `language` | language | UI lang, default post lang | — |
-| `cli` | cli | CLI tool selector, path override, connection test | — |
 | `oauth` | oauth | GitHub connection status & management | `connected` / `!` |
 | `api` | api | LLM API key management (anthropic, openai, gemini) | configured count |
 | `channel` | channel | Subscribe / manage topic channels | — |
@@ -45,7 +44,7 @@ Active tab URL param: `/settings?tab=profile` (default: `profile`)
 ├────────────┬─────────────────────────────────────────────────────────┤
 │  sidebar   │                                                         │
 │            │  $ settings --tab=                                      │
-│            │  [profile] [language] [cli] [oauth ●] [api 2/3] [channel] │
+│            │  [profile] [language] [oauth ●] [api 2/3] [channel]        │
 │            │  ─────────────────────────────────────────────────────  │
 │            │                                                         │
 │            │  (tab content here)                                     │
@@ -124,55 +123,6 @@ $ set --default-post-lang=
 
 ---
 
-### Tab: `cli`
-
-CLI 연동 설정. API 키가 필요 없는 로컬 CLI 도구들을 관리.
-
-```
-// cli tools
-
-$ cli --list
-> claude-code    claude --print        [● active]  [test]
-> codex          codex --quiet         [○ inactive] [test]
-> gemini-cli     gemini -p             [○ inactive] [test]
-> opencode       opencode run          [○ inactive] [test]
-
-$ cli --default=
-  [claude-code ▾]
-
-$ cli --path-override=
-  // leave empty to use $PATH
-  ┌──────────────────────────────────────────────────────┐
-  │ /usr/local/bin/claude                                │
-  └──────────────────────────────────────────────────────┘
-
-[test connection]  →  ✓ claude-code responding (0.3s)
-                  →  ✗ codex: command not found
-```
-
-**Fields:**
-
-| Setting | Description |
-|---------|-------------|
-| Active tools | Toggle which CLI tools are enabled for use |
-| Default CLI tool | Used when no model is explicitly selected |
-| Path override | Custom binary path (optional, overrides $PATH) |
-
-**Implementation:**
-- Tool list from `GET /api/llm/cli/status` (**session required**): binary install + version probe; `authenticated` / `models` use the logged-in user’s **Settings API keys** and/or local CLI login files — **not** server `.env` API keys
-- Selected model per tool stored in `localStorage('clitoris:cli-model-settings')`: `{ toolId: { main: modelId } }`
-- Sidebar `// my LLM` section reads this localStorage to show active tools instantly
-
-**Actions:**
-
-| Action | Endpoint | Description |
-|--------|----------|-------------|
-| Refresh status | `GET /api/llm/cli/status` | Re-runs binary detection |
-| Install tool | `POST /api/llm/cli/install` | Runs `npm install -g <package>` server-side (dev only) |
-| Test connection | `POST /api/llm/cli/test` | Runs `<bin> --version`; returns latency |
-
----
-
 ### Tab: `oauth`
 
 ```
@@ -246,10 +196,6 @@ $ set --llm-key=gemini
 
 // local providers (no key needed)
 > ollama     — running at localhost:11434
-> claude-code — via claude CLI
-> codex       — via codex CLI
-> gemini-cli  — via gemini CLI
-> opencode    — via opencode CLI
 ```
 
 **Providers requiring keys:**
@@ -400,7 +346,6 @@ Provides setup instructions for connecting a GitHub repository webhook. No confi
     <TabBar>                        // tab navigation
       <TabButton tab="profile" />
       <TabButton tab="language" />
-      <TabButton tab="cli" />
       <TabButton tab="oauth" badge="connected" />
       <TabButton tab="api" badge="2/3" />
       <TabButton tab="channel" />
@@ -409,7 +354,6 @@ Provides setup instructions for connecting a GitHub repository webhook. No confi
 
     {tab === 'profile'  && <ProfileTab />}
     {tab === 'language' && <LanguageTab />}
-    {tab === 'cli'      && <CliTab />}
     {tab === 'oauth'    && <OAuthTab />}
     {tab === 'api'      && <ApiTab />}
     {tab === 'channel'  && <ChannelTab />}
@@ -439,7 +383,6 @@ All tab components live in `packages/client/src/components/settings/`.
 |-----|--------|
 | `/settings` | Opens `profile` tab (default) |
 | `/settings?tab=language` | Opens language tab |
-| `/settings?tab=cli` | Opens CLI tab |
 | `/settings?tab=oauth` | Opens OAuth tab |
 | `/settings?tab=api` | Opens API tab |
 | `/settings?tab=channel` | Opens channel tab |
@@ -467,8 +410,7 @@ Same patterns as current implementation:
 3. `LanguageTab` — migrate existing language section
 4. `ApiTab` — migrate existing LLM key management
 5. `OAuthTab` — migrate existing GitHub section + disconnect action
-6. `CliTab` — new: tool list, default selector, path override, test endpoint
-7. `ChannelTab` — new: requires DB migration + API routes (Phase 3)
+6. `ChannelTab` — new: requires DB migration + API routes (Phase 3)
 
 ---
 
@@ -476,9 +418,6 @@ Same patterns as current implementation:
 
 | Endpoint | Method | Status | Purpose |
 |----------|--------|--------|---------|
-| `GET /api/llm/cli/status` | GET | ✅ Done | Detect installed CLI tools, versions, auth, models |
-| `POST /api/llm/cli/install` | POST `{ id }` | ✅ Done | npm install CLI tool (dev only) |
-| `POST /api/llm/cli/test` | POST `{ tool }` | ✅ Done | Test CLI tool connectivity + latency |
 | `GET /api/llm/providers` | GET | ✅ Done | List local runtimes + user-configured API keys |
 | `POST /api/llm/keys` | POST `{ provider, apiKey }` | ✅ Done | Save user API key |
 | `DELETE /api/llm/keys/:provider` | DELETE | ✅ Done | Remove user API key |

@@ -117,9 +117,8 @@ This guide is split into focused sub-documents for easier navigation:
 │ Sidebar    │  Main Content Area                              │
 │ (w-56)     │  (flex-1)                                       │
 │            │                                                 │
-│ fixed      │  ┌─ Composer Bar ─────────────────────────┐     │
-│ left       │  │ Input + LLM selector + Submit          │     │
-│            │  └────────────────────────────────────────┘     │
+│ fixed      │  (Composer Modal — triggered by [+ post]       │
+│ left       │   button in HeaderBar or "/" hotkey)            │
 │            │                                                 │
 │            │  ┌─ Post Card ────────────────────────────┐     │
 │            │  │ ┌─ Natural ──┐  ┌─ CLI ──────────────┐ │     │

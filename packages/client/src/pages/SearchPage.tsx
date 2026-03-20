@@ -7,7 +7,7 @@ import { useSearchStore } from '../stores/searchStore.js';
 export default function SearchPage() {
   const { query, results, isLoading, search, setQuery, clear } = useSearchStore();
   const [input, setInput] = useState(query);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

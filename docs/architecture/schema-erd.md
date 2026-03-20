@@ -33,9 +33,12 @@ erDiagram
         TEXT tags "JSON array of strings"
         TEXT mentions "JSON array of usernames"
         TEXT visibility "public | private | unlisted"
-        TEXT llm_model "claude-sonnet | gpt-4o | gemini-2.5-pro | llama-3 | custom"
+        TEXT llm_model "free-form model identifier"
         TEXT parent_id FK "reply parent (nullable)"
         TEXT forked_from_id FK "fork source (nullable)"
+        TEXT intent "casual | formal | question | announcement | reaction"
+        TEXT emotion "neutral | happy | surprised | frustrated | excited | sad | angry"
+        TEXT quoted_post_id FK "quoted post (nullable)"
         TEXT created_at "ISO 8601 timestamp"
     }
 
@@ -84,6 +87,58 @@ erDiagram
         TEXT synced_at "ISO 8601 timestamp"
     }
 
+    user_llm_keys {
+        TEXT id PK "UUID v7"
+        TEXT user_id FK "references users.id"
+        TEXT provider "anthropic | openai | gemini | api | etc."
+        TEXT api_key "encrypted API key"
+        TEXT base_url "custom base URL (nullable)"
+        TEXT label "user label (nullable)"
+        TEXT created_at "ISO 8601 timestamp"
+    }
+
+    translations {
+        TEXT id PK "UUID v7"
+        TEXT post_id FK "references posts.id"
+        TEXT lang "target language code"
+        TEXT text "translated content"
+        TEXT created_at "ISO 8601 timestamp"
+    }
+
+    webhook_deliveries {
+        TEXT delivery_id PK "GitHub delivery UUID"
+        TEXT received_at "ISO 8601 timestamp"
+    }
+
+    activity_feed {
+        TEXT id PK "UUID v7"
+        TEXT actor_id FK "references users.id"
+        TEXT event_type "follow | star_post | fork_post | reply | github_*"
+        TEXT target_user_id FK "target user (nullable)"
+        TEXT target_post_id FK "target post (nullable)"
+        TEXT metadata "JSON metadata"
+        TEXT github_event_id "dedup key (nullable, unique)"
+        TEXT created_at "ISO 8601 timestamp"
+    }
+
+    notifications {
+        TEXT id PK "UUID v7"
+        TEXT user_id FK "references users.id"
+        TEXT type "reply | mention | quote | star | fork | follow | reaction"
+        TEXT actor_id FK "references users.id"
+        TEXT post_id FK "related post (nullable)"
+        TEXT message "preview text (nullable)"
+        INTEGER read "0=unread, 1=read"
+        TEXT created_at "ISO 8601 timestamp"
+    }
+
+    reactions {
+        TEXT user_id PK_FK "references users.id"
+        TEXT post_id PK_FK "references posts.id"
+        TEXT emoji PK "lgtm | ship_it | fire | bug | thinking | rocket | eyes | heart"
+        TEXT created_at "ISO 8601 timestamp"
+    }
+
     users ||--o{ posts : "creates"
     users ||--o{ follows : "follower"
     users ||--o{ follows : "following"
@@ -93,7 +148,15 @@ erDiagram
     posts ||--o{ stars : "starred by"
     posts ||--o{ posts : "reply (parent_id)"
     posts ||--o{ posts : "fork (forked_from_id)"
+    posts ||--o{ posts : "quote (quoted_post_id)"
     posts ||--o| repo_attachments : "attaches"
+    posts ||--o{ translations : "translated to"
+    posts ||--o{ reactions : "reacted on"
+    users ||--o{ user_llm_keys : "configures"
+    users ||--o{ activity_feed : "performs"
+    users ||--o{ notifications : "receives"
+    users ||--o{ notifications : "triggers (actor)"
+    users ||--o{ reactions : "reacts"
 ```
 
 ## Relationships
@@ -108,6 +171,12 @@ erDiagram
 | `posts` → `repo_attachments` | One-to-One | 1:0..1 | A post can attach one repo |
 | `users` → `analyses` | One-to-Many | 1:N | A user requests many analyses |
 | `users` → `github_synced_events` | One-to-Many | 1:N | A user has many synced GitHub events (dedup log) |
+| `users` → `user_llm_keys` | One-to-Many | 1:N | A user configures many LLM API keys |
+| `posts` → `translations` | One-to-Many | 1:N | A post can have many translations (one per language) |
+| `posts` → `posts` (quoted_post_id) | Self-referencing | 1:N | A post can be quoted many times |
+| `users` → `activity_feed` | One-to-Many | 1:N | A user performs many activities |
+| `users` → `notifications` | One-to-Many | 1:N | A user receives/triggers many notifications |
+| `users` ↔ `posts` (via reactions) | Many-to-Many | M:N | Users react to posts with emoji |
 
 ## Cardinality
 
@@ -120,6 +189,12 @@ posts  1 ──── * posts          (one post has many forks)
 posts  1 ──── 0..1 repo_attachments  (one post attaches at most one repo)
 users  1 ──── * analyses       (one user requests many analyses)
 users  1 ──── * github_synced_events  (one user has many deduped event records)
+users  1 ──── * user_llm_keys        (one user configures many API keys)
+posts  1 ──── * translations          (one post has many translations)
+posts  1 ──── * posts                 (one post is quoted many times)
+users  1 ──── * activity_feed         (one user performs many activities)
+users  1 ──── * notifications         (one user receives many notifications)
+users  * ──── * posts                 (many-to-many via reactions)
 ```
 
 ## Indexes
@@ -163,6 +238,26 @@ graph LR
     subgraph "github_synced_events indexes"
         G1["PK (event_id)"]
         G2["idx_github_synced_events_user<br/>(user_id)"]
+    end
+
+    subgraph "activity_feed indexes"
+        AF1["idx_activity_feed_actor<br/>(actor_id, created_at DESC)"]
+        AF2["idx_activity_feed_created<br/>(created_at DESC)"]
+        AF3["idx_activity_feed_github_event<br/>UNIQUE (github_event_id) WHERE NOT NULL"]
+    end
+
+    subgraph "notifications indexes"
+        N1["idx_notifications_user<br/>(user_id, read, created_at DESC)"]
+        N2["idx_notifications_actor<br/>(actor_id)"]
+    end
+
+    subgraph "reactions indexes"
+        RE1["PK (user_id, post_id, emoji)"]
+        RE2["idx_reactions_post<br/>(post_id)"]
+    end
+
+    subgraph "posts (additional)"
+        P6["idx_posts_quoted_post_id<br/>(quoted_post_id)"]
     end
 ```
 

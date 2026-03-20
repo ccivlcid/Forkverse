@@ -9,7 +9,7 @@ export default function SettingsPage() {
   useEffect(() => {
     if (!isLoading) {
       if (user) {
-        navigate(`/@${user.username}?tab=cli`, { replace: true });
+        navigate(`/@${user.username}?tab=profile`, { replace: true });
       } else {
         navigate('/login?redirect=/settings', { replace: true });
       }

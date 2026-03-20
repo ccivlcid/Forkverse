@@ -30,7 +30,7 @@
 │ $ github       │  ──────────────────────────────────────────── │
 │                │                                                 │
 │ // by LLM      │  ■ vercel/next.js                              │
-│ ● claude-code  │    The React Framework for production          │
+│ ▸ anthropic    │    The React Framework for production          │
 │                │    ● TypeScript  ★ 128k  ⑂ 27k  #react       │
 │                │    starred 2d ago                               │
 │                │                                                 │

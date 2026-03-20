@@ -132,10 +132,6 @@ LocalFeedPage                           src/pages/LocalFeedPage.tsx
 │   │   ├── LlmFilterSection            src/components/layout/LlmFilterSection.tsx
 │   │   └── MeSection                   src/components/layout/MeSection.tsx
 │   └── MainContent                     (slot)
-│       ├── ComposerBar                 src/components/composer/ComposerBar.tsx
-│       │   ├── ComposerTextarea        src/components/composer/ComposerTextarea.tsx
-│       │   ├── ModelSelector           src/components/composer/ModelSelector.tsx
-│       │   └── SubmitButton            src/components/composer/SubmitButton.tsx
 │       └── FeedList                    src/components/feed/FeedList.tsx
 │           ├── PostCard                src/components/post/PostCard.tsx
 │           │   ├── PostHeader          src/components/post/PostHeader.tsx

@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.js';
-import ComposerBar from '../components/composer/ComposerBar.js';
 import FeedList from '../components/feed/FeedList.js';
 import { useAuthStore } from '../stores/authStore.js';
 import { useFeedStore } from '../stores/feedStore.js';
@@ -33,7 +32,6 @@ export default function LocalFeedPage() {
   return (
     <AppShell breadcrumb="feed --local">
       <div className="max-w-2xl mx-auto">
-        <ComposerBar />
         <FeedList emptyTitle="$ feed --local" emptySubtitle="> 0 posts found." emptyBody={'No posts from people you follow.\nFollow someone to see their posts here.'} />
       </div>
     </AppShell>

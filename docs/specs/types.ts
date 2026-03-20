@@ -34,6 +34,19 @@ export interface UserProfile extends User {
 export type PostIntent = 'casual' | 'formal' | 'question' | 'announcement' | 'reaction';
 export type PostEmotion = 'neutral' | 'happy' | 'surprised' | 'frustrated' | 'excited' | 'sad' | 'angry';
 
+export const REACTION_EMOJIS = ['lgtm', 'ship_it', 'fire', 'bug', 'thinking', 'rocket', 'eyes', 'heart'] as const;
+export type ReactionEmoji = typeof REACTION_EMOJIS[number];
+
+export const REACTION_DISPLAY: Record<ReactionEmoji, string> = {
+  lgtm: 'lgtm', ship_it: 'ship', fire: 'fire', bug: 'bug',
+  thinking: 'hmm', rocket: 'rocket', eyes: 'eyes', heart: 'heart',
+};
+
+export interface PostReactions {
+  counts: Partial<Record<ReactionEmoji, number>>;
+  mine: ReactionEmoji[];
+}
+
 export interface Post {
   id: string;
   userId: string;
@@ -55,6 +68,9 @@ export interface Post {
   repoAttachment: RepoAttachment | null;
   intent: PostIntent;   // LLM-extracted communication intent
   emotion: PostEmotion; // LLM-extracted emotional tone
+  reactions: PostReactions;
+  quotedPostId: string | null;
+  quotedPost: Post | null;
 }
 
 export interface PostUser {
@@ -244,4 +260,66 @@ export interface TrendingRepo {
   name: string;
   mentionCount: number;
   topTags: string[];
+  stars: number;
+  forks: number;
+  language?: string;
+}
+
+// ============================================
+// Suggested Users
+// ============================================
+export interface SuggestedUser {
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+  githubUsername: string;
+  reason: string;
+  topLanguages: string[];
+}
+
+// ============================================
+// Activity Feed
+// ============================================
+export type ActivityEventType =
+  | 'github_push' | 'github_pr_merge' | 'github_pr_open'
+  | 'github_release' | 'github_star' | 'github_fork' | 'github_create'
+  | 'follow' | 'star_post' | 'fork_post' | 'reply';
+
+export interface ActivityEvent {
+  id: string;
+  actorId: string;
+  actor: PostUser;
+  eventType: ActivityEventType;
+  targetUserId?: string;
+  targetUser?: PostUser;
+  targetPostId?: string;
+  targetPost?: { messageRaw: string; messageCli: string };
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+// ============================================
+// Notifications
+// ============================================
+export type NotificationType = 'star' | 'reply' | 'follow' | 'mention' | 'fork' | 'reaction' | 'quote';
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  actorId: string;
+  actor: PostUser;
+  postId?: string;
+  message?: string;
+  read: boolean;
+  createdAt: string;
+}
+
+// ============================================
+// Search
+// ============================================
+export interface SearchResult {
+  posts: Post[];
+  users: UserProfile[];
+  tags: { tag: string; count: number }[];
 }

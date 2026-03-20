@@ -12,6 +12,8 @@ import AnalyzePage from './pages/AnalyzePage.js';
 import GitHubFeedPage from './pages/GitHubFeedPage.js';
 import ActivityFeedPage from './pages/ActivityFeedPage.js';
 import SearchPage from './pages/SearchPage.js';
+import LeaderboardPage from './pages/LeaderboardPage.js';
+import MessagesPage from './pages/MessagesPage.js';
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props: { children: ReactNode }) {
@@ -28,6 +30,11 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
       return (
         <div className="min-h-screen bg-[var(--bg-void)] flex items-center justify-center p-8">
           <div className="font-mono text-center max-w-md">
+            <div className="font-mono text-xl font-bold mb-4">
+              <span className="text-white">{'>'}_</span>
+              <span className="text-[#3fb950]">CLI</span>
+              <span className="text-white">toris</span>
+            </div>
             <div className="text-[var(--accent-red,#f87171)] text-lg mb-2">$ error --fatal</div>
             <div className="text-[var(--text-muted)] text-sm mb-6">
               Something went wrong. The process has crashed.
@@ -63,6 +70,9 @@ const router = createBrowserRouter([
   { path: '/github', element: <GitHubFeedPage /> },
   { path: '/activity', element: <ActivityFeedPage /> },
   { path: '/search', element: <SearchPage /> },
+  { path: '/leaderboard', element: <LeaderboardPage /> },
+  { path: '/messages', element: <MessagesPage /> },
+  { path: '/messages/:username', element: <MessagesPage /> },
   { path: '*', element: <Navigate to="/" replace /> },
 ]);
 

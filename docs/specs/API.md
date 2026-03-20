@@ -1,6 +1,6 @@
 # API.md — REST API Specification
 
-> **Source of truth** for all 47 REST API endpoints across 8 groups, request/response formats, and error handling.
+> **Source of truth** for all 61 REST API endpoints across 10 groups, request/response formats, and error handling.
 > Base URL: `/api`
 > Content-Type: `application/json`
 > Authentication: Session-based (express-session) via GitHub OAuth
@@ -233,13 +233,19 @@ Create a new post. Requires authentication.
 
 **Validation (zod):**
 ```
-messageRaw:  string, min 1, max 2000
-messageCli:  string, min 1, max 4000
-lang:        string, length 2 (ISO 639-1)
-tags:        string[], max 10 items, each max 50 chars
-mentions:    string[], max 20 items
-visibility:  enum ["public", "private", "unlisted"]
-llmModel:    enum ["claude-sonnet", "gpt-4o", "gemini-2.5-pro", "llama-3", "cursor", "cli", "api", "custom"]
+messageRaw:    string, min 1, max 2000
+messageCli:    string, min 1, max 4000
+lang:          string, length 2 (ISO 639-1)
+tags:          string[], max 10 items, each max 50 chars
+mentions:      string[], max 20 items
+visibility:    enum ["public", "private", "unlisted"]
+llmModel:      string, min 1, max 200 (free-form model identifier)
+parentId:      string (optional — set for replies)
+intent:        enum ["casual", "formal", "question", "announcement", "reaction"] (default: "casual")
+emotion:       enum ["neutral", "happy", "surprised", "frustrated", "excited", "sad", "angry"] (default: "neutral")
+repoOwner:     string, max 100 (optional — GitHub repo attachment)
+repoName:      string, max 100 (optional — GitHub repo attachment)
+quotedPostId:  string (optional — for quote posts)
 ```
 
 **Response:** `201 Created`
@@ -397,31 +403,117 @@ Get a single post by ID.
 
 ---
 
-### POST `/posts/:id/reply`
+### Replies
 
-Reply to a post. Requires authentication.
+Replies are created via `POST /posts` with the `parentId` field set to the parent post ID. There is no separate `/posts/:id/reply` endpoint.
+
+---
+
+### GET `/posts/feed/explore`
+
+Get trending posts sorted by star count. No authentication required.
+
+**Query Parameters:** Same as global feed (`cursor`, `limit`).
+
+**Response:** Same shape as global feed, sorted by star count descending.
+
+---
+
+### GET `/posts/trending/tags`
+
+Get the top 20 trending tags from the last 7 days. No authentication required.
+
+**Response:** `200 OK`
+```json
+{
+  "data": [
+    { "tag": "cli-first", "count": 42 },
+    { "tag": "rust", "count": 31 }
+  ]
+}
+```
+
+---
+
+### GET `/posts/trending/repos`
+
+Get the top 10 most-mentioned repos from the last 7 days. No authentication required.
+
+**Response:** `200 OK`
+```json
+{
+  "data": [
+    {
+      "owner": "vercel",
+      "name": "next.js",
+      "mentionCount": 15,
+      "topTags": ["react", "ssr"],
+      "stars": 128000,
+      "forks": 27000,
+      "language": "TypeScript"
+    }
+  ]
+}
+```
+
+---
+
+### GET `/posts/search`
+
+Full-text search across posts, users, and tags. Uses FTS5.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| `q` | string | Search query |
+| `cursor` | string | Pagination cursor |
+| `limit` | number | Items per page (default 20, max 50) |
+
+**Response:** `200 OK`
+```json
+{
+  "data": {
+    "posts": [ /* Post objects */ ],
+    "users": [ /* UserProfile objects */ ],
+    "tags": [ { "tag": "...", "count": 5 } ]
+  }
+}
+```
+
+---
+
+### POST `/posts/:id/react`
+
+Add or remove an emoji reaction on a post. Requires authentication. Toggle behavior: if the user already reacted with the same emoji, it is removed.
 
 **Request:**
 ```json
 {
-  "messageRaw": "Totally agree!",
-  "messageCli": "reply --to=01912345-aaaa --message=\"Totally agree!\" --lang=en",
-  "lang": "en",
-  "tags": [],
-  "mentions": [],
-  "visibility": "public",
-  "llmModel": "claude-sonnet"
+  "emoji": "lgtm"
 }
 ```
 
-**Response:** `201 Created` — Same shape as POST `/posts` response, with `parentId` set.
+**Validation:** `emoji` must be one of: `lgtm`, `ship_it`, `fire`, `bug`, `thinking`, `rocket`, `eyes`, `heart`
+
+**Response:** `200 OK`
+```json
+{
+  "data": {
+    "added": true,
+    "reactions": {
+      "lgtm": 3,
+      "fire": 1
+    }
+  }
+}
+```
 
 **Errors:**
 | Code | Condition |
 |------|-----------|
-| `400` | Validation error |
+| `400` | Invalid emoji |
 | `401` | Not authenticated |
-| `404` | Parent post not found |
+| `404` | Post not found |
 
 ---
 
@@ -644,7 +736,7 @@ Rate limited: 30 requests per minute per user.
 **Validation (zod):**
 ```
 message:  string, min 1, max 2000
-model:    enum ["claude-sonnet", "gpt-4o", "gemini-2.5-pro", "llama-3", "cursor", "cli", "api", "custom"]
+model:    string, min 1 (free-form model identifier)
 lang:     string, length 2
 ```
 
@@ -812,9 +904,9 @@ Remove a user's saved API key for a provider. Requires authentication.
 
 ---
 
-### GET `/api/llm/local-models`
+### GET `/api/llm/providers/list`
 
-Returns locally installed LLM models (Ollama).
+Returns the user's saved API keys with labels and base URLs (keys are masked).
 
 **Auth:** Yes
 
@@ -822,7 +914,8 @@ Returns locally installed LLM models (Ollama).
 ```json
 {
   "data": [
-    { "name": "llama-3-8b", "size": "4.7GB", "quantization": "Q4", "provider": "ollama" }
+    { "provider": "anthropic", "label": "My key", "baseUrl": null },
+    { "provider": "api", "label": "Custom", "baseUrl": "https://my-server.com/v1" }
   ]
 }
 ```
@@ -1203,7 +1296,163 @@ Receives GitHub webhook events and auto-creates posts for relevant event types. 
 
 ---
 
-## 8. Analyze
+## 8. Notifications
+
+### GET `/api/notifications`
+
+Get user's notifications, paginated by cursor.
+
+**Auth:** Yes
+
+**Query Parameters:**
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `cursor` | string | — | Pagination cursor |
+| `limit` | number | 20 | Page size (max 50) |
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "notification-uuid",
+      "userId": "user-uuid",
+      "type": "star",
+      "actorId": "actor-uuid",
+      "actor": {
+        "username": "octocat",
+        "displayName": "Octocat",
+        "avatarUrl": "https://...",
+        "domain": null
+      },
+      "postId": "post-uuid",
+      "message": "starred your post",
+      "read": false,
+      "createdAt": "2026-03-20T10:00:00Z"
+    }
+  ],
+  "meta": { "cursor": "...", "hasMore": true }
+}
+```
+
+---
+
+### GET `/api/notifications/unread-count`
+
+Get the count of unread notifications.
+
+**Auth:** Yes
+
+**Response (200):**
+```json
+{
+  "data": { "count": 5 }
+}
+```
+
+---
+
+### POST `/api/notifications/:id/read`
+
+Mark a single notification as read.
+
+**Auth:** Yes
+
+**Response (200):**
+```json
+{
+  "data": { "ok": true }
+}
+```
+
+---
+
+### POST `/api/notifications/read-all`
+
+Mark all notifications as read.
+
+**Auth:** Yes
+
+**Response (200):**
+```json
+{
+  "data": { "ok": true }
+}
+```
+
+---
+
+## 9. Activity
+
+### GET `/api/activity/feed`
+
+Activity from users you follow + your own, paginated.
+
+**Auth:** Yes
+
+**Query Parameters:**
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `cursor` | string | — | Pagination cursor |
+| `limit` | number | 20 | Page size (max 50) |
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "activity-uuid",
+      "actorId": "actor-uuid",
+      "actor": {
+        "username": "octocat",
+        "displayName": "Octocat",
+        "avatarUrl": "https://...",
+        "domain": null
+      },
+      "eventType": "star_post",
+      "targetUserId": null,
+      "targetUser": null,
+      "targetPostId": "post-uuid",
+      "targetPost": { "messageRaw": "...", "messageCli": "..." },
+      "metadata": {},
+      "createdAt": "2026-03-20T10:00:00Z"
+    }
+  ],
+  "meta": { "cursor": "...", "hasMore": true }
+}
+```
+
+---
+
+### GET `/api/activity/global`
+
+All activity on the platform, paginated. No authentication required.
+
+**Query Parameters:** Same as `/api/activity/feed`.
+
+**Response:** Same shape as `/api/activity/feed`.
+
+---
+
+### POST `/api/activity/sync-github`
+
+Fetch GitHub events and insert into activity feed.
+
+**Auth:** Yes
+
+**Response (200):**
+```json
+{
+  "data": {
+    "created": 3,
+    "skipped": 12
+  }
+}
+```
+
+---
+
+## 10. Analyze
 
 ### POST `/api/analyze`
 
@@ -1331,7 +1580,7 @@ Create a feed post from a completed analysis. The post includes the analysis sum
 
 ---
 
-## 8. Rate Limits
+## 11. Rate Limits
 
 | Endpoint | Limit | Window |
 |----------|-------|--------|
@@ -1405,7 +1654,7 @@ Standard error responses for each HTTP error code:
 
 ---
 
-## 9. Pagination
+## 12. Pagination
 
 All list endpoints use **cursor-based pagination**:
 
@@ -1422,65 +1671,80 @@ GET /api/posts/feed/global?cursor=2026-03-19T12:15:00Z&limit=20
 
 ---
 
-## 10. Endpoint Summary
+## 13. Endpoint Summary
 
-47 endpoints across 8 groups.
+61 endpoints across 10 groups.
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| **Auth** | | | |
+| **Auth (8)** | | | |
 | `GET` | `/api/auth/github` | No | Initiate GitHub OAuth |
 | `GET` | `/api/auth/github/callback` | No | OAuth callback |
 | `POST` | `/api/auth/setup` | Partial | Complete profile setup |
 | `GET` | `/api/auth/me/pending` | No | Pending GitHub profile in session |
-| `POST` | `/api/auth/logout` | Yes | Logout |
+| `POST` | `/api/auth/logout` | No | Logout |
 | `GET` | `/api/auth/me` | Yes | Current user |
 | `PUT` | `/api/auth/me` | Yes | Update profile |
 | `DELETE` | `/api/auth/me` | Yes | Delete account |
-| **Posts** | | | |
-| `POST` | `/api/posts` | Yes | Create post |
+| **Posts (13)** | | | |
+| `POST` | `/api/posts` | Yes | Create post (also used for replies via `parentId` and quotes via `quotedPostId`) |
 | `GET` | `/api/posts/feed/global` | No | Global feed |
-| `GET` | `/api/posts/feed/local` | Yes | Local feed |
-| `GET` | `/api/posts/:id` | No | Single post |
-| `POST` | `/api/posts/:id/reply` | Yes | Reply to post |
-| `POST` | `/api/posts/:id/fork` | Yes | Fork post |
-| `POST` | `/api/posts/:id/star` | Yes | Toggle star |
-| `DELETE` | `/api/posts/:id` | Yes | Delete post |
+| `GET` | `/api/posts/feed/local` | No | Local feed (following) |
+| `GET` | `/api/posts/feed/explore` | No | Trending feed (sorted by stars) |
+| `GET` | `/api/posts/trending/tags` | No | Top 20 trending tags (7 days) |
+| `GET` | `/api/posts/trending/repos` | No | Top 10 trending repos (7 days) |
 | `GET` | `/api/posts/by-llm/:model` | No | Posts by LLM model |
-| **Users** | | | |
+| `GET` | `/api/posts/search` | No | Full-text search (posts, users, tags) |
+| `GET` | `/api/posts/:id` | No | Single post + replies |
+| `POST` | `/api/posts/:id/star` | Yes | Toggle star |
+| `POST` | `/api/posts/:id/fork` | Yes | Fork post |
+| `POST` | `/api/posts/:id/translate` | No | Translate post to target language |
+| `POST` | `/api/posts/:id/react` | Yes | Add/remove emoji reaction |
+| `DELETE` | `/api/posts/:id` | Yes | Delete post (author only) |
+| **Users (8)** | | | |
 | `GET` | `/api/users/@:username` | No | User profile |
 | `GET` | `/api/users/@:username/posts` | No | User posts |
 | `GET` | `/api/users/@:username/starred` | No | User starred posts |
-| `POST` | `/api/users/@:username/follow` | Yes | Toggle follow |
 | `GET` | `/api/users/@:username/repos` | No | User's GitHub repos |
-| `POST` | `/api/users/sync-profile` | Yes | Re-sync GitHub profile data |
+| `POST` | `/api/users/@:username/follow` | Yes | Toggle follow |
+| `GET` | `/api/users/suggested` | Yes | Suggested users to follow |
+| `POST` | `/api/users/sync-profile` | Yes | Re-sync GitHub profile data + top languages |
 | `POST` | `/api/users/sync-activity` | Yes | Import GitHub events as posts |
-| **LLM** | | | |
+| **LLM (6)** | | | |
 | `POST` | `/api/llm/transform` | Yes | LLM transformation |
 | `GET` | `/api/llm/providers` | Yes | Local runtimes + user's configured providers |
-| `GET` | `/api/llm/cli/status` | Yes | CLI install probe + per-user auth/models |
+| `GET` | `/api/llm/models/:provider` | Yes | List models for a cloud provider |
+| `GET` | `/api/llm/providers/list` | Yes | User's saved API keys with labels |
 | `POST` | `/api/llm/keys` | Yes | Save user's LLM API key |
 | `DELETE` | `/api/llm/keys/:provider` | Yes | Remove user's LLM API key |
-| `GET` | `/api/llm/local-models` | Yes | Local Ollama models |
-| **GitHub** | | | |
+| **GitHub (9)** | | | |
 | `GET` | `/api/github/stars` | Yes | User's GitHub starred repos |
 | `GET` | `/api/github/notifications` | Yes | User's GitHub notifications |
 | `GET` | `/api/github/issues` | Yes | User's open issues & PRs |
 | `POST` | `/api/github/notifications/:id/mark-read` | Yes | Mark notification as read |
-| `GET` | `/api/github/following` | Yes | GitHub following list + CLItoris status |
-| `POST` | `/api/github/sync-follows` | Yes | Bulk-follow GitHub following on CLItoris |
-| `GET` | `/api/github/followers` | Yes | GitHub followers list + CLItoris status |
-| `GET` | `/api/github/reviews` | Yes | PR review requests for authenticated user |
 | `GET` | `/api/github/contributions/:username` | Optional | GitHub contribution graph (heatmap) |
-| **Webhook** | | | |
+| `GET` | `/api/github/reviews` | Yes | PR review requests |
+| `GET` | `/api/github/followers` | Yes | GitHub followers + CLItoris status |
+| `GET` | `/api/github/following` | Yes | GitHub following + CLItoris status |
+| `POST` | `/api/github/sync-follows` | Yes | Bulk-follow GitHub following on CLItoris |
+| **Notifications (4)** | | | |
+| `GET` | `/api/notifications` | Yes | User's notifications (paginated) |
+| `GET` | `/api/notifications/unread-count` | Yes | Unread notification count |
+| `POST` | `/api/notifications/:id/read` | Yes | Mark notification as read |
+| `POST` | `/api/notifications/read-all` | Yes | Mark all notifications as read |
+| **Activity (3)** | | | |
+| `GET` | `/api/activity/feed` | Yes | Activity from followed users + self |
+| `GET` | `/api/activity/global` | No | All platform activity |
+| `POST` | `/api/activity/sync-github` | Yes | Sync GitHub events to activity feed |
+| **Webhook (1)** | | | |
 | `POST` | `/api/webhook/github` | Signature | GitHub webhook → auto-create post |
-| **Analyze** | | | |
+| **Analyze (5)** | | | |
 | `POST` | `/api/analyze` | Yes | Start repo analysis |
 | `GET` | `/api/analyze` | Yes | List user's analyses |
 | `GET` | `/api/analyze/:id` | Yes | Get analysis result |
 | `GET` | `/api/analyze/:id/download` | Yes | Download PPTX or view HTML video |
 | `POST` | `/api/analyze/:id/share` | Yes | Share analysis result as feed post |
-| **Health** | | | |
+| **Health (1)** | | | |
 | `GET` | `/api/health` | No | Server health check |
 
 ---

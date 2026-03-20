@@ -101,12 +101,6 @@ export default function AnalyzePage() {
     async function loadModels() {
       const opts: string[] = [];
       try {
-        const st = await api.get<ApiResponse<Array<{ id: string; installed: boolean }>>>('/llm/cli/status');
-        for (const t of st.data) {
-          if (t.installed) opts.push(t.id);
-        }
-      } catch { /* ignore */ }
-      try {
         const prov = await api.get<ApiResponse<Array<{ provider: string; source: string }>>>('/llm/providers');
         const apiKeys = prov.data.filter((p) => p.source === 'user-settings');
         await Promise.all(

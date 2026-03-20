@@ -12,15 +12,14 @@ graph TB
         PRETTIER[".prettierrc"]
         GITIGNORE[".gitignore"]
         ENV_EXAMPLE[".env.example"]
+        VITEST["vitest.config.ts"]
+        PLAYWRIGHT["playwright.config.ts"]
     end
 
     subgraph "Documentation"
         CLAUDE_MD["CLAUDE.md"]
-        CONVENTIONS["CONVENTIONS.md"]
-        README["README.md"]
         DOCS_DIR["docs/"]
-        SPECS_DIR["specs/"]
-        ARCH_DIR["architecture/"]
+        README["README.md"]
     end
 
     subgraph "packages/"
@@ -28,118 +27,84 @@ graph TB
             CLIENT_PKG["package.json"]
             CLIENT_VITE["vite.config.ts"]
             CLIENT_TW["tailwind.config.ts"]
-            CLIENT_SRC["src/"]
 
             subgraph "client/src/"
                 C_MAIN["main.tsx"]
-                C_APP["App.tsx"]
-                C_COMPONENTS["components/"]
-                C_PAGES["pages/"]
-                C_STORES["stores/"]
-                C_HOOKS["hooks/"]
-                C_STYLES["styles/"]
-            end
-
-            subgraph "components/"
-                COMP_FEED["feed/<br/>feed-list, post-card"]
-                COMP_POST["post/<br/>dual-panel, cli-highlight,<br/>composer, action-bar"]
-                COMP_LAYOUT["layout/<br/>shell, sidebar, header"]
-                COMP_COMMON["common/<br/>button, input, tag,<br/>spinner, lang-badge"]
+                C_APP["App.tsx<br/>ErrorBoundary + Router"]
+                C_API["api/client.ts"]
+                C_COMPONENTS["components/<br/>29 TSX files"]
+                C_PAGES["pages/<br/>12 pages"]
+                C_STORES["stores/<br/>9 Zustand stores"]
+                C_HOOKS["hooks/<br/>useKeyboardShortcuts"]
+                C_I18N["i18n/<br/>en, ko, zh, ja"]
+                C_MOCKS["mocks/<br/>localFeedMock"]
             end
         end
 
         subgraph "@clitoris/server"
             SERVER_PKG["package.json"]
-            SERVER_SRC["src/"]
 
             subgraph "server/src/"
-                S_INDEX["index.ts"]
-                S_APP["app.ts"]
-                S_ROUTES["routes/<br/>posts, users, llm, auth"]
-                S_DB["db/<br/>index, schema, migrations/"]
-                S_MIDDLEWARE["middleware/<br/>auth, validate,<br/>rate-limit, error"]
+                S_INDEX["index.ts<br/>Express 5 + port 3771"]
+                S_ROUTES["routes/<br/>auth, posts, users, llm,<br/>github, analyze, webhook,<br/>activity, notifications"]
+                S_DB["db/<br/>index.ts + 19 migrations"]
+                S_MIDDLEWARE["middleware/<br/>auth, error"]
+                S_LIB["lib/<br/>id, lang-detect,<br/>generatePptx, generateVideo"]
             end
         end
 
         subgraph "@clitoris/shared"
             SHARED_PKG["package.json"]
-            SHARED_SRC["src/"]
 
             subgraph "shared/src/"
-                SH_TYPES["types/<br/>user, post, api, llm"]
-                SH_CONSTANTS["constants/<br/>models, limits, visibility"]
+                SH_INDEX["index.ts"]
+                SH_TYPES["types.ts<br/>Post, User, ApiResponse,<br/>Reactions, Notifications,<br/>Activity, Search"]
             end
         end
 
         subgraph "@clitoris/llm"
             LLM_PKG["package.json"]
-            LLM_SRC["src/"]
 
             subgraph "llm/src/"
                 L_INDEX["index.ts"]
-                L_PROVIDERS["providers/<br/>anthropic, openai, ollama"]
-                L_TRANSFORMER["transformer.ts"]
+                L_TYPES["types.ts"]
+                L_PROMPT["prompt.ts + parser.ts"]
+                L_FACTORY["provider-factory.ts"]
+                L_DETECT["credential-detector.ts"]
+                L_PROVIDERS["providers/<br/>anthropic, openai, gemini,<br/>ollama, cursor, cli, api"]
             end
         end
     end
 
-    subgraph "Testing"
-        TESTS_UNIT["tests/unit/"]
-        TESTS_E2E["tests/e2e/<br/>playwright.config.ts"]
-    end
-
     subgraph "Scripts"
-        SCRIPTS["scripts/<br/>build, deploy, seed"]
+        SCRIPTS["scripts/seed.ts"]
     end
 
     %% Connections
     ROOT --> PKG_ROOT
     ROOT --> WORKSPACE
-    ROOT --> TSCONFIG_BASE
     ROOT --> CLAUDE_MD
-    ROOT --> CONVENTIONS
-    ROOT --> README
+    ROOT --> DOCS_DIR
 
     ROOT --> CLIENT_PKG
     ROOT --> SERVER_PKG
     ROOT --> SHARED_PKG
     ROOT --> LLM_PKG
-
-    ROOT --> DOCS_DIR
-    ROOT --> SPECS_DIR
-    ROOT --> ARCH_DIR
-    ROOT --> TESTS_UNIT
-    ROOT --> TESTS_E2E
     ROOT --> SCRIPTS
 
-    CLIENT_SRC --> C_MAIN
-    CLIENT_SRC --> C_COMPONENTS
-    CLIENT_SRC --> C_PAGES
-    CLIENT_SRC --> C_STORES
-
-    C_COMPONENTS --> COMP_FEED
-    C_COMPONENTS --> COMP_POST
-    C_COMPONENTS --> COMP_LAYOUT
-    C_COMPONENTS --> COMP_COMMON
-
-    SERVER_SRC --> S_INDEX
-    SERVER_SRC --> S_ROUTES
-    SERVER_SRC --> S_DB
-    SERVER_SRC --> S_MIDDLEWARE
-
     %% Styling
-    classDef root fill:#0f3460,stroke:#4ade80,color:#e2e8f0,font-weight:bold
-    classDef config fill:#1a1a2e,stroke:#64748b,color:#94a3b8
-    classDef docs fill:#16213e,stroke:#a78bfa,color:#e2e8f0
-    classDef client fill:#16213e,stroke:#22d3ee,color:#e2e8f0
-    classDef server fill:#16213e,stroke:#4ade80,color:#e2e8f0
-    classDef shared fill:#16213e,stroke:#fbbf24,color:#e2e8f0
-    classDef llm fill:#16213e,stroke:#fb923c,color:#e2e8f0
+    classDef root fill:#0f3460,stroke:#3fb950,color:#e6edf3,font-weight:bold
+    classDef config fill:#0d1117,stroke:#30363d,color:#7d8590
+    classDef docs fill:#161b22,stroke:#bc8cff,color:#e6edf3
+    classDef client fill:#161b22,stroke:#76e3ea,color:#e6edf3
+    classDef server fill:#161b22,stroke:#3fb950,color:#e6edf3
+    classDef shared fill:#161b22,stroke:#d29922,color:#e6edf3
+    classDef llm fill:#161b22,stroke:#f0883e,color:#e6edf3
 
     class ROOT root
-    class PKG_ROOT,WORKSPACE,TSCONFIG_BASE,ESLINT,PRETTIER,GITIGNORE,ENV_EXAMPLE config
-    class CLAUDE_MD,CONVENTIONS,README,DOCS_DIR,SPECS_DIR,ARCH_DIR docs
-    class CLIENT_PKG,CLIENT_VITE,CLIENT_TW,CLIENT_SRC,C_MAIN,C_APP,C_COMPONENTS,C_PAGES,C_STORES,C_HOOKS,C_STYLES,COMP_FEED,COMP_POST,COMP_LAYOUT,COMP_COMMON client
-    class SERVER_PKG,SERVER_SRC,S_INDEX,S_APP,S_ROUTES,S_DB,S_MIDDLEWARE server
-    class SHARED_PKG,SHARED_SRC,SH_TYPES,SH_CONSTANTS shared
-    class LLM_PKG,LLM_SRC,L_INDEX,L_PROVIDERS,L_TRANSFORMER llm
+    class PKG_ROOT,WORKSPACE,TSCONFIG_BASE,ESLINT,PRETTIER,GITIGNORE,ENV_EXAMPLE,VITEST,PLAYWRIGHT config
+    class CLAUDE_MD,DOCS_DIR,README docs
+    class CLIENT_PKG,CLIENT_VITE,CLIENT_TW,C_MAIN,C_APP,C_API,C_COMPONENTS,C_PAGES,C_STORES,C_HOOKS,C_I18N,C_MOCKS client
+    class SERVER_PKG,S_INDEX,S_ROUTES,S_DB,S_MIDDLEWARE,S_LIB server
+    class SHARED_PKG,SH_INDEX,SH_TYPES shared
+    class LLM_PKG,L_INDEX,L_TYPES,L_PROMPT,L_FACTORY,L_DETECT,L_PROVIDERS llm

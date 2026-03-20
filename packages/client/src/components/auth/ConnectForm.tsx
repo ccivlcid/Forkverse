@@ -36,16 +36,23 @@ export default function ConnectForm({ errorFromCallback }: ConnectFormProps) {
     <div
       data-testid="connect-form"
       role="form"
-      aria-label="Connect to terminal.social via GitHub"
-      className="w-full max-w-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-8"
+      aria-label="Connect to CLItoris via GitHub"
+      className="w-full max-w-md border border-[var(--border)] bg-[var(--bg-elevated)] p-10"
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
-      {/* Title */}
-      <p className="text-gray-600 text-sm font-mono mb-4">{t('auth.connect.title')}</p>
+      {/* Logo */}
+      <div className="mb-10 text-center">
+        <p className="font-mono text-3xl font-bold tracking-tight">
+          <span className="text-white/90">{'>'}_</span>
+          <span className="text-[var(--accent-green)]">CLI</span>
+          <span className="text-white/90">toris</span>
+        </p>
+        <p className="text-[var(--text-faint)] font-mono text-[11px] mt-2 tracking-wider">terminal.social</p>
+      </div>
 
       {/* SSH prompt */}
-      <p className="text-green-400 font-mono text-sm mb-4">{t('auth.connect.ssh')}</p>
+      <p className="text-[var(--accent-green)]/70 font-mono text-sm mb-6">{t('auth.connect.ssh')}</p>
 
       {/* Status / Error */}
       {displayError ? (
@@ -80,10 +87,10 @@ export default function ConnectForm({ errorFromCallback }: ConnectFormProps) {
         aria-label="Connect with GitHub"
         aria-busy={isConnecting}
         aria-disabled={isConnecting}
-        className={`w-full border px-4 py-3 font-mono text-sm text-left transition-colors ${
+        className={`w-full border px-4 py-3.5 font-mono text-sm text-center transition-all duration-200 ${
           isConnecting
-            ? 'border-gray-600 text-gray-500 opacity-40 cursor-not-allowed'
-            : 'border-gray-600 text-gray-300 hover:border-green-400 hover:text-green-400'
+            ? 'border-[var(--border)] text-[var(--text-faint)] opacity-50 cursor-not-allowed'
+            : 'border-[var(--accent-green)]/30 text-[var(--accent-green)] bg-[var(--accent-green)]/[0.06] hover:bg-[var(--accent-green)]/[0.12] hover:border-[var(--accent-green)]/50'
         }`}
       >
         {isConnecting ? t('auth.connect.connecting') : t('auth.connect.button')}

@@ -108,7 +108,6 @@ Users select an LLM provider when composing posts to perform natural language �
 | **gemini** | API | All Gemini models (gemini-2.5-pro, 2.5-flash, 2.0-flash...) | Google GenAI SDK (`@google/genai`) |
 | **ollama** | Local | All installed local models | Ollama REST API |
 | **cursor** | API | Cursor-supported models | Cursor AI |
-| **cli** | CLI | Depends on CLI tool | Claude Code, Codex, Gemini CLI, OpenCode |
 | **api** | API | Any model on the endpoint | Generic OpenAI-compatible REST |
 | **custom** | Custom | User-configured | User-provided configuration |
 
@@ -117,7 +116,6 @@ Users select an LLM provider when composing posts to perform natural language �
 **Connection types:**
 - **API providers**: Require API key, call external endpoints, fetch available model list
 - **Local LLM**: Run models locally via Ollama (no API key needed), list installed models
-- **CLI adapter**: Execute CLI coding tools (Claude Code, Codex, Gemini CLI, Cursor, OpenCode)
 - **Generic API**: Connect any OpenAI-compatible endpoint with custom base URL + model name
 - **Auto-detection**: Server scans local env vars, config files (`~/.config/gcloud/`, `~/.anthropic/`), and PATH for available providers. Users already logged into providers on their PC need no additional setup — see `docs/llm/LLM_INTEGRATION.md` section 7
 
@@ -132,7 +130,6 @@ Natural language input → [Cmd+Enter] → Select provider → CLI format conver
 |------|-------------|----------|
 | **Cloud API** | Anthropic, OpenAI, Gemini via API keys | Post transformation, repo analysis |
 | **Local LLM** | Ollama, llama.cpp installed on user's PC | Offline analysis, privacy-sensitive repos |
-| **CLI Tool** | Claude Code, Codex, Gemini CLI | Deep code analysis with tool use |
 
 **Local LLM setup:**
 CLItoris provides in-app guidance for installing and managing local models:

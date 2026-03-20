@@ -3,12 +3,14 @@ import { useAuthStore } from '../../stores/authStore.js';
 import { useUiStore } from '../../stores/uiStore.js';
 import { useState, useEffect, useRef } from 'react';
 import NotificationBell from './NotificationBell.js';
+import ComposerModal from '../composer/ComposerModal.js';
 
 export default function HeaderBar() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { t } = useUiStore();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [composerOpen, setComposerOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
@@ -26,23 +28,40 @@ export default function HeaderBar() {
     return () => document.removeEventListener('keydown', onKey);
   }, [menuOpen]);
 
+  // "/" hotkey opens composer
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === '/' && !composerOpen && document.activeElement?.tagName !== 'TEXTAREA' && document.activeElement?.tagName !== 'INPUT') {
+        e.preventDefault();
+        setComposerOpen(true);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [composerOpen]);
+
   return (
-    <header className="h-11 bg-[var(--bg-surface)] border-b border-[var(--border)] flex items-center justify-between px-5 shrink-0">
+    <header className="h-12 bg-[var(--bg-surface)] border-b border-[var(--border)]/60 flex items-center justify-between px-5 shrink-0">
       <Link
         to="/"
-        className="font-mono text-sm font-bold text-[var(--text)] tracking-tight hover:text-white transition-colors"
+        className="flex items-center gap-1.5 hover:opacity-90 transition-opacity"
       >
-        terminal<span className="text-[var(--accent-green)]">.</span>social
+        <span className="font-mono text-sm font-bold text-white tracking-tight">
+          <span className="text-white">{'>'}&#x5f;</span>
+          <span className="text-[var(--accent-green)]">CLI</span>
+          <span className="text-white">toris</span>
+        </span>
       </Link>
 
       <div className="flex items-center gap-3">
-        <Link
-          to="/search"
-          className="font-mono text-[11px] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
-          aria-label="Search"
-        >
-          [grep]
-        </Link>
+        {isAuthenticated && (
+          <button
+            onClick={() => setComposerOpen(true)}
+            className="font-mono text-[11px] text-[var(--bg-surface)] bg-[var(--accent-green)] hover:bg-[var(--accent-green)]/80 px-3 py-1 transition-colors"
+          >
+            + post
+          </button>
+        )}
 
         {isAuthenticated && <NotificationBell />}
 
@@ -78,14 +97,6 @@ export default function HeaderBar() {
                   >
                     {t('menu.profile')}
                   </Link>
-                  <Link
-                    to={`/@${user.username}?tab=cli`}
-                    className="block px-4 py-2 text-[var(--text-muted)] hover:text-white font-mono text-[11px] transition-colors"
-                    onClick={() => setMenuOpen(false)}
-                    role="menuitem"
-                  >
-                    {t('menu.llm')}
-                  </Link>
                   <div className="border-t border-[var(--border)] my-0.5" />
                   <button
                     className="w-full text-left px-4 py-2 text-[var(--text-muted)] hover:text-[var(--color-error)] font-mono text-[11px] transition-colors"
@@ -116,6 +127,8 @@ export default function HeaderBar() {
           [?]
         </button>
       </div>
+
+      <ComposerModal open={composerOpen} onClose={() => setComposerOpen(false)} />
     </header>
   );
 }

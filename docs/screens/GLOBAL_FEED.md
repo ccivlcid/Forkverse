@@ -24,15 +24,11 @@
 │                │                                                                │
 │ // navigate    │  › feed --global --dual-format --translate=auto               │
 │ $ feed --global│                                                                │
-│ $ feed --local │  ┌─ Composer Bar ──────────────────────────────────────────┐   │
-│ $ following    │  │ › 하고 싶은 말을 그냥 쓰세요. LLM이 CLI로 번역하고,     │   │
-│ $ explore      │  │   둘 다 올라갑니다.  (italic, dim — empty placeholder)   │   │
-│                │  │                                                          │   │
-│ // my LLM      │  │ Cmd+Enter · 자연어 + CLI 를 포스트로 저장               │   │
-│ ● claude-sonnet│  │                      [claude-sonnet ▾]   [LLM → CLI ↗]  │   │
-│ ○ gpt-4o       │  └────────────────────────────────────────────────────────┘   │
-│ ○ llama-3      │                                                                │
-│ + connect LLM  │  ┌─ Post Card ────────────────────────────────────────────┐   │
+│ $ feed --local │                                                                │
+│ $ following    │  (Composer is a modal — opened via [+ post] button in header │
+│ $ explore      │   or "/" hotkey. Not embedded in feed.)                       │
+│                │                                                                │
+│ // by LLM      │  ┌─ Post Card ────────────────────────────────────────────┐   │
 │                │  │ @0xmitsuki  mitsuki.sh · 3m ago              --lang=en │   │
 │ // me          │  ├──────────────────────────┬─────────────────────────────┤   │
 │ ~ @you.local   │  │ ⓘ 자연어                 │ ⊡ CLI — open source   copy │   │
@@ -131,12 +127,6 @@ GlobalFeedPage                          src/pages/GlobalFeedPage.tsx
 │   │   ├── LlmFilterSection            src/components/layout/LlmFilterSection.tsx
 │   │   └── MeSection                   src/components/layout/MeSection.tsx
 │   └── MainContent                     (slot)
-│       ├── ComposerBar                 src/components/composer/ComposerBar.tsx
-│       │   ├── ComposerTextarea        src/components/composer/ComposerTextarea.tsx
-│       │   ├── ModelSelector           src/components/composer/ModelSelector.tsx
-│       │   ├── SubmitButton            src/components/composer/SubmitButton.tsx
-│       │   ├── RepoAttachButton       src/components/composer/RepoAttachButton.tsx
-│       │   └── RepoAttachPreview      src/components/composer/RepoAttachPreview.tsx
 │       └── FeedList                    src/components/feed/FeedList.tsx
 │           ├── PostCard                src/components/post/PostCard.tsx
 │           │   ├── PostHeader          src/components/post/PostHeader.tsx

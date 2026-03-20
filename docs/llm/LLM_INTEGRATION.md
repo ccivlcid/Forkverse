@@ -182,7 +182,6 @@ interface TranslateInput {
 |------|-------------|----------|
 | **Cloud API** | Anthropic, OpenAI, Gemini via API keys | Post transformation, repo analysis |
 | **Local LLM** | Ollama, llama.cpp installed on user's PC | Offline analysis, privacy-sensitive repos |
-| **CLI Tool** | Claude Code, Codex, Gemini CLI | Deep code analysis with tool use |
 
 **Local LLM setup:**
 CLItoris provides in-app guidance for installing and managing local models:

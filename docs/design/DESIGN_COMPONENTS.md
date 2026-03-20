@@ -133,16 +133,22 @@
 
 ---
 
-## 3. Composer Bar
+## 3. Composer Modal
+
+Opened via `[+ post]` button in HeaderBar or `/` hotkey. Full-screen centered modal with backdrop.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ › 하고 싶은 말을 그냥 쓰세요. LLM이 CLI로 번역하고,         │
-│   둘 다 올라갑니다.                                         │
-│   (italic, dim — textarea placeholder, shown when empty)    │
+│ $ new post                                          [esc]   │
+├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│ Cmd+Enter · 자연어 + CLI 를 포스트로 저장                   │
-│                           [claude-sonnet ▾]  [LLM → CLI ↗] │
+│  Write your thoughts...                                     │
+│  (textarea, 5 rows, auto-focus)                             │
+│                                                             │
+│  [CLI preview area — shown after transform]                 │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│ [repo] [lang ▾]              model badge   [preview] [post] │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -150,15 +156,12 @@
 
 | Property | Value |
 |----------|-------|
-| Background | `bg-[#16213e]` |
-| Border | `border border-gray-700` |
-| Textarea bg | transparent / no visible border when empty |
-| Textarea text | `text-gray-200 font-sans text-sm` |
-| Placeholder | `text-gray-600 italic` — localized: `하고 싶은 말을 그냥 쓰세요. LLM이 CLI로 번역하고, 둘 다 올라갑니다.` |
-| Hint text | `text-gray-500 text-xs font-mono` — `Cmd+Enter · 자연어 + CLI 를 포스트로 저장` |
-| Model selector | `bg-[#0d1117] border border-gray-700 text-gray-300 text-xs px-3 py-1.5` |
-| Transform button | `bg-green-400/10 text-green-400 border border-green-400/30 px-4 py-1.5 font-mono text-sm hover:bg-green-400/20` — label `LLM → CLI ↗`; triggers **transform** action (not submit) |
-| Submit trigger | `Cmd+Enter` keyboard shortcut — posts after transform |
+| Backdrop | `bg-black/60`, click to close |
+| Modal | `bg-[var(--bg-surface)]`, `max-w-[600px]`, `border border-[var(--border)]` |
+| Textarea | transparent bg, `text-[15px] leading-[1.7]`, sans-serif font |
+| Footer | border-top, left: attachment buttons, right: actions |
+| Submit | `Ctrl+Enter` keyboard shortcut |
+| Close | `Escape` key or backdrop click |
 
 ---
 

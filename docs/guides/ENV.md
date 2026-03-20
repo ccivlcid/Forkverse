@@ -23,7 +23,7 @@
 
 > **LLM API keys are not environment variables.** Each user enters their own API keys in Settings (`/settings`). Keys are stored per-user in the `user_llm_keys` database table. See [LLM_DETECTION.md](../llm/LLM_DETECTION.md) for the key management flow.
 >
-> Locally running runtimes (Ollama on `localhost:11434`, CLI tools in PATH) are auto-detected and require no key.
+> Locally running runtimes (Ollama on `localhost:11434`) are auto-detected and require no key.
 
 ### Client (`@clitoris/client`)
 

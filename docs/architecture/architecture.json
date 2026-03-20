@@ -99,7 +99,6 @@
         "src/providers/openai.ts": "GPT integration (OpenAI SDK)",
         "src/providers/ollama.ts": "Local LLM integration (Ollama REST API)",
         "src/providers/cursor.ts": "Cursor AI integration (Cursor API)",
-        "src/providers/cli.ts": "CLI-based LLM adapter (pipes to any CLI tool: claude, ollama, llama.cpp)",
         "src/providers/api.ts": "Generic REST API adapter (connect any OpenAI-compatible endpoint)",
         "src/transformer.ts": "Natural language → CLI transformation logic and prompts"
       }

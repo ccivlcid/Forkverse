@@ -89,6 +89,24 @@
       "auth": true,
       "layout": "AppShell",
       "spec": "docs/screens/GITHUB_FEED.md"
+    },
+    {
+      "path": "/activity",
+      "page": "ActivityFeedPage",
+      "file": "packages/client/src/pages/ActivityFeedPage.tsx",
+      "title": "terminal.social / activity --feed",
+      "auth": true,
+      "layout": "AppShell",
+      "spec": "docs/screens/ACTIVITY_FEED.md"
+    },
+    {
+      "path": "/search",
+      "page": "SearchPage",
+      "file": "packages/client/src/pages/SearchPage.tsx",
+      "title": "terminal.social / search",
+      "auth": false,
+      "layout": "AppShell",
+      "spec": "docs/screens/SEARCH.md"
     }
   ]
 }

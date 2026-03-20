@@ -1,6 +1,6 @@
 # LLM_PROVIDERS.md — Provider Implementations
 
-> **Source of truth** for all 7 LLM provider implementations.
+> **Source of truth** for all 6 LLM provider implementations.
 > See [LLM_INTEGRATION.md](./LLM_INTEGRATION.md) for system prompt, interface, and overview.
 
 ---
@@ -196,86 +196,7 @@ export class CursorProvider implements LlmProvider {
 }
 ```
 
-## 5. cli.ts -- CLI Tools (Claude Code, Codex, Gemini CLI, OpenCode)
-
-Spawns a CLI tool as a child process and captures stdout.
-
-```typescript
-// packages/llm/src/providers/cli.ts
-import { spawn } from "node:child_process";
-import type { LlmProvider, TransformRequest, TransformResponse } from "../types.js";
-import { SYSTEM_PROMPT } from "../prompt.js";
-import { parseCliCommand } from "../parser.js";
-
-interface CliToolConfig {
-  bin: string;
-  args: (prompt: string) => string[];
-}
-
-const CLI_TOOLS: Record<string, CliToolConfig> = {
-  "claude-code": {
-    bin: "claude",
-    args: (prompt) => ["--print", prompt],
-  },
-  codex: {
-    bin: "codex",
-    args: (prompt) => ["--quiet", "--prompt", prompt],
-  },
-  "gemini-cli": {
-    bin: "gemini",
-    args: (prompt) => ["-p", prompt],
-  },
-  opencode: {
-    bin: "opencode",
-    args: (prompt) => ["run", prompt],
-  },
-};
-
-export class CliProvider implements LlmProvider {
-  name = "cli";
-
-  async listModels(): Promise<string[]> {
-    return Object.keys(CLI_TOOLS);
-  }
-
-  async transform(input: TransformRequest): Promise<TransformResponse> {
-    const tool = CLI_TOOLS[input.model];
-    if (!tool) throw new Error(`Unknown CLI tool: ${input.model}`);
-
-    const fullPrompt = `${SYSTEM_PROMPT}\n\nUser: ${input.username}\nLang: ${input.lang}\nMessage: ${input.message}`;
-
-    const output = await this.exec(tool.bin, tool.args(fullPrompt));
-
-    return {
-      messageCli: parseCliCommand(output),
-      model: input.model,
-      tokensUsed: 0, // CLI tools do not report token usage
-    };
-  }
-
-  private exec(bin: string, args: string[]): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const child = spawn(bin, args, { timeout: 30_000 });
-      let stdout = "";
-      let stderr = "";
-
-      child.stdout.on("data", (chunk: Buffer) => {
-        stdout += chunk.toString();
-      });
-      child.stderr.on("data", (chunk: Buffer) => {
-        stderr += chunk.toString();
-      });
-      child.on("close", (code) => {
-        if (code === 0) resolve(stdout.trim());
-        else reject(new Error(`${bin} exited with code ${code}: ${stderr}`));
-      });
-      child.on("error", reject);
-    });
-  }
-}
-```
-
-## 6. gemini.ts -- Google Gemini SDK
+## 5. gemini.ts -- Google Gemini SDK
 
 ```typescript
 // packages/llm/src/providers/gemini.ts

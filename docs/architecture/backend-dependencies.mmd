@@ -3,111 +3,134 @@
 
 graph TD
     subgraph "@clitoris/server"
-        INDEX["index.ts<br/>(entry point)"]
-        APP["app.ts<br/>(Express setup)"]
+        INDEX["index.ts<br/>(entry, port 3771)"]
 
         subgraph Routes
+            AUTH_R["routes/auth.ts"]
             POSTS_R["routes/posts.ts"]
             USERS_R["routes/users.ts"]
             LLM_R["routes/llm.ts"]
-            AUTH_R["routes/auth.ts"]
+            GITHUB_R["routes/github.ts"]
+            ANALYZE_R["routes/analyze.ts"]
+            WEBHOOK_R["routes/webhook.ts"]
+            ACTIVITY_R["routes/activity.ts"]
+            NOTIF_R["routes/notifications.ts"]
         end
 
         subgraph Middleware
             AUTH_M["middleware/auth.ts"]
-            VALIDATE_M["middleware/validate.ts"]
-            RATE_M["middleware/rate-limit.ts"]
             ERROR_M["middleware/error.ts"]
         end
 
         subgraph Database
             DB["db/index.ts<br/>(connection + migrations)"]
-            SCHEMA["db/schema.ts<br/>(queries)"]
-            MIGRATIONS["db/migrations/<br/>001_create_users.sql<br/>002_create_posts.sql<br/>003_create_social.sql"]
+            MIGRATIONS["db/migrations/<br/>001–019 SQL files"]
+        end
+
+        subgraph Lib
+            ID_LIB["lib/id.ts"]
+            LANG_LIB["lib/lang-detect.ts"]
+            PPTX_LIB["lib/generatePptx.ts"]
+            VIDEO_LIB["lib/generateVideo.ts"]
         end
     end
 
     subgraph "@clitoris/shared"
-        TYPES["types/<br/>user.ts, post.ts, api.ts"]
-        CONSTANTS["constants/<br/>models.ts, limits.ts"]
+        TYPES["types.ts<br/>Post, User, ApiResponse,<br/>Reactions, Notifications"]
     end
 
     subgraph "@clitoris/llm"
         LLM_INDEX["index.ts<br/>(provider factory)"]
-        ANTHROPIC["providers/anthropic.ts"]
-        OPENAI["providers/openai.ts"]
-        OLLAMA["providers/ollama.ts"]
-        TRANSFORMER["transformer.ts"]
+        PROVIDERS["providers/<br/>anthropic, openai, gemini,<br/>ollama, cursor, cli, api"]
+        PROMPT["prompt.ts + parser.ts"]
+        DETECT["credential-detector.ts"]
     end
 
     subgraph "External Packages"
-        EXPRESS["express"]
+        EXPRESS["express 5"]
         BETTER_SQLITE["better-sqlite3"]
         PINO["pino"]
         ZOD["zod"]
         SESSION["express-session"]
-        RATE_LIMIT["express-rate-limit"]
+        PPTXGEN["pptxgenjs"]
         ANTHROPIC_SDK["@anthropic-ai/sdk"]
         OPENAI_SDK["openai"]
+        GEMINI_SDK["@google/genai"]
     end
 
     %% Server internal flow
-    INDEX --> APP
-    APP --> POSTS_R
-    APP --> USERS_R
-    APP --> LLM_R
-    APP --> AUTH_R
-    APP --> AUTH_M
-    APP --> ERROR_M
+    INDEX --> AUTH_R
+    INDEX --> POSTS_R
+    INDEX --> USERS_R
+    INDEX --> LLM_R
+    INDEX --> GITHUB_R
+    INDEX --> ANALYZE_R
+    INDEX --> WEBHOOK_R
+    INDEX --> ACTIVITY_R
+    INDEX --> NOTIF_R
+    INDEX --> ERROR_M
+    INDEX --> DB
 
     %% Routes use middleware
     POSTS_R --> AUTH_M
-    POSTS_R --> VALIDATE_M
     USERS_R --> AUTH_M
     LLM_R --> AUTH_M
-    LLM_R --> VALIDATE_M
-    LLM_R --> RATE_M
-    AUTH_R --> VALIDATE_M
+    GITHUB_R --> AUTH_M
+    ANALYZE_R --> AUTH_M
+    ACTIVITY_R --> AUTH_M
+    NOTIF_R --> AUTH_M
+
+    %% Routes use lib
+    POSTS_R --> ID_LIB
+    POSTS_R --> NOTIF_R
+    ANALYZE_R --> PPTX_LIB
+    ANALYZE_R --> VIDEO_LIB
+    USERS_R --> LANG_LIB
 
     %% Routes use DB
-    POSTS_R --> SCHEMA
-    USERS_R --> SCHEMA
-    AUTH_R --> SCHEMA
-    SCHEMA --> DB
+    POSTS_R --> DB
+    USERS_R --> DB
+    AUTH_R --> DB
+    GITHUB_R --> DB
+    ANALYZE_R --> DB
+    WEBHOOK_R --> DB
+    ACTIVITY_R --> DB
+    NOTIF_R --> DB
     DB --> MIGRATIONS
 
     %% Routes use LLM
     LLM_R --> LLM_INDEX
-    LLM_INDEX --> ANTHROPIC
-    LLM_INDEX --> OPENAI
-    LLM_INDEX --> OLLAMA
-    LLM_INDEX --> TRANSFORMER
+    LLM_R --> DETECT
+    LLM_INDEX --> PROVIDERS
+    LLM_INDEX --> PROMPT
+    POSTS_R --> LLM_INDEX
 
     %% Shared types
     POSTS_R --> TYPES
     USERS_R --> TYPES
     LLM_R --> TYPES
-    SCHEMA --> TYPES
     LLM_INDEX --> TYPES
-    VALIDATE_M --> CONSTANTS
 
     %% External dependencies
-    APP --> EXPRESS
-    DB --> BETTER_SQLITE
+    INDEX --> EXPRESS
     INDEX --> PINO
-    VALIDATE_M --> ZOD
-    AUTH_M --> SESSION
-    RATE_M --> RATE_LIMIT
-    ANTHROPIC --> ANTHROPIC_SDK
-    OPENAI --> OPENAI_SDK
+    INDEX --> SESSION
+    DB --> BETTER_SQLITE
+    POSTS_R --> ZOD
+    AUTH_R --> ZOD
+    LLM_R --> ZOD
+    PPTX_LIB --> PPTXGEN
+    PROVIDERS --> ANTHROPIC_SDK
+    PROVIDERS --> OPENAI_SDK
+    PROVIDERS --> GEMINI_SDK
 
     %% Styling
-    classDef server fill:#0f3460,stroke:#4ade80,color:#e2e8f0
-    classDef shared fill:#16213e,stroke:#a78bfa,color:#e2e8f0
-    classDef llm fill:#16213e,stroke:#22d3ee,color:#e2e8f0
-    classDef external fill:#1a1a2e,stroke:#64748b,color:#94a3b8
+    classDef server fill:#161b22,stroke:#3fb950,color:#e6edf3
+    classDef shared fill:#161b22,stroke:#bc8cff,color:#e6edf3
+    classDef llm fill:#161b22,stroke:#76e3ea,color:#e6edf3
+    classDef external fill:#0d1117,stroke:#30363d,color:#7d8590
 
-    class INDEX,APP,POSTS_R,USERS_R,LLM_R,AUTH_R,AUTH_M,VALIDATE_M,RATE_M,ERROR_M,DB,SCHEMA,MIGRATIONS server
-    class TYPES,CONSTANTS shared
-    class LLM_INDEX,ANTHROPIC,OPENAI,OLLAMA,TRANSFORMER llm
-    class EXPRESS,BETTER_SQLITE,PINO,ZOD,SESSION,RATE_LIMIT,ANTHROPIC_SDK,OPENAI_SDK external
+    class INDEX,AUTH_R,POSTS_R,USERS_R,LLM_R,GITHUB_R,ANALYZE_R,WEBHOOK_R,ACTIVITY_R,NOTIF_R,AUTH_M,ERROR_M,DB,MIGRATIONS,ID_LIB,LANG_LIB,PPTX_LIB,VIDEO_LIB server
+    class TYPES shared
+    class LLM_INDEX,PROVIDERS,PROMPT,DETECT llm
+    class EXPRESS,BETTER_SQLITE,PINO,ZOD,SESSION,PPTXGEN,ANTHROPIC_SDK,OPENAI_SDK,GEMINI_SDK external

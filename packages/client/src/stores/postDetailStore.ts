@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { api } from '../api/client.js';
 import type { Post, PostUser, ApiResponse, LlmModel } from '@clitoris/shared';
-import { usePostStore } from './postStore.js';
 
 interface ForkedFrom {
   id: string;
@@ -114,14 +113,12 @@ export const usePostDetailStore = create<PostDetailState>((set, get) => ({
     const { draft, selectedModel } = get();
     if (!draft.trim()) return;
     if (!selectedModel.trim()) return;
-    const { selectedCliTool } = usePostStore.getState();
     set({ isTransforming: true, transformError: null });
     try {
       const res = await api.post<ApiResponse<{ messageCli: string }>>('/llm/transform', {
         message: draft,
         model: selectedModel,
         lang: 'en',
-        ...(selectedCliTool.trim() ? { cliTool: selectedCliTool } : {}),
       });
       set({ cliPreview: res.data.messageCli, isTransforming: false });
     } catch (err: unknown) {

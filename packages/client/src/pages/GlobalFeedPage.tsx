@@ -1,7 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.js';
-import ComposerBar from '../components/composer/ComposerBar.js';
 import FeedList from '../components/feed/FeedList.js';
 import { useAuthStore } from '../stores/authStore.js';
 import { useUiStore } from '../stores/uiStore.js';
@@ -75,7 +74,6 @@ export default function GlobalFeedPage() {
   return (
     <AppShell>
       <div className="max-w-[680px] mx-auto">
-        <ComposerBar />
         <FeedList />
       </div>
     </AppShell>

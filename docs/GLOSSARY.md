@@ -36,6 +36,15 @@
 | **UUID v7** | Time-sortable universally unique identifier used as primary key for all database tables |
 | **Visibility** | Post access level: `public` (everyone), `private` (author only), `unlisted` (direct link only) |
 | **WAL mode** | SQLite Write-Ahead Logging (`PRAGMA journal_mode = WAL`) for concurrent read access |
+| **Reaction** | Emoji-based response to a post. 8 types: `lgtm`, `ship_it`, `fire`, `bug`, `thinking`, `rocket`, `eyes`, `heart`. Toggle per user per post per emoji |
+| **Quote post** | A post that references another post via `quotedPostId`, displaying the quoted post inline via `QuotedPost` component |
+| **FTS5** | SQLite full-text search engine. Virtual table `posts_fts` indexes `message_raw` and `tags` with auto-sync triggers |
+| **Notification** | In-app alert for social interactions: reply, mention, quote, star, fork, follow, reaction. Stored in `notifications` table |
+| **Activity feed** | Chronological log of platform events (follows, stars, forks, replies, GitHub events). Two views: following (personal) and global |
+| **Webhook** | GitHub webhook receiver (`POST /api/webhook/github`) that auto-creates posts from push/PR/release/create events. HMAC-SHA256 verified |
+| **ErrorBoundary** | App-level React class component that catches render errors and displays a terminal-style crash recovery UI |
+| **i18n** | Client-side internationalization. 4 languages: en, ko, zh, ja. Managed by `uiStore` with `t()` function. Persisted to localStorage |
+| **topLanguages** | JSON array of a user's top programming languages, computed from GitHub repos on profile sync. Displayed as badges |
 
 ---
 

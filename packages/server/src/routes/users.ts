@@ -3,6 +3,7 @@ import type { Database } from 'better-sqlite3';
 import { generateId } from '../lib/id.js';
 import { requireAuth } from '../middleware/auth.js';
 import { createNotification, createActivity } from './notifications.js';
+import { updateGithubStats, recalculateForUser } from '../lib/influence.js';
 
 interface UserProfileRow {
   id: string;
@@ -318,17 +319,19 @@ export function createUsersRouter(db: Database): Router {
         public_repos: number; html_url: string;
       };
 
-      // Compute top languages from repos
+      // Compute top languages and star totals from repos
       const reposRes = await fetch(
         `https://api.github.com/users/${user.github_username}/repos?sort=pushed&per_page=100&type=owner`,
         { headers: { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github+json' } },
       );
       let topLanguages: string[] = [];
+      let ghTotalStars = 0;
       if (reposRes.ok) {
-        const repos = await reposRes.json() as Array<{ language: string | null; fork: boolean }>;
+        const repos = await reposRes.json() as Array<{ language: string | null; fork: boolean; stargazers_count: number }>;
         const counts: Record<string, number> = {};
         for (const r of repos) {
           if (!r.fork && r.language) counts[r.language] = (counts[r.language] ?? 0) + 1;
+          ghTotalStars += r.stargazers_count;
         }
         topLanguages = Object.entries(counts)
           .sort((a, b) => b[1] - a[1])
@@ -345,6 +348,11 @@ export function createUsersRouter(db: Database): Router {
           display_name = COALESCE(NULLIF(?, ''), display_name)
         WHERE id = ?
       `).run(ghUser.avatar_url, ghUser.html_url, ghUser.public_repos, JSON.stringify(topLanguages), ghUser.name, sessionUserId);
+
+      // Update influence score with GitHub stats
+      const ghFollowers = (ghUser as unknown as { followers?: number }).followers ?? 0;
+      updateGithubStats(db, sessionUserId, ghTotalStars, ghFollowers);
+      recalculateForUser(db, sessionUserId);
 
       res.json({ data: { synced: true, reposCount: ghUser.public_repos, topLanguages } });
     } catch {

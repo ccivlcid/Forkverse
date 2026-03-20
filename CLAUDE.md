@@ -16,16 +16,16 @@ All social interactions (post, follow, fork, star) are expressed as CLI commands
 
 | Area | Technology |
 |------|-----------|
-| Frontend | React 19 + TypeScript + Vite + Tailwind CSS |
-| State management | Zustand |
+| Frontend | React 19 + TypeScript + Vite + Tailwind CSS v4 |
+| State management | Zustand v5 |
 | Routing | React Router v7 (`react-router-dom`) |
-| Flow diagrams | `@xyflow/react` v12 |
-| Backend | Node.js + Express + tsx (TypeScript direct execution) |
-| DB | SQLite (`better-sqlite3`) + versioned migrations |
+| Backend | Node.js + Express 5 + tsx (TypeScript direct execution) |
+| DB | SQLite (`better-sqlite3`) + 19 versioned migrations |
 | Logging | pino |
 | Testing | Vitest (frontend + server), Playwright (E2E) |
 | Package manager | pnpm |
-| LLM Integration | Anthropic SDK, OpenAI SDK, Google Gemini SDK, Ollama, Cursor, CLI adapter, Generic API |
+| LLM Integration | Anthropic SDK, OpenAI SDK, Google Gemini SDK, Ollama, Cursor, Generic API |
+| i18n | 4 languages (en, ko, zh, ja) — client-side via Zustand |
 
 ## Monorepo Structure
 
@@ -66,9 +66,11 @@ llm    ──→ shared
 
 ## Design Conventions
 
-- **UI**: Dark background (`#1a1a2e`), monospace font, terminal aesthetic
-- **Colors**: Green (`#4ade80`) CLI keywords, Amber (`#fbbf24`) usernames, Cyan (`#22d3ee`) hashtags
+- **UI**: Dark background (`#0d1117`), monospace font (JetBrains Mono), terminal aesthetic
+- **Colors**: Green (`#3fb950`) CLI keywords, Yellow (`#d29922`) usernames, Cyan (`#76e3ea`) hashtags, Blue (`#58a6ff`) links, Purple (`#bc8cff`) accents
+- **Surface**: `#161b22` cards/panels, `#30363d` borders, `#e6edf3` primary text, `#7d8590` muted text
 - **Layout**: Left sidebar navigation + dual-panel posts (natural language | CLI)
+- **Keyboard**: Vim-like shortcuts (j/k nav, s star, o open, g-chord page navigation)
 
 ## Development Workflow
 
@@ -116,7 +118,7 @@ All documentation lives under `docs/` organized by category.
 
 ```
 docs/
-├── GLOSSARY.md                        # Unified terminology index (24 terms)
+├── GLOSSARY.md                        # Unified terminology index (34 terms)
 ├── PROGRESS.md                        # Development status and decision log
 ├── setup/                             # Project bootstrapping
 │   └── CONFIGS.md                     # All config files (package.json, tsconfig, vite, tailwind)
@@ -125,6 +127,8 @@ docs/
 │   ├── PATTERNS.md                    # Implementation patterns (optimistic updates, pagination, auth)
 │   ├── PROMPTS.md                     # Vibe coding prompt templates
 │   ├── ENV.md                         # Environment variables reference
+│   ├── I18N.md                        # Internationalization (4 languages)
+│   ├── error.md                       # Error handling guide
 │   └── TROUBLESHOOTING.md            # Common issues & solutions for local development
 ├── design/                            # Visual design system
 │   ├── DESIGN_GUIDE.md               # Visual system index — colors, typography, layout
@@ -148,11 +152,13 @@ docs/
 │   ├── SETUP.md                       # /setup — First-time profile setup (replaces REGISTER.md)
 │   ├── SETTINGS.md                    # /settings — User settings
 │   ├── ANALYZE.md                     # /analyze — Repo analysis tool (report, pptx, video)
-│   └── GITHUB_FEED.md                 # /github — GitHub Stars, Notifications, Issues & PRs
+│   ├── GITHUB_FEED.md                 # /github — GitHub Stars, Notifications, Issues & PRs
+│   ├── ACTIVITY_FEED.md               # /activity — Activity feed (following + global)
+│   └── SEARCH.md                      # /search — Full-text search (posts, users, tags)
 ├── specs/                             # Technical specifications
 │   ├── PRD.md                         # Product requirements document
 │   ├── DATABASE.md                    # DB schema, queries, migrations, migration files
-│   ├── API.md                         # REST API documentation (41 endpoints, error formats, rate limits)
+│   ├── API.md                         # REST API documentation (61 endpoints, error formats, rate limits)
 │   ├── api-schema.json                # OpenAPI 3.1 schema (machine-readable)
 │   └── types.ts                       # Shared type definitions
 ├── llm/                               # LLM integration documentation

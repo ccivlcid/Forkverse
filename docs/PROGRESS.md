@@ -5,9 +5,9 @@
 
 ---
 
-## Current Phase: Phase 4 — GitHub Platform (Complete) / Phase 5 — GitHub Social (Complete)
+## Current Phase: Phase 6 — SNS Social Features (Complete)
 
-All Phase 0–4 features are complete. Phase 5 (GitHub follow sync, contribution graph, webhook auto-posting, topLanguages, UI contrast improvements) is also complete.
+All Phase 0–6 features are complete. Phase 6 added emoji reactions, quote posts, full-text search, notifications, activity feed, and ErrorBoundary.
 
 ---
 
@@ -21,6 +21,7 @@ All Phase 0–4 features are complete. Phase 5 (GitHub follow sync, contribution
 | Phase 3 | Expansion | **Complete** |
 | Phase 4 | GitHub Platform + Media | **Complete** |
 | Phase 5 | GitHub Social + UI Polish | **Complete** |
+| Phase 6 | SNS Social Features | **Complete** |
 
 ---
 
@@ -44,7 +45,7 @@ All documentation, configuration files, and project scaffolding complete.
 | Server: llm routes | ✅ Done | transform, providers list, key management |
 | Server: users routes | ✅ Done | profile, follow |
 | Client: AppShell + Sidebar | ✅ Done | Header, nav, LLM filter |
-| Client: GlobalFeedPage | ✅ Done | Composer + FeedList + infinite scroll |
+| Client: GlobalFeedPage | ✅ Done | FeedList + infinite scroll (composer is a modal via HeaderBar) |
 | Client: PostCard | ✅ Done | Dual panel, intent badge, translate toggle |
 | Client: LoginPage | ✅ Done | GitHub OAuth connect screen |
 | Client: SetupPage | ✅ Done | First-time profile setup |
@@ -89,16 +90,15 @@ All documentation, configuration files, and project scaffolding complete.
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| SettingsPage (tabbed) | ✅ Done | 6 tabs: profile, language, cli, oauth, api, channel |
+| SettingsPage (tabbed) | ✅ Done | 5 tabs: profile, language, oauth, api, channel |
 | ProfileTab | ✅ Done | Display name, bio, domain, avatar, danger zone |
 | LanguageTab | ✅ Done | UI lang (en/ko/zh/ja) + persisted to localStorage |
-| CliTab | ✅ Done | Detects installed CLI tools via `/api/llm/cli/status`; model selection saved to localStorage |
 | OAuthTab | ✅ Done | GitHub connection status + disconnect |
 | ApiTab | ✅ Done | LLM API key management (anthropic/openai/gemini) |
 | ChannelTab | ⏳ Stub | UI placeholder; backend not yet implemented |
-| Sidebar my LLM section | ✅ Done | Shows configured CLI tools + API providers; links to settings tabs |
+| Sidebar my LLM section | ✅ Done | Shows configured API providers; links to settings API tab |
 | UI language persistence | ✅ Done | `localStorage('clitoris:ui-lang')` — survives page reload |
-| Multi-LLM UI | ✅ Done | CLI tools + API models in Composer; LLM filter in Explore/Sidebar |
+| Multi-LLM UI | ✅ Done | API models in Composer; LLM filter in Explore/Sidebar |
 | Reference UI polish | ✅ Done | Panel labels (ⓘ 자연어 / ⊡ CLI), ¶ continuation, ↵/○ icons, HeaderBar subtitle |
 | ExplorePage | ✅ Done | Trending tags, star-sorted posts, tag filter |
 | AnalyzePage | ✅ Done | `/analyze` — repo input, progress polling, result display, history |
@@ -125,7 +125,23 @@ All documentation, configuration files, and project scaffolding complete.
 | Contribution Graph | ✅ Done | `GET /api/github/contributions/:username` — GitHub GraphQL; `ContributionGraph` component; grass heatmap on all user profiles |
 | GithubTab (Settings) | ✅ Done | New `github` tab in Settings: PR Review Requests list + Webhook setup instructions |
 | Local Feed mock data | ✅ Done | `packages/client/src/mocks/localFeedMock.ts` — 6 mock posts (Korean/English mix, various LLM models); `LocalFeedPage` auto-injects when API returns empty |
-| UI contrast improvements | ✅ Done | All component text colors improved: `#525270`→`#7a8898`, `#404060`→`#7a8898`, `#6b6b8a`→`#9aacbf`; PostCard timestamps/separators/flags, DualPanel copy/translate buttons, ComposerBar hints/model indicator/lang selector/transform button |
+| UI contrast improvements | ✅ Done | All component text colors improved: `#525270`→`#7a8898`, `#404060`→`#7a8898`, `#6b6b8a`→`#9aacbf`; PostCard timestamps/separators/flags, DualPanel copy/translate buttons, ComposerModal hints/model indicator/lang selector/transform button |
+
+---
+
+## Phase 6 — SNS Social Features (Complete)
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Emoji reactions | ✅ Done | `POST /api/posts/:id/react` — 8 reactions (lgtm, ship_it, fire, bug, thinking, rocket, eyes, heart); `ReactionBar` component; migration `016_create_reactions.sql` |
+| Quote posts | ✅ Done | `quotedPostId` field on posts; `QuotedPost` component; migrations `018_add_quoted_post_id.sql` + `019_add_quoted_post_index.sql` |
+| Full-text search | ✅ Done | FTS5 virtual table `posts_fts` on `message_raw` + `tags`; auto-sync triggers; `GET /api/posts/search`; `SearchPage` + `searchStore`; migration `017_create_posts_fts.sql` |
+| Notifications | ✅ Done | `notifications` table; 7 types (reply, mention, quote, star, fork, follow, reaction); `NotificationBell` component; `notificationStore`; 4 endpoints; migration `015_create_notifications.sql` |
+| Activity feed | ✅ Done | `activity_feed` table; following + global feeds; GitHub sync; `ActivityFeedPage` + `activityStore`; 3 endpoints; migration `014_create_activity_feed.sql` |
+| Webhook dedup | ✅ Done | `webhook_deliveries` table; idempotent webhook processing; migration `013_create_webhook_deliveries.sql` |
+| ErrorBoundary | ✅ Done | App-level React class component error boundary with terminal-style crash UI |
+| SQL injection fix | ✅ Done | Sanitized FTS5 queries (escape special chars, wrap terms in quotes); parameterized all user inputs |
+| Suggested users | ✅ Done | `GET /api/users/suggested` — recommends users to follow based on activity |
 
 ---
 
@@ -149,10 +165,10 @@ All documentation, configuration files, and project scaffolding complete.
 | 2026-03-20 | LLM outputs JSON (not CLI string) | Reliable parsing; server reconstructs CLI; enables intent/emotion extraction |
 | 2026-03-20 | Translation cached per (post_id, lang) | Zero server cost (uses viewer's key); instant on cache hit |
 | 2026-03-20 | Ports changed to 3771 (server) / 7878 (client) | Avoids common port conflicts (3000/5173 often occupied) |
-| 2026-03-20 | CLI tool status via process spawn | `claude --version`, `codex --version` etc. run server-side to detect installed tools + models |
+| 2026-03-20 | CLI tool feature removed | Removed CLI-based LLM tools (claude-code, codex, gemini-cli, opencode); API-only LLM connections |
 | 2026-03-20 | UI language persisted in localStorage | `clitoris:ui-lang` key; avoids API round-trip for a client-only preference |
 | 2026-03-20 | GitHub OAuth fix: `/api/auth/me/pending` endpoint | SetupPage called this endpoint; missing 404 caused login loop; fixed by adding endpoint |
-| 2026-03-20 | Sidebar my LLM: localStorage + `/api/llm/providers` | CLI tools read from localStorage (client fast); API keys from server (source of truth) |
+| 2026-03-20 | Sidebar my LLM: `/api/llm/providers` | API keys from server (source of truth); sidebar shows configured providers |
 | 2026-03-20 | GitHub OAuth scope expanded to `notifications repo` | Required for platform integration (notifications, issues, PRs); only applies to the logged-in user's own data |
 | 2026-03-20 | GitHub token stored in DB (`github_access_token`, `github_token_scope`) | Persists token across sessions; migration 011 |
 | 2026-03-20 | GitHub activity dedup via `github_synced_events` table | Prevents re-importing same event; migration 010 |

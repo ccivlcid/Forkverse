@@ -11,7 +11,6 @@ interface PostState {
   draft: string;
   cliPreview: string | null;
   selectedModel: LlmModel;
-  selectedCliTool: string;
   selectedLang: string;
   isTransforming: boolean;
   isSubmitting: boolean;
@@ -24,7 +23,7 @@ interface PostState {
 
   setDraft: (text: string) => void;
   setLang: (lang: string) => void;
-  selectModel: (cliTool: string, model: string) => void;
+  selectModel: (model: string) => void;
   attachRepo: (owner: string, name: string) => void;
   removeRepo: () => void;
   transformToCli: () => Promise<void>;
@@ -43,28 +42,10 @@ interface TransformResult {
   emotion?: string;
 }
 
-function getDefaultCliSettings(): { model: LlmModel; cliTool: string } {
-  try {
-    const cliSettings = localStorage.getItem('clitoris:cli-settings');
-    const modelSettings = localStorage.getItem('clitoris:cli-model-settings');
-    if (cliSettings && modelSettings) {
-      const { defaultTool } = JSON.parse(cliSettings) as { defaultTool: string };
-      const models = JSON.parse(modelSettings) as Record<string, { main: string }>;
-      if (defaultTool && models[defaultTool]?.main) {
-        return { model: models[defaultTool].main, cliTool: defaultTool };
-      }
-    }
-  } catch { /* ignore */ }
-  return { model: '', cliTool: '' };
-}
-
-const _defaults = getDefaultCliSettings();
-
 export const usePostStore = create<PostState>((set, get) => ({
   draft: '',
   cliPreview: null,
-  selectedModel: _defaults.model,
-  selectedCliTool: _defaults.cliTool,
+  selectedModel: '',
   selectedLang: 'auto',
   isTransforming: false,
   isSubmitting: false,
@@ -77,15 +58,15 @@ export const usePostStore = create<PostState>((set, get) => ({
 
   setDraft: (text) => set({ draft: text, cliPreview: null }),
   setLang: (lang) => set({ selectedLang: lang }),
-  selectModel: (cliTool, model) => set({ selectedCliTool: cliTool, selectedModel: model }),
+  selectModel: (model) => set({ selectedModel: model }),
   attachRepo: (owner, name) => set({ attachedRepo: { owner, name } }),
   removeRepo: () => set({ attachedRepo: null }),
 
   transformToCli: async () => {
-    const { draft, selectedModel, selectedCliTool, selectedLang } = get();
+    const { draft, selectedModel, selectedLang } = get();
     if (!draft.trim()) return;
     if (!selectedModel.trim()) {
-      set({ transformError: 'Select a model (sidebar or Settings → CLI).' });
+      set({ transformError: 'Select a model (sidebar or Settings → API).' });
       return;
     }
 
@@ -94,7 +75,6 @@ export const usePostStore = create<PostState>((set, get) => ({
       const res = await api.post<ApiResponse<TransformResult>>('/llm/transform', {
         message: draft,
         model: selectedModel,
-        ...(selectedCliTool.trim() ? { cliTool: selectedCliTool } : {}),
         lang: selectedLang === 'auto' ? 'en' : selectedLang,
       });
       set({
