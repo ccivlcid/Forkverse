@@ -109,6 +109,7 @@ export default function ActivityFeedPage() {
   }, [tab, isAuthenticated]);
 
   const handleSync = async () => {
+    if (syncing) return;
     setSyncing(true);
     const result = await syncGithub();
     setSyncing(false);

@@ -12,6 +12,9 @@ export default function SearchPage() {
 
   useEffect(() => {
     inputRef.current?.focus();
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, []);
 
   const handleChange = useCallback((val: string) => {

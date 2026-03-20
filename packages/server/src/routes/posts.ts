@@ -129,14 +129,14 @@ function mapPost(row: PostRow, _userId: string | undefined, db?: Database): Post
     emotion: (row.emotion as PostEmotion) ?? 'neutral',
     reactions,
     quotedPostId: row.quoted_post_id ?? null,
-    quotedPost: row.qp_id ? {
+    quotedPost: (row.qp_id && row.qp_message_raw && row.qp_message_cli && row.qp_username) ? {
       id: row.qp_id,
-      messageRaw: row.qp_message_raw!,
-      messageCli: row.qp_message_cli!,
+      messageRaw: row.qp_message_raw,
+      messageCli: row.qp_message_cli,
       user: {
-        username: row.qp_username!,
+        username: row.qp_username,
         domain: row.qp_domain ?? null,
-        displayName: row.qp_display_name!,
+        displayName: row.qp_display_name ?? row.qp_username,
         avatarUrl: row.qp_avatar_url ?? null,
       },
     } : null,
@@ -492,6 +492,92 @@ export function createPostsRouter(db: Database, logger: Logger): Router {
     res.json({ data, meta: { cursor: data[data.length - 1]?.createdAt, hasMore } });
   });
 
+  // GET /search — full-text search (MUST be before /:id to avoid route collision)
+  router.get('/search', (req, res) => {
+    const { q, cursor, limit = '20' } = req.query as Record<string, string>;
+    if (!q || q.trim().length === 0) {
+      res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'Search query is required' } });
+      return;
+    }
+    const searchQuery = q.trim().slice(0, 200);
+
+    const userId = (req as { session?: { userId?: string } }).session?.userId;
+    const pageLimit = Math.min(parseInt(limit, 10) || 20, 50);
+
+    // Sanitize FTS5 query: escape special characters, wrap terms in double quotes
+    const ftsQuery = searchQuery.replace(/["\-*(){}[\]^~:]/g, ' ').trim().split(/\s+/).filter(Boolean).map(t => `"${t}"`).join(' ');
+
+    if (!ftsQuery) {
+      res.json({ data: { posts: [], users: [], tags: [] }, meta: { hasMore: false } });
+      return;
+    }
+
+    const starredSub = starredSubquery(userId);
+    const cursorClause = cursor ? 'AND p.created_at < ?' : '';
+    const params = cursor
+      ? [ftsQuery, cursor, pageLimit + 1]
+      : [ftsQuery, pageLimit + 1];
+
+    let postRows: PostRow[] = [];
+    try {
+      postRows = db.prepare(`
+        SELECT p.*, u.username, u.domain, u.display_name, u.avatar_url,
+          ${countsFragment()}
+          ${starredSub}
+          ${repoFragment()}
+          ${quotedPostFragment()}
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        ${repoJoin()} ${quotedPostJoin()}
+        WHERE p.rowid IN (SELECT rowid FROM posts_fts WHERE posts_fts MATCH ?)
+          ${cursorClause}
+        ORDER BY p.created_at DESC
+        LIMIT ?
+      `).all(...params) as PostRow[];
+    } catch {
+      // FTS5 query parse error — return empty results
+    }
+
+    const hasMore = postRows.length > pageLimit;
+    const posts = postRows.slice(0, pageLimit).map(r => mapPost(r, userId, db));
+
+    const likePattern = `%${searchQuery}%`;
+    const userRows = db.prepare(`
+      SELECT username, display_name, avatar_url, github_username, bio
+      FROM users
+      WHERE username LIKE ? OR display_name LIKE ? OR github_username LIKE ?
+      LIMIT 10
+    `).all(likePattern, likePattern, likePattern) as Array<{
+      username: string; display_name: string; avatar_url: string | null;
+      github_username: string; bio: string | null;
+    }>;
+
+    const tagRows = db.prepare(`
+      SELECT t.value as tag, COUNT(*) as count
+      FROM posts p2, json_each(p2.tags) t
+      WHERE t.value LIKE ?
+      GROUP BY t.value ORDER BY count DESC LIMIT 10
+    `).all(likePattern) as Array<{ tag: string; count: number }>;
+
+    res.json({
+      data: {
+        posts,
+        users: userRows.map(u => ({
+          username: u.username,
+          displayName: u.display_name,
+          avatarUrl: u.avatar_url,
+          githubUsername: u.github_username,
+          bio: u.bio,
+        })),
+        tags: tagRows,
+      },
+      meta: {
+        cursor: posts.length > 0 ? posts[posts.length - 1]?.createdAt : undefined,
+        hasMore,
+      },
+    });
+  });
+
   router.get('/:id', (req, res) => {
     const userId = (req as { session?: { userId?: string } }).session?.userId;
     const row = db.prepare(singlePostQuery(userId)).get(req.params.id) as PostRow | undefined;
@@ -692,83 +778,6 @@ export function createPostsRouter(db: Database, logger: Logger): Router {
     ).all(id, userId) as Array<{ emoji: string }>).map(r => r.emoji as ReactionEmoji);
 
     res.json({ data: { toggled: !existing, emoji, reactions: { counts, mine } } });
-  });
-
-  // GET /search — full-text search
-  router.get('/search', (req, res) => {
-    const { q, cursor, limit = '20' } = req.query as Record<string, string>;
-    if (!q || q.trim().length === 0) {
-      res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'Search query is required' } });
-      return;
-    }
-
-    const userId = (req as { session?: { userId?: string } }).session?.userId;
-    const pageLimit = Math.min(parseInt(limit, 10) || 20, 50);
-
-    // Search posts via FTS5
-    const starredSub = userId
-      ? `, (SELECT 1 FROM stars s2 WHERE s2.user_id = '${userId}' AND s2.post_id = p.id) as is_starred`
-      : ', 0 as is_starred';
-
-    const cursorClause = cursor ? 'AND p.created_at < ?' : '';
-    const params = cursor
-      ? [q.trim(), cursor, pageLimit + 1]
-      : [q.trim(), pageLimit + 1];
-
-    const postRows = db.prepare(`
-      SELECT p.*, u.username, u.domain, u.display_name, u.avatar_url,
-        ${countsFragment()}
-        ${starredSub}
-        ${repoFragment()}
-        ${quotedPostFragment()}
-      FROM posts p
-      JOIN users u ON p.user_id = u.id
-      ${repoJoin()} ${quotedPostJoin()}
-      WHERE p.rowid IN (SELECT rowid FROM posts_fts WHERE posts_fts MATCH ?)
-        ${cursorClause}
-      ORDER BY p.created_at DESC
-      LIMIT ?
-    `).all(...params) as PostRow[];
-
-    const hasMore = postRows.length > pageLimit;
-    const posts = postRows.slice(0, pageLimit).map(r => mapPost(r, userId, db));
-
-    // Search users
-    const userRows = db.prepare(`
-      SELECT username, display_name, avatar_url, github_username, bio
-      FROM users
-      WHERE username LIKE ? OR display_name LIKE ? OR github_username LIKE ?
-      LIMIT 10
-    `).all(`%${q.trim()}%`, `%${q.trim()}%`, `%${q.trim()}%`) as Array<{
-      username: string; display_name: string; avatar_url: string | null;
-      github_username: string; bio: string | null;
-    }>;
-
-    // Search tags
-    const tagRows = db.prepare(`
-      SELECT t.value as tag, COUNT(*) as count
-      FROM posts p2, json_each(p2.tags) t
-      WHERE t.value LIKE ?
-      GROUP BY t.value ORDER BY count DESC LIMIT 10
-    `).all(`%${q.trim()}%`) as Array<{ tag: string; count: number }>;
-
-    res.json({
-      data: {
-        posts,
-        users: userRows.map(u => ({
-          username: u.username,
-          displayName: u.display_name,
-          avatarUrl: u.avatar_url,
-          githubUsername: u.github_username,
-          bio: u.bio,
-        })),
-        tags: tagRows,
-      },
-      meta: {
-        cursor: posts.length > 0 ? posts[posts.length - 1]?.createdAt : undefined,
-        hasMore,
-      },
-    });
   });
 
   router.delete('/:id', requireAuth, (req, res) => {

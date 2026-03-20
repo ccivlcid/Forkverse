@@ -172,16 +172,19 @@ export function createActivityRouter(db: Database): Router {
         VALUES (?, ?, ?, ?, ?, ?)
       `);
 
-      for (const event of events) {
-        const mapped = mapGitHubEvent(event);
-        if (!mapped) continue;
+      const insertAll = db.transaction(() => {
+        for (const event of events) {
+          const mapped = mapGitHubEvent(event);
+          if (!mapped) continue;
 
-        const result = insertStmt.run(
-          generateId(), userId, mapped.eventType,
-          JSON.stringify(mapped.metadata), event.id, event.created_at,
-        );
-        if (result.changes > 0) created++;
-      }
+          const result = insertStmt.run(
+            generateId(), userId, mapped.eventType,
+            JSON.stringify(mapped.metadata), event.id, event.created_at,
+          );
+          if (result.changes > 0) created++;
+        }
+      });
+      insertAll();
 
       res.json({ data: { synced: created, total: events.length } });
     } catch {

@@ -42,10 +42,10 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   fetchNextPage: async () => {
     const { cursor, hasMore, isLoading } = get();
-    if (!hasMore || isLoading) return;
+    if (!hasMore || isLoading || !cursor) return;
     set({ isLoading: true });
     try {
-      const res = await api.get<ApiResponse<Notification[]>>(`/notifications?cursor=${encodeURIComponent(cursor!)}`);
+      const res = await api.get<ApiResponse<Notification[]>>(`/notifications?cursor=${encodeURIComponent(cursor)}`);
       set((s) => ({
         notifications: [...s.notifications, ...res.data],
         cursor: res.meta?.cursor ?? null,
@@ -66,6 +66,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   },
 
   markRead: async (id: string) => {
+    const prev = get().notifications;
+    const prevCount = get().unreadCount;
     set((s) => ({
       notifications: s.notifications.map((n) => n.id === id ? { ...n, read: true } : n),
       unreadCount: Math.max(0, s.unreadCount - 1),
@@ -73,11 +75,14 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     try {
       await api.post(`/notifications/${id}/read`);
     } catch {
+      set({ notifications: prev, unreadCount: prevCount });
       toastError('Failed to mark notification as read');
     }
   },
 
   markAllRead: async () => {
+    const prev = get().notifications;
+    const prevCount = get().unreadCount;
     set((s) => ({
       notifications: s.notifications.map((n) => ({ ...n, read: true })),
       unreadCount: 0,
@@ -85,6 +90,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     try {
       await api.post('/notifications/read-all');
     } catch {
+      set({ notifications: prev, unreadCount: prevCount });
       toastError('Failed to mark all as read');
     }
   },

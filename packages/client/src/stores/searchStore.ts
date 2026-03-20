@@ -3,6 +3,8 @@ import { api } from '../api/client.js';
 import { toastError } from './toastStore.js';
 import type { SearchResult, ApiResponse } from '@clitoris/shared';
 
+let searchSeq = 0;
+
 interface SearchState {
   query: string;
   results: SearchResult | null;
@@ -22,15 +24,21 @@ export const useSearchStore = create<SearchState>((set) => ({
 
   search: async (q) => {
     if (!q.trim()) { set({ results: null }); return; }
+    const seq = ++searchSeq;
     set({ isLoading: true, query: q });
     try {
       const res = await api.get<ApiResponse<SearchResult>>(`/posts/search?q=${encodeURIComponent(q.trim())}`);
-      set({ results: res.data, isLoading: false });
+      // Only apply if this is still the latest search request
+      if (seq === searchSeq) {
+        set({ results: res.data, isLoading: false });
+      }
     } catch {
-      set({ isLoading: false });
-      toastError('Search failed');
+      if (seq === searchSeq) {
+        set({ isLoading: false });
+        toastError('Search failed');
+      }
     }
   },
 
-  clear: () => set({ query: '', results: null }),
+  clear: () => { searchSeq++; set({ query: '', results: null, isLoading: false }); },
 }));

@@ -42,10 +42,10 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
 
   fetchNextPage: async () => {
     const { cursor, hasMore, isLoading, events, feedType } = get();
-    if (!hasMore || isLoading) return;
+    if (!hasMore || isLoading || !cursor) return;
     set({ isLoading: true });
     try {
-      const res = await api.get<ApiResponse<ActivityEvent[]>>(`/activity/${feedType}?cursor=${encodeURIComponent(cursor!)}`);
+      const res = await api.get<ApiResponse<ActivityEvent[]>>(`/activity/${feedType}?cursor=${encodeURIComponent(cursor)}`);
       set({
         events: [...events, ...res.data],
         cursor: res.meta?.cursor ?? null,

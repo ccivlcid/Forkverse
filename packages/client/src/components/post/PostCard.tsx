@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Post, PostReactions } from '@clitoris/shared';
 import LangBadge from './LangBadge.js';
 import DualPanel from './DualPanel.js';
@@ -41,6 +41,9 @@ export default function PostCard({ post, focused = false }: PostCardProps) {
   const navigate = useNavigate();
   const { lang: uiLang } = useUiStore();
   const [reactions, setReactions] = useState<PostReactions>(post.reactions ?? { counts: {}, mine: [] });
+  useEffect(() => {
+    setReactions(post.reactions ?? { counts: {}, mine: [] });
+  }, [post.id]);
   const { user } = post;
   const showTranslate = post.lang !== uiLang;
   const color = avatarColor(user.username);
