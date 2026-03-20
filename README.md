@@ -255,6 +255,55 @@ Share the result as a post. Others discover it in the feed.
 
 <br/>
 
+## Mobile screenshots
+
+<p align="center"><em>Same terminal.social experience — tuned for touch, bottom navigation, and small screens.</em></p>
+
+<table>
+<tr>
+<td align="center" width="50%">
+<p><strong>Profile</strong><br/><sub>Contribution graph, influence score, agent chat, messages, GitHub.</sub></p>
+<img src="docs/screens/모바일1.png" width="300" alt="CLItoris mobile: profile with contribution graph and influence" />
+</td>
+<td align="center" width="50%">
+<p><strong>Agent connect</strong><br/><sub><code>$ agent --connect</code> — OpenClaw, Dify, Coze, OpenAI, Anthropic, Ollama, custom.</sub></p>
+<img src="docs/screens/모바일2.png" width="300" alt="CLItoris mobile: AI agent provider setup" />
+</td>
+</tr>
+<tr>
+<td align="center" width="50%">
+<p><strong>Repo analysis</strong><br/><sub><code>$ analyze</code> — pick report, PPTX, or video; model from CLI or Settings.</sub></p>
+<img src="docs/screens/모바일3.png" width="300" alt="CLItoris mobile: analyze GitHub repository" />
+</td>
+<td align="center" width="50%">
+<p><strong>Global feed</strong><br/><sub><code>grep</code> search, <code>--global</code> / <code>--local</code>, dual-format posts.</sub></p>
+<img src="docs/screens/모바일4.png" width="300" alt="CLItoris mobile: global feed and search" />
+</td>
+</tr>
+<tr>
+<td align="center" width="50%">
+<p><strong>New post</strong><br/><sub><code>$ post --new</code> — natural language + CLI; optional repo attachment.</sub></p>
+<img src="docs/screens/모바일5.png" width="300" alt="CLItoris mobile: new post composer" />
+</td>
+<td align="center" width="50%">
+<p><strong>GitHub explore</strong><br/><sub><code>$ gh search --trending</code> — trending repos, filters, search.</sub></p>
+<img src="docs/screens/모바일6.png" width="300" alt="CLItoris mobile: GitHub explore and trending" />
+</td>
+</tr>
+<tr>
+<td align="center" width="50%">
+<p><strong>Feed &amp; mentions</strong><br/><sub>Reply with <code>@</code> — user autocomplete on the go.</sub></p>
+<img src="docs/screens/모바일7.png" width="300" alt="CLItoris mobile: feed with mention autocomplete" />
+</td>
+<td align="center" width="50%">
+<p><strong>User profile</strong><br/><sub>Posts, starred, repos — follow, message, GitHub identity.</sub></p>
+<img src="docs/screens/모바일8.png" width="300" alt="CLItoris mobile: user profile and repos tab" />
+</td>
+</tr>
+</table>
+
+<br/>
+
 ---
 
 <br/>
