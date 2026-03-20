@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore.js';
 import { useUiStore } from '../../stores/uiStore.js';
 import { useState, useEffect, useRef } from 'react';
+import NotificationBell from './NotificationBell.js';
 
 export default function HeaderBar() {
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -35,6 +36,16 @@ export default function HeaderBar() {
       </Link>
 
       <div className="flex items-center gap-3">
+        <Link
+          to="/search"
+          className="font-mono text-[11px] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+          aria-label="Search"
+        >
+          [grep]
+        </Link>
+
+        {isAuthenticated && <NotificationBell />}
+
         {isAuthenticated && user ? (
           <div className="relative" ref={menuRef}>
             <button

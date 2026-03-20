@@ -5,6 +5,7 @@ import { usePostStore } from '../../stores/postStore.js';
 import { api } from '../../api/client.js';
 import { toastError } from '../../stores/toastStore.js';
 import type { ApiResponse } from '@clitoris/shared';
+import SuggestedUsers from './SuggestedUsers.js';
 
 const TOOL_ICONS: Record<string, string> = {
   'claude-code': '*',
@@ -35,6 +36,7 @@ const NAV = [
   { to: '/feed/local', label: 'feed --local'  },
   { to: '/explore',    label: 'explore'        },
   { to: '/github',     label: 'github'         },
+  { to: '/activity',   label: 'activity'       },
 ];
 
 const ME_NAV: Array<{
@@ -177,6 +179,9 @@ export default function Sidebar() {
           )}
         </div>
       )}
+
+      {/* Suggested users */}
+      {isAuthenticated && <SuggestedUsers />}
 
       {/* Me section */}
       {isAuthenticated && user ? (

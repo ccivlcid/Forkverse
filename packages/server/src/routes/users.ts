@@ -2,6 +2,7 @@ import { Router } from 'express';
 import type { Database } from 'better-sqlite3';
 import { generateId } from '../lib/id.js';
 import { requireAuth } from '../middleware/auth.js';
+import { createNotification, createActivity } from './notifications.js';
 
 interface UserProfileRow {
   id: string;
@@ -248,10 +249,53 @@ export function createUsersRouter(db: Database): Router {
       db.prepare('DELETE FROM follows WHERE follower_id = ? AND following_id = ?').run(sessionUserId, target.id);
     } else {
       db.prepare('INSERT INTO follows (follower_id, following_id) VALUES (?, ?)').run(sessionUserId, target.id);
+      createNotification(db, target.id, 'follow', sessionUserId, null, null);
+      createActivity(db, sessionUserId, 'follow', target.id, null);
     }
 
     const count = (db.prepare('SELECT COUNT(*) as c FROM follows WHERE following_id = ?').get(target.id) as { c: number }).c;
     res.json({ data: { following: !existing, followerCount: count } });
+  });
+
+  // ── Suggested users ──────────────────────────────────────────────────
+  router.get('/suggested', requireAuth, (req, res) => {
+    const sessionUserId = req.session.userId!;
+
+    // Suggest users who share languages or are followed by people you follow,
+    // excluding users you already follow and yourself
+    const rows = db.prepare(`
+      SELECT u.username, u.display_name, u.avatar_url, u.github_username,
+        u.top_languages, u.bio,
+        CASE
+          WHEN EXISTS (
+            SELECT 1 FROM follows f1
+            JOIN follows f2 ON f2.follower_id = f1.following_id AND f2.following_id = u.id
+            WHERE f1.follower_id = ?
+          ) THEN 'mutual_connection'
+          ELSE 'similar_interests'
+        END as reason
+      FROM users u
+      WHERE u.id != ?
+        AND u.id NOT IN (SELECT following_id FROM follows WHERE follower_id = ?)
+      ORDER BY
+        (SELECT COUNT(*) FROM follows WHERE following_id = u.id) DESC
+      LIMIT 10
+    `).all(sessionUserId, sessionUserId, sessionUserId) as Array<{
+      username: string; display_name: string; avatar_url: string | null;
+      github_username: string; top_languages: string | null; bio: string | null;
+      reason: string;
+    }>;
+
+    const data = rows.map(r => ({
+      username: r.username,
+      displayName: r.display_name,
+      avatarUrl: r.avatar_url,
+      githubUsername: r.github_username,
+      reason: r.reason === 'mutual_connection' ? 'Followed by people you follow' : 'Popular in the community',
+      topLanguages: JSON.parse(r.top_languages ?? '[]') as string[],
+    }));
+
+    res.json({ data });
   });
 
   // ── Sync GitHub profile ────────────────────────────────────────────────

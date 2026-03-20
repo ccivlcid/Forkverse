@@ -5,7 +5,8 @@ import { useAuthStore } from '../../stores/authStore.js';
 import { useFeedStore } from '../../stores/feedStore.js';
 import { useUiStore } from '../../stores/uiStore.js';
 import { toastError } from '../../stores/toastStore.js';
-import type { ApiResponse } from '@clitoris/shared';
+import type { ApiResponse, PostReactions, ReactionEmoji } from '@clitoris/shared';
+import { REACTION_DISPLAY } from '@clitoris/shared';
 
 interface ActionBarProps {
   postId: string;
@@ -13,6 +14,8 @@ interface ActionBarProps {
   forkCount: number;
   starCount: number;
   isStarred: boolean;
+  reactions?: PostReactions;
+  onReactionUpdate?: (reactions: PostReactions) => void;
 }
 
 export default function ActionBar({
@@ -21,6 +24,8 @@ export default function ActionBar({
   forkCount,
   starCount,
   isStarred,
+  reactions,
+  onReactionUpdate,
 }: ActionBarProps) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
@@ -59,6 +64,28 @@ export default function ActionBar({
       toastError('Failed to fork post');
     } finally {
       forkBusy.current = false;
+    }
+  };
+
+  const reactBusy = useRef(false);
+  const [reactPickerOpen, setReactPickerOpen] = useState(false);
+
+  const handleQuickReact = async (e: React.MouseEvent, emoji: ReactionEmoji) => {
+    e.stopPropagation();
+    if (!isAuthenticated) { navigate('/login'); return; }
+    if (reactBusy.current) return;
+    reactBusy.current = true;
+    try {
+      const res = await api.post<ApiResponse<{ toggled: boolean; emoji: string; reactions: PostReactions }>>(
+        `/posts/${postId}/react`,
+        { emoji },
+      );
+      onReactionUpdate?.(res.data.reactions);
+    } catch {
+      toastError('Failed to react');
+    } finally {
+      reactBusy.current = false;
+      setReactPickerOpen(false);
     }
   };
 
@@ -106,6 +133,39 @@ export default function ActionBar({
           </span>
         )}
       </button>
+
+      {/* Quick react */}
+      {reactions && onReactionUpdate && (
+        <div className="relative ml-auto">
+          <button
+            onClick={(e) => { e.stopPropagation(); setReactPickerOpen((o) => !o); }}
+            className="font-mono text-[12px] text-[var(--text-muted)] hover:text-[var(--accent-green)] transition-colors"
+            aria-label="Add reaction"
+          >
+            [react]
+          </button>
+          {reactPickerOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setReactPickerOpen(false)} aria-hidden="true" />
+              <div className="absolute bottom-full right-0 mb-1 bg-[var(--bg-surface)] border border-[var(--border)] z-50 flex gap-1 p-1.5 shadow-lg shadow-black/40">
+                {(['lgtm', 'ship_it', 'fire', 'bug', 'thinking', 'rocket', 'eyes', 'heart'] as ReactionEmoji[]).map((emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={(e) => handleQuickReact(e, emoji)}
+                    className={`font-mono text-[10px] px-1 py-0.5 transition-colors ${
+                      reactions.mine.includes(emoji)
+                        ? 'text-[var(--accent-green)]'
+                        : 'text-[var(--text-muted)] hover:text-[var(--accent-green)]'
+                    }`}
+                  >
+                    [{REACTION_DISPLAY[emoji]}]
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

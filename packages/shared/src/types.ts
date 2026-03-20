@@ -54,6 +54,9 @@ export interface Post {
   repoAttachment: RepoAttachment | null;
   intent: PostIntent;
   emotion: PostEmotion;
+  reactions: PostReactions;
+  quotedPostId: string | null;
+  quotedPost: { id: string; messageRaw: string; messageCli: string; user: PostUser } | null;
 }
 
 export interface PostUser {
@@ -246,4 +249,85 @@ export interface TrendingRepo {
   stars: number;
   forks: number;
   language: string | null;
+}
+
+// ============================================
+// Activity Feed
+// ============================================
+export type ActivityEventType =
+  | 'github_push' | 'github_pr_merge' | 'github_pr_open'
+  | 'github_release' | 'github_star' | 'github_fork' | 'github_create'
+  | 'follow' | 'star_post' | 'fork_post' | 'reply';
+
+export interface ActivityEvent {
+  id: string;
+  actorId: string;
+  actor: PostUser;
+  eventType: ActivityEventType;
+  targetUserId: string | null;
+  targetUser: PostUser | null;
+  targetPostId: string | null;
+  targetPost: { messageRaw: string; messageCli: string } | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+// ============================================
+// Notifications
+// ============================================
+export type NotificationType = 'star' | 'reply' | 'follow' | 'mention' | 'fork' | 'reaction' | 'quote';
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  actorId: string;
+  actor: PostUser;
+  postId: string | null;
+  message: string | null;
+  read: boolean;
+  createdAt: string;
+}
+
+// ============================================
+// Reactions
+// ============================================
+export const REACTION_EMOJIS = ['lgtm', 'ship_it', 'fire', 'bug', 'thinking', 'rocket', 'eyes', 'heart'] as const;
+export type ReactionEmoji = typeof REACTION_EMOJIS[number];
+
+export const REACTION_DISPLAY: Record<ReactionEmoji, string> = {
+  lgtm: 'lgtm',
+  ship_it: 'ship',
+  fire: 'fire',
+  bug: 'bug',
+  thinking: 'hmm',
+  rocket: 'rocket',
+  eyes: 'eyes',
+  heart: 'heart',
+};
+
+export interface PostReactions {
+  counts: Partial<Record<ReactionEmoji, number>>;
+  mine: ReactionEmoji[];
+}
+
+// ============================================
+// Search
+// ============================================
+export interface SearchResult {
+  posts: Post[];
+  users: Array<{ username: string; displayName: string; avatarUrl: string | null; githubUsername: string; bio: string | null }>;
+  tags: Array<{ tag: string; count: number }>;
+}
+
+// ============================================
+// Suggested User
+// ============================================
+export interface SuggestedUser {
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+  githubUsername: string;
+  reason: string;
+  topLanguages: string[];
 }

@@ -1,9 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
-import type { Post } from '@clitoris/shared';
+import { useState } from 'react';
+import type { Post, PostReactions } from '@clitoris/shared';
 import LangBadge from './LangBadge.js';
 import DualPanel from './DualPanel.js';
 import ActionBar from './ActionBar.js';
 import RepoCard from './RepoCard.js';
+import ReactionBar from './ReactionBar.js';
+import QuotedPost from './QuotedPost.js';
 import { useUiStore } from '../../stores/uiStore.js';
 
 interface PostCardProps {
@@ -37,6 +40,7 @@ function avatarColor(username: string): string {
 export default function PostCard({ post, focused = false }: PostCardProps) {
   const navigate = useNavigate();
   const { lang: uiLang } = useUiStore();
+  const [reactions, setReactions] = useState<PostReactions>(post.reactions ?? { counts: {}, mine: [] });
   const { user } = post;
   const showTranslate = post.lang !== uiLang;
   const color = avatarColor(user.username);
@@ -117,8 +121,23 @@ export default function PostCard({ post, focused = false }: PostCardProps) {
         uiLang={uiLang}
       />
 
+      {/* Quoted post */}
+      {post.quotedPost && (
+        <QuotedPost
+          id={post.quotedPost.id}
+          messageRaw={post.quotedPost.messageRaw}
+          messageCli={post.quotedPost.messageCli}
+          user={post.quotedPost.user}
+        />
+      )}
+
       {/* Repo attachment */}
       {post.repoAttachment && <RepoCard repo={post.repoAttachment} />}
+
+      {/* Reactions */}
+      {(Object.keys(reactions.counts).length > 0 || reactions.mine.length > 0) && (
+        <ReactionBar postId={post.id} reactions={reactions} onUpdate={setReactions} />
+      )}
 
       {/* Action Bar */}
       <ActionBar
@@ -127,6 +146,8 @@ export default function PostCard({ post, focused = false }: PostCardProps) {
         forkCount={post.forkCount}
         starCount={post.starCount}
         isStarred={post.isStarred}
+        reactions={reactions}
+        onReactionUpdate={setReactions}
       />
     </article>
   );

@@ -1,0 +1,1 @@
+ALTER TABLE posts ADD COLUMN quoted_post_id TEXT REFERENCES posts(id) ON DELETE SET NULL;

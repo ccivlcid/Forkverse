@@ -13,6 +13,8 @@ import { createLlmRouter } from './routes/llm.js';
 import { createAnalyzeRouter } from './routes/analyze.js';
 import { createGithubRouter } from './routes/github.js';
 import { createWebhookRouter } from './routes/webhook.js';
+import { createActivityRouter } from './routes/activity.js';
+import { createNotificationRouter } from './routes/notifications.js';
 import { createErrorHandler } from './middleware/error.js';
 
 const logger = pino({
@@ -48,6 +50,8 @@ app.use('/api/llm', createLlmRouter(db, logger));
 app.use('/api/analyze', createAnalyzeRouter(db, logger));
 app.use('/api/github', createGithubRouter(db));
 app.use('/api/webhook', createWebhookRouter(db, logger));
+app.use('/api/activity', createActivityRouter(db));
+app.use('/api/notifications', createNotificationRouter(db));
 
 app.get('/api/health', (_req, res) => {
   res.json({ data: { status: 'ok', timestamp: new Date().toISOString() } });
