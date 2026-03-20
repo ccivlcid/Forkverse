@@ -78,13 +78,14 @@ export function createAuthRouter(db: Database, logger: Logger): Router {
 
   const router = Router();
 
-  router.get('/github', (_req, res) => {
+  router.get('/github', (req, res) => {
     if (!githubClientId.trim()) {
       logger.warn('GITHUB_CLIENT_ID is missing; GitHub login will fail');
       res.redirect(`${clientUrl}/login?error=config`);
       return;
     }
     const state = generateId();
+    req.session.oauthState = state;
     const params = new URLSearchParams({
       client_id: githubClientId,
       redirect_uri: githubRedirectUri,
@@ -95,7 +96,7 @@ export function createAuthRouter(db: Database, logger: Logger): Router {
   });
 
   router.get('/github/callback', async (req, res) => {
-    const { code, error: oauthError } = req.query as Record<string, string>;
+    const { code, error: oauthError, state } = req.query as Record<string, string>;
 
     if (oauthError) {
       res.redirect(`${clientUrl}/login?error=denied`);
@@ -103,6 +104,14 @@ export function createAuthRouter(db: Database, logger: Logger): Router {
     }
     if (!code) {
       res.redirect(`${clientUrl}/login?error=no_code`);
+      return;
+    }
+
+    // CSRF protection: verify state matches session
+    const expectedState = req.session.oauthState;
+    delete req.session.oauthState;
+    if (!expectedState || expectedState !== state) {
+      res.redirect(`${clientUrl}/login?error=state_mismatch`);
       return;
     }
 

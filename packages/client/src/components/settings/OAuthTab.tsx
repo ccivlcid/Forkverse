@@ -44,7 +44,7 @@ export default function OAuthTab() {
   return (
     <div className="space-y-4">
       {/* GitHub */}
-      <div className="border border-gray-700 bg-[#16213e] p-6 space-y-4">
+      <div className="border border-[var(--border)] bg-[var(--bg-elevated)] p-6 space-y-4">
         <div className="flex items-center justify-between">
           <p className="text-gray-600 text-xs font-mono">// oauth connections</p>
           <span className="text-emerald-400 font-mono text-xs bg-emerald-400/10 px-2 py-0.5">connected</span>
@@ -69,7 +69,7 @@ export default function OAuthTab() {
         </div>
 
         {/* Sync profile */}
-        <div className="pt-2 border-t border-gray-700 space-y-2">
+        <div className="pt-2 border-t border-[var(--border)] space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-gray-500 font-mono text-sm">$ github --sync-profile</span>
             <button
@@ -89,7 +89,7 @@ export default function OAuthTab() {
         </div>
 
         {/* Sync activity */}
-        <div className="pt-2 border-t border-gray-700 space-y-2">
+        <div className="pt-2 border-t border-[var(--border)] space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-gray-500 font-mono text-sm">$ github --sync-activity</span>
             <button
@@ -109,7 +109,7 @@ export default function OAuthTab() {
         </div>
 
         {/* Disconnect */}
-        <div className="pt-2 border-t border-gray-700 space-y-2">
+        <div className="pt-2 border-t border-[var(--border)] space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-gray-500 font-mono text-sm">$ oauth --provider=github --disconnect</span>
             <button
@@ -127,7 +127,7 @@ export default function OAuthTab() {
       </div>
 
       {/* Future providers */}
-      <div className="border border-gray-700 bg-[#16213e] p-6 space-y-3">
+      <div className="border border-[var(--border)] bg-[var(--bg-elevated)] p-6 space-y-3">
         <p className="text-gray-600 text-xs font-mono">// future providers</p>
         {['gitlab', 'gitea'].map((provider) => (
           <div key={provider} className="flex items-center justify-between">

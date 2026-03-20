@@ -4,7 +4,7 @@ import AppShell from '../components/layout/AppShell.js';
 import PostCard from '../components/post/PostCard.js';
 import { useAuthStore } from '../stores/authStore.js';
 import { api, ApiError } from '../api/client.js';
-import { toastError } from '../stores/toastStore.js';
+import { toastError, toastSuccess } from '../stores/toastStore.js';
 import ContributionGraph from '../components/profile/ContributionGraph.js';
 import GithubFollowSync from '../components/profile/GithubFollowSync.js';
 import ProfileTab from '../components/settings/ProfileTab.js';
@@ -23,18 +23,6 @@ const BASE_TABS = ['posts', 'starred', 'repos'] as const;
 const SELF_TABS = ['profile', 'language', 'cli', 'api', 'oauth', 'channel', 'github'] as const;
 const ALL_TABS: Tab[] = [...BASE_TABS, ...SELF_TABS];
 
-function Toast({ message, onDone }: { message: string; onDone: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onDone, 2500);
-    return () => clearTimeout(t);
-  }, [onDone]);
-  return (
-    <div className="fixed top-4 right-4 bg-[#0d1117] border border-emerald-400/30 px-4 py-2 font-mono text-sm text-emerald-400 z-50">
-      {message} ✓
-    </div>
-  );
-}
-
 interface GithubRepo {
   name: string;
   description: string | null;
@@ -52,17 +40,17 @@ function formatCount(n: number): string {
 
 function SkeletonProfile() {
   return (
-    <div className="border border-gray-700 bg-[#16213e] p-6 animate-pulse space-y-4">
+    <div className="border border-[var(--border)] bg-[var(--bg-elevated)] p-6 animate-pulse space-y-4">
       <div className="flex items-start gap-4">
-        <div className="w-16 h-16 bg-gray-700 rounded-sm shrink-0" />
+        <div className="w-16 h-16 bg-[var(--border)] rounded-sm shrink-0" />
         <div className="space-y-2 flex-1">
-          <div className="h-4 w-32 bg-gray-700 rounded" />
-          <div className="h-3 w-24 bg-gray-700 rounded" />
-          <div className="h-3 w-48 bg-gray-700 rounded" />
+          <div className="h-4 w-32 bg-[var(--border)] rounded" />
+          <div className="h-3 w-24 bg-[var(--border)] rounded" />
+          <div className="h-3 w-48 bg-[var(--border)] rounded" />
         </div>
       </div>
-      <div className="h-3 w-full bg-gray-700 rounded" />
-      <div className="h-3 w-3/4 bg-gray-700 rounded" />
+      <div className="h-3 w-full bg-[var(--border)] rounded" />
+      <div className="h-3 w-3/4 bg-[var(--border)] rounded" />
     </div>
   );
 }
@@ -85,7 +73,6 @@ export default function UserProfilePage() {
   const [notFound, setNotFound] = useState(false);
   const [repos, setRepos] = useState<GithubRepo[]>([]);
   const [isLoadingRepos, setIsLoadingRepos] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
 
   const isSelf = me?.username === username;
 
@@ -186,7 +173,7 @@ export default function UserProfilePage() {
           <button onClick={() => navigate(-1)} className="text-gray-500 hover:text-gray-300 font-mono text-sm">
             ← back
           </button>
-          <div className="border border-red-400/30 bg-[#16213e] p-8 text-center space-y-3">
+          <div className="border border-red-400/30 bg-[var(--bg-elevated)] p-8 text-center space-y-3">
             <p className="text-green-400 font-mono text-sm">$ user --lookup=@{username}</p>
             <p className="text-red-400 font-mono text-sm">error: 404 user not found</p>
             <p className="text-gray-400 font-sans text-sm">This user doesn&apos;t exist.</p>
@@ -201,7 +188,6 @@ export default function UserProfilePage() {
 
   return (
     <AppShell breadcrumb={`@${username ?? ''}`}>
-      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       <div className="max-w-2xl mx-auto p-4 space-y-4">
 
         {/* Back */}
@@ -213,10 +199,10 @@ export default function UserProfilePage() {
         {isLoading ? (
           <SkeletonProfile />
         ) : profile ? (
-          <div className="border border-gray-700 bg-[#16213e] p-6 space-y-4">
+          <div className="border border-[var(--border)] bg-[var(--bg-elevated)] p-6 space-y-4">
             <div className="flex items-start gap-4">
               {/* Avatar */}
-              <div className="w-16 h-16 border border-gray-700 bg-[#0d1117] flex items-center justify-center shrink-0 text-gray-600 font-mono text-xl">
+              <div className="w-16 h-16 border border-[var(--border)] bg-[var(--bg-input)] flex items-center justify-center shrink-0 text-[var(--text-faint)] font-mono text-xl">
                 {profile.githubAvatarUrl ? (
                   <img src={profile.githubAvatarUrl} alt={profile.username} className="w-full h-full object-cover" />
                 ) : (
@@ -248,17 +234,17 @@ export default function UserProfilePage() {
                   href={profile.githubProfileUrl ?? `https://github.com/${profile.githubUsername}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#7a8898] hover:text-[#c9d1d9] transition-colors flex items-center gap-1.5"
+                  className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5"
                 >
-                  <span className="text-[#525270]">■</span> github.com/{profile.githubUsername}
-                  <span className="text-[#525270]">({profile.githubReposCount} repos)</span>
+                  <span className="text-[var(--text-faint)]">■</span> github.com/{profile.githubUsername}
+                  <span className="text-[var(--text-faint)]">({profile.githubReposCount} repos)</span>
                 </a>
                 {profile.topLanguages.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 pt-0.5">
                     {profile.topLanguages.map((lang) => (
                       <span
                         key={lang}
-                        className="px-2 py-0.5 border border-[#1c1c30] text-[#7a8898] font-mono text-[10px]"
+                        className="px-2 py-0.5 border border-[var(--border)] text-[var(--text-muted)] font-mono text-[10px]"
                       >
                         {lang}
                       </span>
@@ -302,7 +288,7 @@ export default function UserProfilePage() {
         {isSelf && <GithubFollowSync />}
 
         {/* Tabs */}
-        <div className="flex flex-wrap border-b border-gray-700">
+        <div className="flex flex-wrap border-b border-[var(--border)]">
           {BASE_TABS.map((t) => (
             <button
               key={t}
@@ -328,10 +314,10 @@ export default function UserProfilePage() {
 
         {/* Self-only panels (CLI, API keys, …): opened via ?tab= — no duplicate “settings” tab strip */}
         {isSelf && username && (SELF_TABS as readonly string[]).includes(tab) && (
-          <div className="flex flex-wrap items-center gap-2 border-b border-gray-700 bg-[#0d1117]/40 px-2 py-2">
+          <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] bg-[var(--bg-input)]/40 px-2 py-2">
             <Link
               to={`/@${username}`}
-              className="px-3 py-1 font-mono text-xs text-gray-500 hover:text-green-400 border border-gray-700 hover:border-green-400/40 transition-colors"
+              className="px-3 py-1 font-mono text-xs text-gray-500 hover:text-green-400 border border-[var(--border)] hover:border-green-400/40 transition-colors"
             >
               [← posts]
             </Link>
@@ -344,11 +330,11 @@ export default function UserProfilePage() {
           isLoadingRepos ? (
             <div className="space-y-2 animate-pulse">
               {Array.from({ length: 4 }, (_, i) => (
-                <div key={i} className="border border-gray-700 h-16 bg-[#16213e]" />
+                <div key={i} className="border border-[var(--border)] h-16 bg-[var(--bg-elevated)]" />
               ))}
             </div>
           ) : repos.length === 0 ? (
-            <div className="border border-gray-700 bg-[#16213e] p-8 text-center space-y-2">
+            <div className="border border-[var(--border)] bg-[var(--bg-elevated)] p-8 text-center space-y-2">
               <p className="text-green-400 font-mono text-sm">$ repos --user=@{username}</p>
               <p className="text-orange-400 font-mono text-sm">&gt; 0 repos found.</p>
             </div>
@@ -360,7 +346,7 @@ export default function UserProfilePage() {
                   href={repo.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 border border-gray-700 bg-[#16213e] px-4 py-3 hover:border-gray-600 transition-colors group"
+                  className="flex items-start gap-3 border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3 hover:border-[var(--border-hover)] transition-colors group"
                 >
                   <span className="text-gray-600 font-mono text-xs shrink-0 mt-0.5 group-hover:text-gray-400">■</span>
                   <div className="flex-1 min-w-0">
@@ -388,13 +374,13 @@ export default function UserProfilePage() {
         {(tab === 'posts' || tab === 'starred') && (isLoadingPosts && posts.length === 0 ? (
           <div className="space-y-0">
             {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className="border border-gray-700 animate-pulse">
-                <div className="h-24 bg-[#16213e]" />
+              <div key={i} className="border border-[var(--border)] animate-pulse">
+                <div className="h-24 bg-[var(--bg-elevated)]" />
               </div>
             ))}
           </div>
         ) : posts.length === 0 ? (
-          <div className="border border-gray-700 bg-[#16213e] p-8 text-center space-y-2">
+          <div className="border border-[var(--border)] bg-[var(--bg-elevated)] p-8 text-center space-y-2">
             <p className="text-green-400 font-mono text-sm">$ {tab} --user=@{username}</p>
             <p className="text-orange-400 font-mono text-sm">&gt; 0 {tab} found.</p>
             <p className="text-gray-400 font-sans text-sm">No {tab} yet.</p>
@@ -408,7 +394,7 @@ export default function UserProfilePage() {
               <button
                 onClick={() => loadPosts(false, cursor)}
                 disabled={isLoadingPosts}
-                className="w-full border border-gray-700 bg-[#16213e] px-4 py-3 text-gray-500 font-mono text-xs hover:text-gray-300 disabled:opacity-40 transition-colors"
+                className="w-full border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3 text-gray-500 font-mono text-xs hover:text-gray-300 disabled:opacity-40 transition-colors"
               >
                 {isLoadingPosts ? '$ loading...' : '$ fetch --more'}
               </button>
@@ -417,13 +403,13 @@ export default function UserProfilePage() {
         ))}
 
         {/* Settings tabs (isSelf only) */}
-        {tab === 'profile'  && isSelf && <ProfileTab  onToast={setToast} />}
+        {tab === 'profile'  && isSelf && <ProfileTab  onToast={toastSuccess} />}
         {tab === 'language' && isSelf && <LanguageTab />}
-        {tab === 'cli'      && isSelf && <CliTab      onToast={setToast} />}
-        {tab === 'api'      && isSelf && <ApiTab      onToast={setToast} />}
+        {tab === 'cli'      && isSelf && <CliTab      onToast={toastSuccess} />}
+        {tab === 'api'      && isSelf && <ApiTab      onToast={toastSuccess} />}
         {tab === 'oauth'    && isSelf && <OAuthTab />}
         {tab === 'channel'  && isSelf && <ChannelTab />}
-        {tab === 'github'   && isSelf && <GithubTab   onToast={setToast} />}
+        {tab === 'github'   && isSelf && <GithubTab   onToast={toastSuccess} />}
 
       </div>
     </AppShell>

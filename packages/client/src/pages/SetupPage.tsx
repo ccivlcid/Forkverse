@@ -108,7 +108,7 @@ export default function SetupPage() {
 
   return (
     <AuthLayout>
-      <div className="w-full max-w-lg border border-gray-700 bg-[#16213e] p-8" onKeyDown={handleKeyDown}>
+      <div className="w-full max-w-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-8" onKeyDown={handleKeyDown}>
         {/* Title */}
         <p className="text-gray-600 text-sm font-mono mb-4">{t('setup.title')}</p>
 
@@ -150,7 +150,7 @@ export default function SetupPage() {
               minLength={2}
               maxLength={32}
               required
-              className="w-full bg-[#0d1117] border border-gray-700 text-gray-200 font-mono text-sm px-3 py-2 outline-none focus:border-green-400/50 placeholder:text-gray-600"
+              className="w-full bg-[var(--bg-input)] border border-gray-700 text-gray-200 font-mono text-sm px-3 py-2 outline-none focus:border-green-400/50 placeholder:text-gray-600"
             />
             {pending && (
               <p className="text-gray-600 font-mono text-xs mt-1">
@@ -173,7 +173,7 @@ export default function SetupPage() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               maxLength={80}
-              className="w-full bg-[#0d1117] border border-gray-700 text-gray-200 font-mono text-sm px-3 py-2 outline-none focus:border-gray-500"
+              className="w-full bg-[var(--bg-input)] border border-gray-700 text-gray-200 font-mono text-sm px-3 py-2 outline-none focus:border-gray-500"
             />
           </div>
 
@@ -188,7 +188,7 @@ export default function SetupPage() {
               onChange={(e) => setBio(e.target.value)}
               maxLength={160}
               rows={2}
-              className="w-full bg-[#0d1117] border border-gray-700 text-gray-200 font-mono text-sm px-3 py-2 outline-none focus:border-gray-500 resize-none"
+              className="w-full bg-[var(--bg-input)] border border-gray-700 text-gray-200 font-mono text-sm px-3 py-2 outline-none focus:border-gray-500 resize-none"
             />
           </div>
 

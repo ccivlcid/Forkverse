@@ -18,7 +18,7 @@ export default function RepoCard({ repo }: RepoCardProps) {
       target="_blank"
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}
-      className="flex items-center gap-3 mx-4 mb-3 px-3 py-2 border border-gray-700 bg-[#0d1117] hover:border-gray-600 transition-colors"
+      className="flex items-center gap-3 mx-4 mb-3 px-3 py-2 border border-[var(--border)] bg-[var(--bg-input)] hover:border-[var(--border-hover)] transition-colors"
     >
       <span className="text-gray-600 font-mono text-xs shrink-0">■</span>
       <div className="flex-1 min-w-0">

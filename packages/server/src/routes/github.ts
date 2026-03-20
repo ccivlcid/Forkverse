@@ -102,22 +102,27 @@ export function createGithubRouter(db: Database): Router {
         repository: { full_name: string; html_url: string };
       }>;
 
-      const data = raw.map((n) => ({
-        id: n.id,
-        reason: n.reason,
-        unread: n.unread,
-        updatedAt: n.updated_at,
-        title: n.subject.title,
-        type: n.subject.type,
-        repoFullName: n.repository.full_name,
-        repoUrl: n.repository.html_url,
-        // Convert API URL to web URL for Issues/PRs
-        url: n.repository.html_url + (
-          n.subject.type === 'Issue' ? '/issues' :
-          n.subject.type === 'PullRequest' ? '/pulls' :
-          ''
-        ),
-      }));
+      const data = raw.map((n) => {
+        // Convert API URL (api.github.com/repos/o/r/issues/123) to web URL
+        let url = n.repository.html_url;
+        if (n.subject.url) {
+          const match = n.subject.url.match(/\/repos\/([^/]+\/[^/]+)\/(issues|pulls)\/(\d+)/);
+          if (match) {
+            url = `https://github.com/${match[1]}/${match[2] === 'pulls' ? 'pull' : 'issues'}/${match[3]}`;
+          }
+        }
+        return {
+          id: n.id,
+          reason: n.reason,
+          unread: n.unread,
+          updatedAt: n.updated_at,
+          title: n.subject.title,
+          type: n.subject.type,
+          repoFullName: n.repository.full_name,
+          repoUrl: n.repository.html_url,
+          url,
+        };
+      });
 
       res.json({ data });
     } catch {
@@ -217,11 +222,11 @@ export function createGithubRouter(db: Database): Router {
   });
 
   // ── GET /api/github/contributions/:username ──────────────────────────
-  // GitHub contribution 데이터 (GraphQL) — 최근 1년
+  // GitHub contribution data (GraphQL) — last year
   router.get('/contributions/:username', async (req, res) => {
     const { username } = req.params;
 
-    // github_username → access_token 조회 (있으면 사용, 없으면 public unauthenticated)
+    // Look up access_token by github_username (use if available, otherwise public unauthenticated)
     const userRow = db.prepare(
       'SELECT github_access_token FROM users WHERE github_username = ? COLLATE NOCASE'
     ).get(username) as { github_access_token: string | null } | undefined;
@@ -299,7 +304,7 @@ export function createGithubRouter(db: Database): Router {
   });
 
   // ── GET /api/github/reviews ──────────────────────────────────────────
-  // 내가 리뷰 요청받은 PR 목록
+  // PRs requesting my review
   router.get('/reviews', requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     const user = getToken(userId);
@@ -356,7 +361,7 @@ export function createGithubRouter(db: Database): Router {
   });
 
   // ── GET /api/github/followers ────────────────────────────────────────
-  // 나를 GitHub에서 팔로우하는 사람 중 CLItoris 가입자
+  // GitHub followers with CLItoris enrollment status
   router.get('/followers', requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     const user = getToken(userId);
@@ -401,7 +406,7 @@ export function createGithubRouter(db: Database): Router {
   });
 
   // ── GET /api/github/following ─────────────────────────────────────────
-  // GitHub에서 내가 팔로우하는 사람 목록 + CLItoris 가입 여부
+  // GitHub following list with CLItoris enrollment status
   router.get('/following', requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     const user = getToken(userId);
@@ -423,7 +428,7 @@ export function createGithubRouter(db: Database): Router {
         html_url: string;
       }>;
 
-      // CLItoris 가입 여부 + 팔로우 여부 일괄 조회
+      // Check CLItoris enrollment + follow status for each GitHub user
       const data = ghUsers.map((gu) => {
         const clitorisUser = db.prepare(
           'SELECT username FROM users WHERE github_username = ? COLLATE NOCASE'
@@ -451,7 +456,7 @@ export function createGithubRouter(db: Database): Router {
   });
 
   // ── POST /api/github/sync-follows ────────────────────────────────────
-  // GitHub 팔로우 목록 중 CLItoris 가입자를 자동 팔로우
+  // Auto-follow CLItoris users from GitHub following list
   router.post('/sync-follows', requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     const user = getToken(userId);

@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.js';
+import { useAuthStore } from '../stores/authStore.js';
 import { api } from '../api/client.js';
+import { toastError } from '../stores/toastStore.js';
 import type { ApiResponse } from '@clitoris/shared';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -54,6 +57,7 @@ type Tab = 'stars' | 'notifications' | 'issues';
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 0) return 'now';
   const s = Math.floor(diff / 1000);
   if (s < 60) return `${s}s ago`;
   const m = Math.floor(s / 60);
@@ -79,7 +83,7 @@ const LANG_COLORS: Record<string, string> = {
 
 function langDot(lang: string | null) {
   if (!lang) return null;
-  const color = LANG_COLORS[lang] ?? '#8b949e';
+  const color = LANG_COLORS[lang] ?? 'var(--text-muted)';
   return <span style={{ color }} className="text-[10px]">● {lang}</span>;
 }
 
@@ -104,7 +108,11 @@ function StarsTab() {
   useEffect(() => {
     api.get<ApiResponse<StarredRepo[]>>('/github/stars')
       .then((res) => setItems(res.data))
-      .catch((err) => setError(err?.response?.data?.error?.message ?? 'Failed to load stars'))
+      .catch((err) => {
+        const msg = err?.response?.data?.error?.message ?? 'Failed to load stars';
+        setError(msg);
+        toastError(msg);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -117,7 +125,8 @@ function StarsTab() {
       {items.map(({ starredAt, repo }) => (
         <article
           key={repo.fullName}
-          className="border border-[#1c1c30] bg-[#0d0d1a] p-4 hover:border-[#2d2d50] transition-colors"
+          tabIndex={0}
+          className="border border-[var(--border)] bg-[var(--bg-surface)] p-4 hover:border-[var(--border-hover)] transition-colors focus-visible:ring-1 focus-visible:ring-[var(--accent-green)]/40 outline-none"
         >
           <div className="flex items-start gap-3">
             <img
@@ -131,22 +140,22 @@ function StarsTab() {
                   href={repo.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-[13px] text-[#58a6ff] hover:underline"
+                  className="font-mono text-[13px] text-[var(--accent-cyan)] hover:underline"
                 >
                   {repo.fullName}
                 </a>
                 {repo.topics.map((t) => (
-                  <span key={t} className="font-mono text-[10px] text-[#22d3ee] border border-[#22d3ee]/30 px-1.5 py-0.5">
+                  <span key={t} className="font-mono text-[10px] text-[var(--accent-cyan)] border border-[var(--accent-cyan)]/30 px-1.5 py-0.5">
                     #{t}
                   </span>
                 ))}
               </div>
               {repo.description && (
-                <p className="mt-1 text-[12px] text-[#8b949e] leading-relaxed truncate">
+                <p className="mt-1 text-[12px] text-[var(--text-muted)] leading-relaxed truncate">
                   {repo.description}
                 </p>
               )}
-              <div className="mt-2 flex items-center gap-4 text-[11px] font-mono text-[#6e7681]">
+              <div className="mt-2 flex items-center gap-4 text-[11px] font-mono text-[var(--text-faint)]">
                 {langDot(repo.language)}
                 <span>★ {repo.stars.toLocaleString()}</span>
                 <span>⑂ {repo.forks.toLocaleString()}</span>
@@ -162,32 +171,51 @@ function StarsTab() {
 
 // ── Notifications Tab ────────────────────────────────────────────────────────
 
-function NotificationsTab() {
+function NotificationsTab({ onUnreadCount }: { onUnreadCount: (n: number) => void }) {
   const [items, setItems] = useState<GhNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [marking, setMarking] = useState<Set<string>>(new Set());
+  const [markingAll, setMarkingAll] = useState(false);
 
   useEffect(() => {
     api.get<ApiResponse<GhNotification[]>>('/github/notifications')
-      .then((res) => setItems(res.data))
-      .catch((err) => setError(err?.response?.data?.error?.message ?? 'Failed to load notifications'))
+      .then((res) => {
+        setItems(res.data);
+        onUnreadCount(res.data.filter((n) => n.unread).length);
+      })
+      .catch((err) => {
+        const msg = err?.response?.data?.error?.message ?? 'Failed to load notifications';
+        setError(msg);
+        toastError(msg);
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [onUnreadCount]);
 
   const markRead = useCallback(async (id: string) => {
     setMarking((prev) => new Set(prev).add(id));
     try {
       await api.post(`/github/notifications/${id}/mark-read`, {});
-      setItems((prev) => prev.map((n) => n.id === id ? { ...n, unread: false } : n));
+      setItems((prev) => {
+        const next = prev.map((n) => n.id === id ? { ...n, unread: false } : n);
+        onUnreadCount(next.filter((n) => n.unread).length);
+        return next;
+      });
+    } catch {
+      toastError('Failed to mark notification as read');
     } finally {
       setMarking((prev) => { const s = new Set(prev); s.delete(id); return s; });
     }
-  }, []);
+  }, [onUnreadCount]);
 
   const markAllRead = useCallback(async () => {
     const unreadIds = items.filter((n) => n.unread).map((n) => n.id);
-    await Promise.allSettled(unreadIds.map((id) => markRead(id)));
+    if (unreadIds.length === 0) return;
+    setMarkingAll(true);
+    const results = await Promise.allSettled(unreadIds.map((id) => markRead(id)));
+    const failed = results.filter((r) => r.status === 'rejected').length;
+    if (failed > 0) toastError(`Failed to mark ${failed} notification(s) as read`);
+    setMarkingAll(false);
   }, [items, markRead]);
 
   if (loading) return <LoadingSpinner />;
@@ -201,9 +229,10 @@ function NotificationsTab() {
         <div className="flex justify-end mb-1">
           <button
             onClick={markAllRead}
-            className="font-mono text-[11px] text-[#8b949e] hover:text-[#3dd68c] transition-colors border border-[#1c1c30] hover:border-[#3dd68c]/40 px-3 py-1"
+            disabled={markingAll}
+            className="font-mono text-[11px] text-[var(--text-muted)] hover:text-[var(--accent-green)] transition-colors border border-[var(--border)] hover:border-[var(--accent-green)]/40 px-3 py-1 disabled:opacity-40"
           >
-            $ mark-read --all ({unreadCount})
+            {markingAll ? '$ marking...' : `$ mark-read --all (${unreadCount})`}
           </button>
         </div>
       )}
@@ -211,25 +240,26 @@ function NotificationsTab() {
       {items.map((n) => (
         <article
           key={n.id}
-          className={`border p-3 transition-colors ${
+          tabIndex={0}
+          className={`border p-3 transition-colors outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-green)]/40 ${
             n.unread
-              ? 'border-[#30363d] bg-[#0d1117] hover:border-[#3dd68c]/40'
-              : 'border-[#1c1c30] bg-[#0a0a14] opacity-60 hover:opacity-80'
+              ? 'border-[var(--border-hover)] bg-[var(--bg-input)] hover:border-[var(--accent-green)]/40'
+              : 'border-[var(--border)] bg-[var(--bg-surface)] opacity-60 hover:opacity-80'
           }`}
         >
           <div className="flex items-start gap-2">
-            <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${n.unread ? 'bg-[#3dd68c]' : 'bg-transparent'}`} />
+            <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${n.unread ? 'bg-[var(--accent-green)]' : 'bg-transparent'}`} />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-mono text-[10px] text-[#6e7681] border border-[#1c1c30] px-1">
+                <span className="font-mono text-[10px] text-[var(--text-faint)] border border-[var(--border)] px-1">
                   {n.type}
                 </span>
-                <span className="font-mono text-[10px] text-[#f59e0b]">
+                <span className="font-mono text-[10px] text-[var(--accent-amber)]">
                   {REASON_LABEL[n.reason] ?? n.reason}
                 </span>
-                <span className="font-mono text-[10px] text-[#22d3ee]">{n.repoFullName}</span>
+                <span className="font-mono text-[10px] text-[var(--accent-cyan)]">{n.repoFullName}</span>
               </div>
-              <p className="mt-1 font-mono text-[12px] text-[#c9d1d9] leading-snug">
+              <p className="mt-1 font-mono text-[12px] text-[var(--text)] leading-snug">
                 {n.title}
               </p>
               <div className="mt-1.5 flex items-center gap-3">
@@ -237,7 +267,7 @@ function NotificationsTab() {
                   href={n.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-[10px] text-[#58a6ff] hover:underline"
+                  className="font-mono text-[10px] text-[var(--accent-cyan)] hover:underline"
                 >
                   → open
                 </a>
@@ -245,12 +275,12 @@ function NotificationsTab() {
                   <button
                     onClick={() => markRead(n.id)}
                     disabled={marking.has(n.id)}
-                    className="font-mono text-[10px] text-[#6e7681] hover:text-[#3dd68c] transition-colors disabled:opacity-40"
+                    className="font-mono text-[10px] text-[var(--text-faint)] hover:text-[var(--accent-green)] transition-colors disabled:opacity-40"
                   >
                     {marking.has(n.id) ? '...' : '✓ mark read'}
                   </button>
                 )}
-                <span className="ml-auto font-mono text-[10px] text-[#6e7681]">
+                <span className="ml-auto font-mono text-[10px] text-[var(--text-faint)]">
                   {relativeTime(n.updatedAt)}
                 </span>
               </div>
@@ -278,7 +308,11 @@ function IssuesTab() {
     setError(null);
     api.get<ApiResponse<GhIssue[]>>(`/github/issues?filter=${f}`)
       .then((res) => setItems(res.data))
-      .catch((err) => setError(err?.response?.data?.error?.message ?? 'Failed to load issues'))
+      .catch((err) => {
+        const msg = err?.response?.data?.error?.message ?? 'Failed to load issues';
+        setError(msg);
+        toastError(msg);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -294,8 +328,8 @@ function IssuesTab() {
             onClick={() => setFilter(f)}
             className={`px-3 py-1 border transition-colors ${
               filter === f
-                ? 'border-[#3dd68c] text-[#3dd68c] bg-[#3dd68c]/[0.06]'
-                : 'border-[#1c1c30] text-[#6e7681] hover:text-[#9aacbf] hover:border-[#2d2d50]'
+                ? 'border-[var(--accent-green)] text-[var(--accent-green)] bg-[var(--accent-green)]/[0.06]'
+                : 'border-[var(--border)] text-[var(--text-faint)] hover:text-[var(--text-muted)] hover:border-[var(--border-hover)]'
             }`}
           >
             --{f}
@@ -311,11 +345,12 @@ function IssuesTab() {
       {!loading && !error && items.map((item) => (
         <article
           key={item.id}
-          className="border border-[#1c1c30] bg-[#0d0d1a] p-3 hover:border-[#2d2d50] transition-colors"
+          tabIndex={0}
+          className="border border-[var(--border)] bg-[var(--bg-surface)] p-3 hover:border-[var(--border-hover)] transition-colors outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-green)]/40"
         >
           <div className="flex items-start gap-2">
             <span className={`font-mono text-[11px] mt-0.5 shrink-0 ${
-              item.type === 'pr' ? 'text-[#a78bfa]' : 'text-[#3dd68c]'
+              item.type === 'pr' ? 'text-purple-400' : 'text-[var(--accent-green)]'
             }`}>
               {item.type === 'pr' ? '⑂' : '#'}
             </span>
@@ -325,14 +360,14 @@ function IssuesTab() {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-[12px] text-[#c9d1d9] hover:text-[#58a6ff] transition-colors"
+                  className="font-mono text-[12px] text-[var(--text)] hover:text-[var(--accent-cyan)] transition-colors"
                 >
                   {item.title}
                 </a>
               </div>
               <div className="mt-1 flex items-center gap-2 flex-wrap">
-                <span className="font-mono text-[10px] text-[#22d3ee]">{item.repoFullName}</span>
-                <span className="font-mono text-[10px] text-[#6e7681]">#{item.number}</span>
+                <span className="font-mono text-[10px] text-[var(--accent-cyan)]">{item.repoFullName}</span>
+                <span className="font-mono text-[10px] text-[var(--text-faint)]">#{item.number}</span>
                 {item.labels.map((l) => (
                   <span
                     key={l.name}
@@ -342,7 +377,7 @@ function IssuesTab() {
                     {l.name}
                   </span>
                 ))}
-                <span className="ml-auto font-mono text-[10px] text-[#6e7681]">
+                <span className="ml-auto font-mono text-[10px] text-[var(--text-faint)]">
                   {relativeTime(item.updatedAt)}
                 </span>
               </div>
@@ -358,7 +393,7 @@ function IssuesTab() {
 
 function LoadingSpinner() {
   return (
-    <div className="py-12 text-center font-mono text-[12px] text-[#4e5d6e]">
+    <div className="py-12 text-center font-mono text-[12px] text-[var(--text-faint)]">
       <span className="animate-pulse">$ fetching...</span>
     </div>
   );
@@ -374,7 +409,7 @@ function ErrorBox({ message }: { message: string }) {
 
 function EmptyBox({ message }: { message: string }) {
   return (
-    <div className="py-12 text-center font-mono text-[12px] text-[#4e5d6e]">{message}</div>
+    <div className="py-12 text-center font-mono text-[12px] text-[var(--text-faint)]">{message}</div>
   );
 }
 
@@ -387,42 +422,80 @@ const TABS: { id: Tab; label: string; cmd: string }[] = [
 ];
 
 export default function GitHubFeedPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuthStore();
   const [tab, setTab] = useState<Tab>('stars');
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Auth guard
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
+  // Keyboard navigation for tabs
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (document.activeElement as HTMLElement).tagName;
+      if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+
+      if (e.key === '1') setTab('stars');
+      else if (e.key === '2') setTab('notifications');
+      else if (e.key === '3') setTab('issues');
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
+  const handleUnreadCount = useCallback((n: number) => {
+    setUnreadCount(n);
+  }, []);
+
+  if (isLoading) return <AppShell><LoadingSpinner /></AppShell>;
+  if (!isAuthenticated) return null;
 
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto px-4 py-6 w-full">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="font-mono text-[14px] text-[#3dd68c]">
-            <span className="text-[#f59e0b]">$</span> github --connect
+          <h1 className="font-mono text-[14px] text-[var(--accent-green)]">
+            <span className="text-[var(--accent-amber)]">$</span> github --connect
           </h1>
-          <p className="mt-1 font-mono text-[11px] text-[#4e5d6e]">
+          <p className="mt-1 font-mono text-[11px] text-[var(--text-faint)]">
             {TABS.find((t) => t.id === tab)?.cmd}
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-[#1c1c30] mb-5">
+        <div className="flex border-b border-[var(--border)] mb-5" role="tablist">
           {TABS.map(({ id, label }) => (
             <button
               key={id}
+              role="tab"
+              aria-selected={tab === id}
               onClick={() => setTab(id)}
               className={`font-mono text-[12px] px-4 py-2 border-b-2 transition-colors -mb-px ${
                 tab === id
-                  ? 'text-[#3dd68c] border-[#3dd68c]'
-                  : 'text-[#6e7681] border-transparent hover:text-[#9aacbf]'
+                  ? 'text-[var(--accent-green)] border-[var(--accent-green)]'
+                  : 'text-[var(--text-faint)] border-transparent hover:text-[var(--text-muted)]'
               }`}
             >
               [{label}]
+              {id === 'notifications' && unreadCount > 0 && (
+                <span className="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-[var(--accent-green)] align-middle" />
+              )}
             </button>
           ))}
         </div>
 
         {/* Tab content */}
-        {tab === 'stars'         && <StarsTab />}
-        {tab === 'notifications' && <NotificationsTab />}
-        {tab === 'issues'        && <IssuesTab />}
+        <div role="tabpanel">
+          {tab === 'stars'         && <StarsTab />}
+          {tab === 'notifications' && <NotificationsTab onUnreadCount={handleUnreadCount} />}
+          {tab === 'issues'        && <IssuesTab />}
+        </div>
       </div>
     </AppShell>
   );

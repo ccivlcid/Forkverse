@@ -37,7 +37,7 @@ export default function ConnectForm({ errorFromCallback }: ConnectFormProps) {
       data-testid="connect-form"
       role="form"
       aria-label="Connect to terminal.social via GitHub"
-      className="w-full max-w-lg border border-gray-700 bg-[#16213e] p-8"
+      className="w-full max-w-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-8"
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >

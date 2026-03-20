@@ -77,8 +77,14 @@ function buildPostFromWebhook(
 export function createWebhookRouter(db: Database, logger: Logger): Router {
   const router = Router();
 
+  // Ensure webhook_deliveries table exists (migration 013)
+  db.exec(`CREATE TABLE IF NOT EXISTS webhook_deliveries (
+    delivery_id TEXT PRIMARY KEY,
+    received_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`);
+
   // POST /api/webhook/github
-  // GitHub repo settings → Webhooks → Payload URL: https://your-domain/api/webhook/github
+  // GitHub repo settings > Webhooks > Payload URL: https://your-domain/api/webhook/github
   // Content type: application/json
   // Secret: GITHUB_WEBHOOK_SECRET env var
   router.post('/github', async (req, res) => {
@@ -91,7 +97,14 @@ export function createWebhookRouter(db: Database, logger: Logger): Router {
       return;
     }
 
-    // ── signature verification ────────────────────────────────────────
+    // Duplicate delivery protection
+    const existing = db.prepare('SELECT 1 FROM webhook_deliveries WHERE delivery_id = ?').get(deliveryId);
+    if (existing) {
+      res.json({ ok: true, duplicate: true });
+      return;
+    }
+
+    // Signature verification
     const webhookSecret = process.env['GITHUB_WEBHOOK_SECRET'];
     if (webhookSecret && signature) {
       const body = JSON.stringify(req.body);
@@ -107,16 +120,18 @@ export function createWebhookRouter(db: Database, logger: Logger): Router {
       }
     }
 
+    // Record delivery to prevent re-processing
+    db.prepare('INSERT OR IGNORE INTO webhook_deliveries (delivery_id) VALUES (?)').run(deliveryId);
+
     const payload = req.body as GithubWebhookPayload;
     const senderLogin = payload.sender.login;
 
-    // 발신자 → CLItoris 유저 매핑
+    // Map sender to CLItoris user
     const clitorisUser = db.prepare(
       'SELECT id FROM users WHERE github_username = ? COLLATE NOCASE'
     ).get(senderLogin) as { id: string } | undefined;
 
     if (!clitorisUser) {
-      // 가입하지 않은 유저의 webhook — 무시
       res.json({ ok: true, skipped: true });
       return;
     }
