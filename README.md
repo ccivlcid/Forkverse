@@ -13,17 +13,13 @@
 
 ## What is CLItoris?
 
-# The social layer GitHub never built.
+# Analyze any GitHub repo with AI. Share the results with developers who care.
 
-GitHub knows what you code. But it doesn't let you **talk about it**.
+Point CLItoris at any public GitHub repository. AI breaks it down — architecture, stack, strengths, risks, improvement paths. You get a structured report, a PPTX deck, or an animated video walkthrough.
 
-You push 47 commits. You merge a PR at 3am. You ship a release that fixes everything. And nobody outside your team ever knows — unless they stalk your contribution graph.
+Then share it. Others discover it in the feed. They discuss it, star it, fork it.
 
-**CLItoris turns your GitHub activity into a social feed — and lets you add your voice on top.**
-
-Your pushes, PRs, releases, and stars automatically become posts. Then you add context, thoughts, and commentary in natural language. AI transforms it all into structured CLI commands. Both versions live side by side.
-
-**This is what GitHub is missing. This is our SNS.**
+**Repo analysis is the content. The social feed is the distribution.**
 
 <br/>
 
@@ -41,7 +37,7 @@ Your pushes, PRs, releases, and stars automatically become posts. Then you add c
   </tr>
 </table>
 
-<em>If it has an API, it's connected. If it runs locally, even better. If it's an agent, chat with it.</em>
+<em>If it has an API, it runs analysis. If it runs locally, even better. If it's an agent, chat with it.</em>
 
 </div>
 
@@ -51,21 +47,29 @@ Your pushes, PRs, releases, and stars automatically become posts. Then you add c
 
 <br/>
 
-## Your code already tells a story. Now give it a voice.
+## How repo analysis works
 
-```
-┌─ What GitHub knows ────────────────┐  ┌─ What CLItoris shows ──────────────┐
-│                                    │  │                                    │
-│  ✓ 3 commits pushed to main       │  │  "Finally cracked the memory leak  │
-│  ✓ mass-refactoring.patch          │  │   that's been haunting us for 2    │
-│  ✓ 847 additions, 1,203 deletions  │  │   weeks. Turned out the event     │
-│                                    │  │   listener was never unsubscribed. │
-│  (nobody sees this)                │  │   #debugging #relief"             │
-│                                    │  │                                    │
-└────────────────────────────────────┘  └────────────────────────────────────┘
+```bash
+$ analyze --repo=vercel/next.js --output=report
 ```
 
-GitHub shows **what** you did. CLItoris shows **why** it mattered.
+```
+> Fetching repository metadata...          ✓ done
+> Scanning file structure...               ✓ done
+> Analyzing architecture patterns...       ✓ done
+> Extracting tech stack...                 ✓ done
+> Generating insights...                   ░░░░░░░░░░  active
+```
+
+Choose your output:
+
+| Output | What you get |
+|--------|-------------|
+| `--output=report` | Structured markdown — stack, architecture, strengths, risks, improvements |
+| `--output=pptx` | 5-slide terminal-themed deck, ready to present |
+| `--output=video` | Animated HTML walkthrough, no ffmpeg required |
+
+Then review, edit your caption, and post it to the feed. Others discover it. Discussion happens.
 
 <br/>
 
@@ -73,26 +77,25 @@ GitHub shows **what** you did. CLItoris shows **why** it mattered.
 
 <br/>
 
-## How it works
+## The social layer
 
-|        | What happens | Example |
-|--------|-------------|---------|
-| **01** | Your GitHub activity auto-posts | Push, PR merge, release, star → instant post on CLItoris |
-| **02** | You add your voice | Write what you were thinking, what you learned, what broke |
-| **03** | AI transforms it | Natural language becomes a structured CLI command with intent, emotion, and tags |
-| **04** | Both get posted | Your words + CLI format, side by side in the feed |
+Analysis results become social content. The feed is where developers discover repos worth their time.
 
 ```
-┌─ Your voice ───────────────────────┐  ┌─ AI-generated CLI ──────────────────┐
-│                                    │  │                                     │
-│  While vibe-coding, I realized     │  │  post --user=jiyeon.kim \           │
-│  we might be adapting to AI,       │  │    --lang=ko \                      │
-│  not the other way around.         │  │    --message="observing AI          │
-│                                    │  │    language convergence" \           │
-│  #vibe-coding #thoughts            │  │    --tags=vibe-coding,thoughts \    │
-│                                    │  │    --intent=casual \                │
-│                                    │  │    --emotion=surprised              │
-└────────────────────────────────────┘  └─────────────────────────────────────┘
+┌─ What GitHub shows ────────────────┐  ┌─ What CLItoris shows ──────────────┐
+│                                    │  │                                    │
+│  vercel/next.js                    │  │  "Analyzed next.js — the RSC       │
+│  ★ 127k  🍴 27k                    │  │   implementation is cleaner than   │
+│  TypeScript · MIT                  │  │   I expected. Surprisingly thin    │
+│                                    │  │   abstraction layers. #nextjs"     │
+│  (that's all you get)              │  │                                    │
+└────────────────────────────────────┘  └────────────────────────────────────┘
+```
+
+Posts use a CLI format that's generated automatically — no AI key required for writing:
+
+```
+post --user=@jiyeon_kim --tags=nextjs,architecture ¶ Analyzed next.js — the RSC...
 ```
 
 <br/>
@@ -103,12 +106,11 @@ GitHub shows **what** you did. CLItoris shows **why** it mattered.
 
 ## CLItoris is right for you if
 
-- ✅ You **code every day** but nobody outside your team sees your work
-- ✅ You want your **GitHub activity to have a social layer** — not just a green grid
-- ✅ You want to **share the story behind the code**, not just the diff
-- ✅ You're curious how **different AI models** interpret the same thought
+- ✅ You want to **understand repos faster** — not just read READMEs
+- ✅ You want AI-generated analysis you can **share and discuss** with other developers
+- ✅ You code every day and want your **GitHub activity to have a social layer**
+- ✅ You want to **share the story behind the code** — not just the diff
 - ✅ You want a social network where **fork** means fork, **star** means star, and **identity** means GitHub
-- ✅ You want to **analyze repos with AI** and share the results
 - ✅ You hate touching the mouse — **keyboard-first navigation** (`j`/`k`/`s`/`r`/`?`)
 - ✅ You want to run LLMs **locally** with Ollama for full privacy
 - ✅ You want to **chat with AI agents** (OpenClaw, Dify, Coze) from one place
@@ -120,12 +122,11 @@ GitHub shows **what** you did. CLItoris shows **why** it mattered.
 
 | GitHub | CLItoris |
 |--------|----------|
+| Shows a star count. Tells you nothing about what the repo actually does. | **AI analyzes it** — architecture, stack, strengths, risks, what to improve. |
 | Shows a green contribution grid. Nobody knows what those squares mean. | Every push, PR, and release becomes a **social post** with your commentary. |
 | PRs are for code review. Not for sharing what you learned. | Add **your voice** — what you were thinking, what broke, what you're proud of. |
 | Stars are silent. You star a repo and nothing happens socially. | Star a post and the author gets notified. Your stars become part of your social profile. |
-| Followers get zero content. Following someone on GitHub gives you... nothing. | Following someone means their **posts, activity, and GitHub events** appear in your feed. |
 | No way to discuss repos outside of Issues. | **Attach repos to posts**. Analyze them with AI. Share reports as social content. |
-| Your GitHub life is invisible to the world. | Your GitHub life **is** your social life. Contribution graph, repos, activity — all visible on your profile. |
 
 <br/>
 
@@ -150,7 +151,7 @@ Sync your recent GitHub events with one click. Pushes, PRs, releases, stars, for
 </td>
 <td align="center" width="33%">
 <h3>💬 Add Your Voice</h3>
-GitHub shows the diff. You add the story — what you learned, what frustrated you, what made you proud.
+Write what you were thinking, what you learned, what broke. No AI key required — CLI format is generated automatically.
 </td>
 </tr>
 </table>
@@ -163,7 +164,7 @@ GitHub shows the diff. You add the story — what you learned, what frustrated y
 <tr>
 <td align="center"><strong>🌱 Contribution<br/>Graph</strong><br/><sub>Your grass heatmap<br/>on your profile</sub></td>
 <td align="center"><strong>👥 Follow<br/>Sync</strong><br/><sub>Auto-follow GitHub<br/>friends on CLItoris</sub></td>
-<td align="center"><strong>📊 Activity<br/>Import</strong><br/><sub>Push · PR · Release<br/>→ posts</sub></td>
+<td align="center"><strong>📊 Activity<br/>Feed</strong><br/><sub>Day-grouped, collapsible<br/>events with filters</sub></td>
 <td align="center"><strong>🔔 Notifications</strong><br/><sub>GitHub notifications<br/>in-app</sub></td>
 </tr>
 <tr>
@@ -181,17 +182,17 @@ GitHub shows the diff. You add the story — what you learned, what frustrated y
 
 <br/>
 
-## More than activity — a full social network
+## More than analysis — a full social network
 
 <table>
 <tr>
 <td align="center" width="33%">
-<h3>🖥️ Dual-Format Posts</h3>
-Every post shows your original text and its CLI representation side by side. AI extracts intent, emotion, and hashtags automatically.
+<h3>📊 Repo Analysis</h3>
+Analyze any public GitHub repo with AI. Architecture reports, PPTX decks, animated HTML walkthroughs. Review before posting.
 </td>
 <td align="center" width="33%">
 <h3>🤖 9+ AI Providers</h3>
-Claude, GPT-4o, Gemini, Ollama, OpenRouter, Together, Groq, Cerebras, or any OpenAI-compatible endpoint.
+Claude, GPT-4o, Gemini, Ollama, OpenRouter, Together, Groq, Cerebras, or any OpenAI-compatible endpoint. Your key, your model.
 </td>
 <td align="center" width="33%">
 <h3>💬 AI Agent Chat</h3>
@@ -200,16 +201,16 @@ Connect external AI agents (OpenClaw, Dify, Coze) and chat with them directly in
 </tr>
 <tr>
 <td align="center">
-<h3>📊 Repo Analysis</h3>
-Analyze any GitHub repo with AI. Architecture reports, PPTX decks, animated video walkthroughs.
+<h3>🖥️ Auto CLI Format</h3>
+Every post gets a CLI representation automatically — no AI key needed. Server generates <code>post --user=@x ¶ ...</code> from your text.
 </td>
 <td align="center">
-<h3>🔍 GitHub Explore</h3>
-Trending repos, search repositories and users — like GitHub search, with terminal aesthetic.
+<h3>📱 Mobile + Desktop</h3>
+Mobile: bottom nav, center <code>+</code> button for analyze/write. Desktop: sidebar navigation, modal composer, <code>$ post --new</code> in the command list.
 </td>
 <td align="center">
-<h3>📱 Mobile-First</h3>
-Redesigned for touch. Bottom nav, full-screen notifications, agent icon profile tab, backdrop-blur glass UI.
+<h3>📣 Activity Feed</h3>
+Day-grouped events (Today / Yesterday / This week). Consecutive GitHub events collapsed. Filter by all / social / github.
 </td>
 </tr>
 <tr>
@@ -219,7 +220,7 @@ Redesigned for touch. Bottom nav, full-screen notifications, agent icon profile 
 </td>
 <td align="center">
 <h3>🌍 4 Languages</h3>
-Full UI in English, Korean, Chinese, Japanese. Write posts in any language — AI handles the rest.
+Full UI in English, Korean, Chinese, Japanese. Write posts in any language.
 </td>
 <td align="center">
 <h3>✉️ Direct Messages</h3>
@@ -241,17 +242,15 @@ Send private messages to any user. Real-time conversation threads. Mobile-optimi
 
 <br/>
 
-## Repo analysis
+## Demo
 
-Analyze any GitHub repo with AI. Choose your output format.
+<video src="docs/screens/녹음 2026-03-21 132654.mp4" controls width="100%"></video>
 
-```bash
-$ analyze --repo=vercel/next.js --output=report   # Architecture analysis
-$ analyze --repo=owner/name --output=pptx          # 5-slide terminal-themed deck
-$ analyze --repo=owner/name --output=video          # Animated HTML walkthrough
-```
+> Can't see the video? [Download / View on GitHub](docs/screens/녹음%202026-03-21%20132654.mp4)
 
-Share the result as a post. Others discover it in the feed.
+<br/>
+
+---
 
 <br/>
 
@@ -272,7 +271,7 @@ Share the result as a post. Others discover it in the feed.
 </tr>
 <tr>
 <td align="center" width="50%">
-<p><strong>Repo analysis</strong><br/><sub><code>$ analyze</code> — pick report, PPTX, or video; model from CLI or Settings.</sub></p>
+<p><strong>Repo analysis</strong><br/><sub><code>$ analyze</code> — pick report, PPTX, or video; review before posting to feed.</sub></p>
 <img src="docs/screens/모바일3.png" width="300" alt="CLItoris mobile: analyze GitHub repository" />
 </td>
 <td align="center" width="50%">
@@ -282,7 +281,7 @@ Share the result as a post. Others discover it in the feed.
 </tr>
 <tr>
 <td align="center" width="50%">
-<p><strong>New post</strong><br/><sub><code>$ post --new</code> — natural language + CLI; optional repo attachment.</sub></p>
+<p><strong>New post</strong><br/><sub><code>$ post --new</code> — write freely, server auto-generates CLI format. No AI key needed.</sub></p>
 <img src="docs/screens/모바일5.png" width="300" alt="CLItoris mobile: new post composer" />
 </td>
 <td align="center" width="50%">
@@ -312,10 +311,10 @@ Share the result as a post. Others discover it in the feed.
 
 |  |  |
 |--|--|
-| **Not another Twitter clone.** | No algorithmic feed. No ads. No engagement bait. Your GitHub activity is the content. |
+| **Not another Twitter clone.** | No algorithmic feed. No ads. No engagement bait. Repo analysis and GitHub activity are the content. |
 | **Not a code editor.** | CLItoris is a social network, not an IDE. |
 | **Not cloud-only.** | Run LLMs locally with Ollama. Your data stays on your machine. |
-| **Not English-only.** | Write in Korean, Japanese, Chinese, or any language. AI handles CLI transformation. |
+| **Not English-only.** | Write in Korean, Japanese, Chinese, or any language. |
 | **Not a closed platform.** | Open source. Self-hosted. Your data, your instance. |
 
 <br/>
@@ -348,13 +347,13 @@ Open **http://localhost:7878** and connect with GitHub.
 Two ways: (1) Set up a GitHub webhook — pushes, PR merges, and releases auto-post instantly. (2) Click "Sync GitHub" to import recent events manually.
 
 **Do I need an AI key?**
-Not for GitHub activity posts. For writing your own posts with AI transformation, you can use free local models via [Ollama](https://ollama.ai) — no API key needed.
+For writing posts — no. CLI format is generated automatically by the server. For **repo analysis**, yes — add your API key (Anthropic, OpenAI, Gemini, or Ollama locally) in Settings → API.
 
 **What languages can I write in?**
-Any language. The AI transforms your text regardless. The UI itself supports English, Korean, Chinese, and Japanese.
+Any language. The UI itself supports English, Korean, Chinese, and Japanese.
 
 **How is this different from Twitter/X?**
-Your GitHub activity is the backbone. Identity is GitHub-only. Social actions use Git metaphors (fork, star). Terminal aesthetic. No algorithmic feed, no ads.
+The primary purpose is repo analysis, not microblogging. GitHub activity is the backbone. Identity is GitHub-only. Social actions use Git metaphors (fork, star). Terminal aesthetic. No algorithmic feed, no ads.
 
 **Can I self-host?**
 Yes. Clone, configure `.env`, run `pnpm dev`. SQLite database — no external services required except GitHub OAuth.
@@ -397,7 +396,7 @@ MIT
 ---
 
 <p align="center">
-  <sub>Your code tells a story. Give it a voice.</sub>
+  <sub>Understand any repo. Share what you find.</sub>
 </p>
 
 <p align="center">

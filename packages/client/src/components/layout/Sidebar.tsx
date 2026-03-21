@@ -17,6 +17,7 @@ function shortModel(model: string): string {
 
 const COMMANDS = [
   { to: '/analyze',     cmd: 'analyze' },
+  { to: '/new',         cmd: 'post --new' },
   { to: '/feed',        cmd: 'feed --global' },
   { to: '/feed/local',  cmd: 'feed --local' },
   { to: '/explore',     cmd: 'explore' },
@@ -77,10 +78,10 @@ export default function Sidebar() {
             <Link
               key={to}
               to={to}
-              className={`py-1.5 px-4 transition-colors ${
+              className={`py-1.5 transition-colors border-l-2 ${
                 active
-                  ? 'text-[var(--text)] bg-white/[0.03]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/[0.04]'
+                  ? 'pl-[14px] text-[var(--text)] bg-white/[0.03] border-[var(--accent-green)]'
+                  : 'pl-[14px] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-white/[0.04] border-transparent'
               }`}
             >
               <span className={active ? 'text-[var(--accent-green)]' : 'text-[var(--text-faint)]'}>$</span>{' '}

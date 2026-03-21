@@ -347,9 +347,9 @@ export function createPostsRouter(db: Database, logger: Logger): Router {
     const messageCli = buildCliLine(userRow.username, messageRaw, repoOwner, repoName);
 
     db.prepare(`
-      INSERT INTO posts (id, user_id, message_raw, message_cli, lang, tags, mentions, visibility, llm_model, parent_id, intent, emotion, quoted_post_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, userId, messageRaw, messageCli, lang, JSON.stringify(tags), JSON.stringify(mentions), visibility, null, parentId ?? null, 'casual', 'neutral', quotedPostId ?? null);
+      INSERT INTO posts (id, user_id, message_raw, message_cli, lang, tags, mentions, visibility, parent_id, intent, emotion, quoted_post_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(id, userId, messageRaw, messageCli, lang, JSON.stringify(tags), JSON.stringify(mentions), visibility, parentId ?? null, 'casual', 'neutral', quotedPostId ?? null);
 
     // Notify parent post author on reply
     if (parentId) {

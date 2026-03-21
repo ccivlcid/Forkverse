@@ -39,3 +39,6 @@ logs/
 
 # Misc
 *.tsbuildinfo
+
+# Local screen recordings (large binaries; keep out of git)
+docs/screens/*.mp4

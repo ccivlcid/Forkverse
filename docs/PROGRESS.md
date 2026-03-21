@@ -1,7 +1,7 @@
 # PROGRESS.md — Development Status
 
 > **Source of truth** for development status, phase tracking, and decision log.
-> Last updated: 2026-03-21
+> Last updated: 2026-03-21 (PC optimization audit)
 
 ---
 
@@ -160,6 +160,11 @@ All documentation, configuration files, and project scaffolding.
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-03-21 | **Logout added to mobile + sidebar** | Mobile: ⏻ in + dropup; Desktop sidebar: ⏻ button next to username |
+| 2026-03-21 | **README / README_ko sync** | Rewritten to reflect B-plan: Repo Analysis Platform hero, LLM-free posting, activity feed redesign, mobile/desktop nav changes |
+| 2026-03-21 | **Post creation 500 fix** | llm_model NOT NULL constraint — removed from INSERT, uses DEFAULT 'claude-sonnet' |
+| 2026-03-21 | **CreatePostPage desktop modal** | PC: centered modal (600px, backdrop, backdrop-click to close); mobile: unchanged full-screen |
+| 2026-03-21 | **PC desktop optimization audit** | Fixed textarea font regression (sm:text-xs → sm:text-sm), scrollbar visibility, sidebar active border indicator, added post --new to sidebar nav |
 | 2026-03-21 | **PROGRESS.md update mandatory** | Added rule to CLAUDE.md: update before and after every task |
 | 2026-03-21 | **LLM removed from post creation** | Posts no longer require LLM; server auto-generates CLI format (`post --user=@x ¶ ...`); reduces friction and dependency |
 | 2026-03-21 | **Activity feed: collapse consecutive GitHub events** | Push ×7 to same repo → one line; filter tabs (all/social/github) added |

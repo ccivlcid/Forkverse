@@ -40,7 +40,7 @@ export default function UserProfilePage() {
   const { atUsername } = useParams<{ atUsername: string }>();
   const username = atUsername?.startsWith('@') ? atUsername.slice(1) : undefined;
   const navigate = useNavigate();
-  const { user: me } = useAuthStore();
+  const { user: me, logout } = useAuthStore();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -220,7 +220,14 @@ export default function UserProfilePage() {
 
                 {/* Actions — aligned with avatar */}
                 <div className="mb-1 ml-auto flex items-center gap-2">
-                  {!isSelf && (
+                  {isSelf ? (
+                    <button
+                      onClick={async () => { await logout(); navigate('/login'); }}
+                      className="font-mono text-[13px] px-4 py-2 text-[var(--text-faint)] border border-[var(--border)] hover:text-[var(--color-error)] hover:border-[var(--color-error)]/30 transition-colors"
+                    >
+                      {t('menu.logout')}
+                    </button>
+                  ) : (
                     <>
                       <button
                         onClick={() => navigate(`/messages/${username}`)}

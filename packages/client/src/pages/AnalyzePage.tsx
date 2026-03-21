@@ -294,7 +294,7 @@ export default function AnalyzePage() {
                     onChange={(e) => setShareCaption(e.target.value)}
                     rows={6}
                     maxLength={2000}
-                    className="w-full bg-[var(--bg-elevated)] border border-[var(--border)] text-[var(--text)] font-mono text-[16px] sm:text-xs px-3 py-2 focus:outline-none focus:border-[var(--border-hover)] resize-none transition-colors"
+                    className="w-full bg-[var(--bg-elevated)] border border-[var(--border)] text-[var(--text)] font-mono text-[16px] sm:text-sm px-3 py-2 focus:outline-none focus:border-[var(--border-hover)] resize-none transition-colors"
                   />
                   <div className="text-right font-mono text-[10px] text-[var(--text-faint)]">
                     {shareCaption.length}/2000

@@ -97,25 +97,32 @@ export default function CreatePostPage() {
 
   if (posted) {
     return (
-      <div className="fixed inset-0 bg-[var(--bg-void)] flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-[var(--bg-void)] sm:bg-black/60 flex items-center justify-center z-50">
         <span className="text-[var(--accent-green)] font-mono text-lg">✓</span>
       </div>
     );
   }
 
-  return (
-    <div className="fixed inset-0 z-50 bg-[var(--bg-void)] flex flex-col">
+  // ── Shared inner content (mobile full-screen / desktop modal) ──
+  const inner = (
+    <div className="flex flex-col w-full h-full sm:h-auto sm:max-h-[80vh]">
 
       {/* ── Header ── */}
-      <header className="flex items-center justify-between px-4 h-12 shrink-0 border-b border-[var(--border)]/20">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-[var(--text-faint)] hover:text-[var(--text)] transition-colors p-1 -ml-1"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+      <header className="flex items-center justify-between px-4 h-12 shrink-0 border-b border-[var(--border)]/30">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-[var(--text-faint)] hover:text-[var(--text)] transition-colors p-1 -ml-1"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          {/* Desktop only: title */}
+          <span className="hidden sm:inline font-mono text-[11px] text-[var(--text-faint)]">
+            <span className="text-[var(--accent-green)]">$</span> post --new
+          </span>
+        </div>
 
         <button
           onClick={() => void handleSubmit()}
@@ -131,7 +138,7 @@ export default function CreatePostPage() {
       </header>
 
       {/* ── Writing area ── */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 flex flex-col gap-3">
 
         {/* Author */}
         <div className="flex items-center gap-2.5">
@@ -149,8 +156,8 @@ export default function CreatePostPage() {
           placeholder="무슨 생각을 하고 있나요?"
           disabled={isBusy}
           rows={4}
-          className="w-full bg-transparent text-[var(--text)] text-[16px] leading-relaxed resize-none outline-none placeholder:text-[var(--text-faint)]/40 overflow-hidden"
-          style={{ fontFamily: 'var(--font-sans)', minHeight: '140px' }}
+          className="w-full bg-transparent text-[var(--text)] text-[16px] sm:text-[15px] leading-relaxed resize-none outline-none placeholder:text-[var(--text-faint)]/40 overflow-hidden"
+          style={{ fontFamily: 'var(--font-sans)', minHeight: '120px' }}
         />
 
         {/* Repo input */}
@@ -166,16 +173,16 @@ export default function CreatePostPage() {
               }}
               placeholder="owner/repo"
               autoFocus
-              className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border)]/60 text-[var(--text)] font-mono text-sm px-3 py-2 outline-none focus:border-[var(--accent-blue)]/60 rounded-lg"
+              className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border)]/60 text-[var(--text)] font-mono text-sm px-3 py-2 outline-none focus:border-[var(--accent-blue)]/60"
             />
-            <button onClick={handleRepoAttach} className="text-[var(--accent-blue)] font-mono text-sm px-1 py-2">↵</button>
+            <button onClick={handleRepoAttach} className="text-[var(--accent-blue)] font-mono text-sm px-2 py-2">↵</button>
             <button onClick={() => setShowRepo(false)} className="text-[var(--text-faint)] font-mono text-sm py-2 px-1">×</button>
           </div>
         )}
 
         {/* Attached repo chip */}
         {attachedRepo && (
-          <div className="flex items-center gap-2 self-start bg-[var(--bg-elevated)] border border-[var(--border)]/40 rounded-full px-3 py-1 font-mono text-xs">
+          <div className="flex items-center gap-2 self-start bg-[var(--bg-elevated)] border border-[var(--border)]/40 px-3 py-1 font-mono text-xs">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-[var(--accent-blue)]">
               <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
             </svg>
@@ -190,7 +197,7 @@ export default function CreatePostPage() {
 
         {/* Media grid */}
         {attachedMedia.length > 0 && (
-          <div className={`grid gap-1 rounded-xl overflow-hidden ${
+          <div className={`grid gap-1 overflow-hidden ${
             attachedMedia.length === 1 ? 'grid-cols-1' :
             attachedMedia.length <= 4 ? 'grid-cols-2' : 'grid-cols-3'
           }`}>
@@ -217,8 +224,8 @@ export default function CreatePostPage() {
       </div>
 
       {/* ── Bottom bar ── */}
-      <div className="shrink-0 border-t border-[var(--border)]/20 pb-safe">
-        <div className="flex items-center px-3 py-2 gap-1">
+      <div className="shrink-0 border-t border-[var(--border)]/30 pb-safe">
+        <div className="flex items-center px-3 sm:px-4 py-2 gap-1">
 
           {/* Photo */}
           <button
@@ -264,5 +271,24 @@ export default function CreatePostPage() {
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {/* Mobile: full-screen */}
+      <div className="sm:hidden fixed inset-0 z-50 bg-[var(--bg-void)] flex flex-col">
+        {inner}
+      </div>
+
+      {/* Desktop: centered modal with backdrop */}
+      <div
+        className="hidden sm:flex fixed inset-0 z-50 items-start justify-center pt-[8vh] bg-black/60 backdrop-blur-sm"
+        onClick={(e) => { if (e.target === e.currentTarget) navigate(-1); }}
+      >
+        <div className="w-full max-w-[600px] bg-[var(--bg-surface)] border border-[var(--border)]/60 shadow-2xl shadow-black/80 flex flex-col max-h-[80vh]">
+          {inner}
+        </div>
+      </div>
+    </>
   );
 }
