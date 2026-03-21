@@ -5,10 +5,10 @@
 
 ---
 
-## Current Phase: B-plan Transition — Phase B1 (In Progress)
+## Current Phase: B-plan Transition — Phase B1 (Complete)
 
 A-plan (SNS-focused) Phases 0–6 are complete. Product direction pivoted to B-plan (Repo Analysis Platform).
-Now transitioning entry point, navigation, and documentation to analysis-first structure.
+Phase B1 entry point transition is now complete. Phase B2 and B3 are next.
 
 ---
 
@@ -16,7 +16,7 @@ Now transitioning entry point, navigation, and documentation to analysis-first s
 
 | Phase | Name | Status |
 |-------|------|--------|
-| Phase B1 | Entry Point Transition | **In Progress** |
+| Phase B1 | Entry Point Transition | **Complete** |
 | Phase B2 | Analysis Result Enhancement | Planned |
 | Phase B3 | Mobile Web Completion + PWA | Planned |
 | Phase B4 | App Store Release (Capacitor) | Planned |
@@ -25,24 +25,28 @@ Now transitioning entry point, navigation, and documentation to analysis-first s
 
 ---
 
-## Phase B1 — Entry Point Transition (In Progress)
+## Phase B1 — Entry Point Transition (Complete)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Documentation update (P0) | In Progress | CLAUDE.md, PRD.md, GLOSSARY.md, PROGRESS.md, routes.json, ANALYZE.md, HOME.md, MOBILE.md |
-| New Home page | Planned | Hero + Analyze CTA + popular analyses + recent shared results |
-| Navigation restructure | Planned | Sidebar: analyze first; Mobile: center = Analyze |
-| Feed route migration | Planned | Move GlobalFeed from `/` to `/feed` |
-| Mobile nav update | Planned | Bottom nav center button → Analyze (was: Create Post) |
-
-### Phase B1 Acceptance Criteria
-
-| Feature | Acceptance Criteria |
-|---------|-------------------|
-| Home page | First-time visitor sees Analyze CTA within 5 seconds, not a feed |
-| Navigation | Analyze is the first item in sidebar and center of mobile nav |
-| Feed | Existing feed accessible at `/feed`, `/` redirects to new Home |
-| Docs | All P0 docs updated to reflect B-plan direction |
+| Home page removed | **Complete** | Removed HomePage; `/` redirects to `/feed` |
+| Feed route migration | **Complete** | GlobalFeed at `/feed`; `/` → `/feed` redirect |
+| Navigation restructure | **Complete** | Sidebar: analyze first; logo → `/feed` |
+| Mobile nav center = dropup | **Complete** | Center button opens analyze / write post options |
+| Header `+ post` removed | **Complete** | Replaced with mobile dropup |
+| AnalyzePage i18n | **Complete** | All strings use `t()` across 4 languages |
+| AnalyzePage URL prefill | **Complete** | `?repo=` and `?output=` params prefill form |
+| AnalyzePage user prompt | **Complete** | Textarea + .md file upload for LLM focus |
+| Analysis history removed | **Complete** | Simplified per Jobs philosophy |
+| Analysis share review step | **Complete** | Edit caption before posting to feed |
+| CreatePostPage redesign | **Complete** | Thread-style → clean full-screen composer, LLM-free |
+| Post CLI format — LLM removed | **Complete** | Server auto-generates `post --user=@x ¶ ...` format |
+| postStore simplified | **Complete** | Removed transformToCli, cliPreview, selectedModel |
+| i18n — all new keys | **Complete** | home.*, analyze.*, new.*, feed.compose.* in en/ko/zh/ja |
+| ActivityFeedPage redesign | **Complete** | Avatar, color badges, day grouping, collapse, filter tabs |
+| Mobile optimization audit | **Complete** | viewport-fit=cover, h-dvh, safe areas, touch targets, 16px inputs |
+| PROGRESS.md update rule | **Complete** | Added mandatory rule to CLAUDE.md |
+| Documentation sync | **Complete** | This update |
 
 ---
 
@@ -156,12 +160,20 @@ All documentation, configuration files, and project scaffolding.
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-03-21 | **PROGRESS.md update mandatory** | Added rule to CLAUDE.md: update before and after every task |
+| 2026-03-21 | **LLM removed from post creation** | Posts no longer require LLM; server auto-generates CLI format (`post --user=@x ¶ ...`); reduces friction and dependency |
+| 2026-03-21 | **Activity feed: collapse consecutive GitHub events** | Push ×7 to same repo → one line; filter tabs (all/social/github) added |
+| 2026-03-21 | **Mobile audit applied** | viewport-fit=cover, h-dvh, safe area insets, 16px inputs, 44px touch targets |
+| 2026-03-21 | **Home page removed** | Landing page content deferred to separate marketing site; `/` now redirects to `/feed` |
+| 2026-03-21 | **Analysis history removed from AnalyzePage** | Clutter; Jobs philosophy — focus on the current task |
+| 2026-03-21 | **Analysis share: review step added** | User edits caption before posting to feed; server accepts optional `caption` param |
+| 2026-03-21 | **CreatePostPage: LLM-free, full-screen** | Simple, fast, no model dependency; server generates CLI format automatically |
+| 2026-03-21 | **Logo → /feed** | Logo was going to `/` (home) which no longer exists; feed is the hub |
+| 2026-03-21 | **ActivityFeedPage redesign** | Avatar + color badges + day groups + collapse + filter tabs |
 | 2026-03-21 | **Pivot to B-plan (Repo Analysis Platform)** | SNS alone lacks differentiation and retention; repo analysis provides clear utility, monetization path, and natural social distribution |
 | 2026-03-21 | **Analyze first, social second** | First-time visitors should see analysis CTA, not a feed; social features distribute analysis results |
 | 2026-03-21 | **Open Core business model** | Core backend proprietary SaaS; frontend/SDK/docs partially open-sourced for trust and developer inflow |
 | 2026-03-21 | **Mobile: PWA → Capacitor → Native** | PWA is free and immediate; Capacitor reuses web code for store release; native only if needed at scale |
-| 2026-03-21 | **Home page = Analyze Hero** | Replace feed homepage with Hero + repo URL input + Analyze CTA + popular analyses |
-| 2026-03-21 | **Mobile nav center = Analyze** | Replace "Create Post" center button with Analyze as the primary mobile action |
 | 2026-03-19 | Use SQLite over PostgreSQL | Zero config, single file, sufficient for MVP (Postgres planned for Phase B5) |
 | 2026-03-19 | No ORM, raw SQL only | AI generates cleaner raw SQL; less abstraction |
 | 2026-03-19 | pnpm monorepo | Clear package boundaries help AI navigate code |

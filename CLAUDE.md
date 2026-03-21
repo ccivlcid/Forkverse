@@ -89,6 +89,17 @@ llm    ──→ shared
 - Keep subject line under 50 characters
 - No vague messages like "fix bugs" or "update code"
 
+## PROGRESS.md Rule
+
+**MANDATORY**: Update `docs/PROGRESS.md` at the start AND end of every task.
+
+- **Before starting**: Add the task to the relevant phase table with status `In Progress`
+- **After completing**: Mark it `Complete` and add a decision log entry if a significant choice was made
+
+This rule applies to every coding task regardless of size.
+
+---
+
 ## Vibe Coding
 
 This project is built through AI-driven development. Humans set direction, AI implements.
