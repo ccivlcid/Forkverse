@@ -104,9 +104,20 @@ export function createWebhookRouter(db: Database, logger: Logger): Router {
       return;
     }
 
-    // Signature verification
+    // Signature verification (required in production)
     const webhookSecret = process.env['GITHUB_WEBHOOK_SECRET'];
-    if (webhookSecret && signature) {
+    if (!webhookSecret) {
+      if (process.env.NODE_ENV === 'production') {
+        logger.error('GITHUB_WEBHOOK_SECRET not set — rejecting webhook');
+        res.status(500).json({ error: 'Webhook secret not configured' });
+        return;
+      }
+      logger.warn('GITHUB_WEBHOOK_SECRET not set — skipping signature verification (dev mode)');
+    } else {
+      if (!signature) {
+        res.status(401).json({ error: 'Missing signature header' });
+        return;
+      }
       const body = JSON.stringify(req.body);
       const expected = 'sha256=' + createHmac('sha256', webhookSecret).update(body).digest('hex');
       try {

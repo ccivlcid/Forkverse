@@ -9,6 +9,7 @@ import type { Database } from 'better-sqlite3';
 import type { Logger } from 'pino';
 import { createProvider } from '@forkverse/llm';
 import type { AnalysisProgress } from '@forkverse/shared';
+import { decrypt } from './crypto.js';
 import { generatePptx } from './generatePptx.js';
 import { generateVideoHtml } from './generateVideo.js';
 import { writeFileSync } from 'node:fs';
@@ -170,7 +171,7 @@ export async function executeAnalysis(
     const keyRow = db.prepare('SELECT api_key, base_url FROM user_llm_keys WHERE user_id = ? AND provider = ?')
       .get(userId, providerName) as LlmKeyRow | undefined;
     if (keyRow) {
-      credentials = { apiKey: keyRow.api_key, ...(keyRow.base_url ? { baseUrl: keyRow.base_url } : {}) };
+      credentials = { apiKey: decrypt(keyRow.api_key), ...(keyRow.base_url ? { baseUrl: keyRow.base_url } : {}) };
     }
   }
 

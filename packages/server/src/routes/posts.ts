@@ -696,6 +696,11 @@ export function createPostsRouter(db: Database, logger: Logger): Router {
       return;
     }
 
+    if (original.user_id === userId) {
+      res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'Cannot fork your own post' } });
+      return;
+    }
+
     const alreadyForked = db.prepare('SELECT 1 FROM posts WHERE user_id = ? AND forked_from_id = ?').get(userId, id);
     if (alreadyForked) {
       res.status(409).json({ error: { code: 'CONFLICT', message: 'Already forked this post' } });

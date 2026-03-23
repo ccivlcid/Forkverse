@@ -12,6 +12,17 @@ const ALLOWED_MIME_TYPES = new Set([
   'video/mp4', 'video/webm', 'video/quicktime',
 ]);
 
+// Map MIME type to forced extension (prevents .exe masquerading as image)
+const MIME_TO_EXT: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/gif': '.gif',
+  'image/webp': '.webp',
+  'video/mp4': '.mp4',
+  'video/webm': '.webm',
+  'video/quicktime': '.mov',
+};
+
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export function createMediaRouter(db: Database, logger: Logger, uploadsDir: string): Router {
@@ -23,7 +34,8 @@ export function createMediaRouter(db: Database, logger: Logger, uploadsDir: stri
   const storage = multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, uploadsDir),
     filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname) || '.bin';
+      // Force extension based on MIME type, not user-provided filename
+      const ext = MIME_TO_EXT[file.mimetype] ?? '.bin';
       cb(null, `${generateId()}${ext}`);
     },
   });

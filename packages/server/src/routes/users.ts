@@ -247,18 +247,22 @@ export function createUsersRouter(db: Database): Router {
       return;
     }
 
-    const existing = db.prepare('SELECT 1 FROM follows WHERE follower_id = ? AND following_id = ?').get(sessionUserId, target.id);
+    const result = db.transaction(() => {
+      const existing = db.prepare('SELECT 1 FROM follows WHERE follower_id = ? AND following_id = ?').get(sessionUserId, target.id);
 
-    if (existing) {
-      db.prepare('DELETE FROM follows WHERE follower_id = ? AND following_id = ?').run(sessionUserId, target.id);
-    } else {
-      db.prepare('INSERT INTO follows (follower_id, following_id) VALUES (?, ?)').run(sessionUserId, target.id);
-      createNotification(db, target.id, 'follow', sessionUserId, null, null);
-      createActivity(db, sessionUserId, 'follow', target.id, null);
-    }
+      if (existing) {
+        db.prepare('DELETE FROM follows WHERE follower_id = ? AND following_id = ?').run(sessionUserId, target.id);
+      } else {
+        db.prepare('INSERT INTO follows (follower_id, following_id) VALUES (?, ?)').run(sessionUserId, target.id);
+        createNotification(db, target.id, 'follow', sessionUserId, null, null);
+        createActivity(db, sessionUserId, 'follow', target.id, null);
+      }
 
-    const count = (db.prepare('SELECT COUNT(*) as c FROM follows WHERE following_id = ?').get(target.id) as { c: number }).c;
-    res.json({ data: { following: !existing, followerCount: count } });
+      const count = (db.prepare('SELECT COUNT(*) as c FROM follows WHERE following_id = ?').get(target.id) as { c: number }).c;
+      return { following: !existing, followerCount: count };
+    })();
+
+    res.json({ data: result });
   });
 
   // ── Suggested users ──────────────────────────────────────────────────
