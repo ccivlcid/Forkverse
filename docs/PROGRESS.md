@@ -1,14 +1,14 @@
 # PROGRESS.md — Development Status
 
 > **Source of truth** for development status, phase tracking, and decision log.
-> Last updated: 2026-03-23 (Phase B4 — App Store Release)
+> Last updated: 2026-03-23 (Phase B5 — Backend Scaling)
 
 ---
 
-## Current Phase: B-plan — Phase B4 (Complete)
+## Current Phase: B-plan — Phase B5 (Complete)
 
 A-plan (SNS-focused) Phases 0–6 are complete. Product direction pivoted to B-plan (Developer SNS with Repo Analysis).
-Phase B1–B4 complete. Phase B5 (Backend Scaling) is next.
+Phase B1–B5 complete. Phase B6 (Extended Features) is next.
 
 ---
 
@@ -20,7 +20,7 @@ Phase B1–B4 complete. Phase B5 (Backend Scaling) is next.
 | Phase B2 | Analysis Result Enhancement | **Complete** |
 | Phase B3 | Mobile Web Completion + PWA | **Complete** |
 | Phase B4 | App Store Release (Capacitor) | **Complete** |
-| Phase B5 | Backend Scaling (Worker + Postgres) | Planned |
+| Phase B5 | Backend Scaling (Worker + Postgres) | **Complete** |
 | Phase B6 | Extended Features | Planned |
 
 ---
@@ -98,15 +98,19 @@ Phase B1–B4 complete. Phase B5 (Backend Scaling) is next.
 
 ---
 
-## Phase B5 — Backend Scaling (Planned)
+## Phase B5 — Backend Scaling (Complete)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| API + Worker separation | Planned | Analysis jobs processed by Worker, not API server |
-| Job Queue | Planned | BullMQ or similar; analysis_job lifecycle management |
-| SQLite → Postgres | Planned | Migration for concurrent users, search, analytics |
-| LLM Gateway | Planned | Provider abstraction, cost/latency tracking, prompt versioning |
-| Redis | Planned | Cache, queue backend, session store |
+| API + Worker separation | **Complete** | `lib/worker.ts` — extracted analysis logic; worker runs in-process via polling, can be separated later |
+| Job Queue | **Complete** | `analysis_jobs` table with state machine: pending → active → completed/failed/dead; migration 029 |
+| Retry mechanism | **Complete** | 3 retries with exponential backoff (2^n seconds); dead letter after max retries |
+| SSE progress streaming | **Complete** | `GET /api/analyze/:id/progress` — Server-Sent Events for real-time progress |
+| LLM Gateway | **Complete** | `lib/llmGateway.ts` — centralized LLM calls with latency/cost logging via pino |
+| Database indexes | **Complete** | Indexes on `analyses(status, created_at)`, `posts(created_at)`, `posts(user_id, created_at)` |
+| Graceful shutdown | **Complete** | Worker stops cleanly on SIGINT/SIGTERM; current job finishes |
+| SQLite → Postgres | Pending | Requires external Postgres instance; current SQLite schema is migration-ready |
+| Redis | Pending | Requires external Redis; current SQLite-based queue works for MVP scale |
 
 ---
 
@@ -173,6 +177,9 @@ All documentation, configuration files, and project scaffolding.
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-03-23 | **Worker: SQLite-based job queue** | In-process polling worker with analysis_jobs table; can be separated into standalone process for horizontal scaling |
+| 2026-03-23 | **SSE progress streaming** | Replaces polling for analysis progress; server pushes events via text/event-stream |
+| 2026-03-23 | **LLM Gateway logging** | All LLM calls routed through gateway with pino-logged latency/provider/model metrics |
 | 2026-03-23 | **Capacitor: dynamic import plugins** | All native plugins lazy-loaded via `import()` — zero bundle cost on web; only loads on native platform |
 | 2026-03-23 | **Rename CLItoris → Forkverse** | Fork/share-centric SNS branding; 118 files updated, 0 remaining old references |
 | 2026-03-23 | **PWA: vite-plugin-pwa + Workbox** | Auto-generated SW with cache-first for fonts/avatars, network-first for API; manifest.json with SVG icons |

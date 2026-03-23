@@ -19,6 +19,7 @@ import { createInfluenceRouter } from './routes/influence.js';
 import { createMessagesRouter } from './routes/messages.js';
 import { createMediaRouter } from './routes/media.js';
 import { createErrorHandler } from './middleware/error.js';
+import { startWorker } from './lib/worker.js';
 
 const logger = pino({
   level: process.env.LOG_LEVEL ?? 'info',
@@ -96,8 +97,12 @@ const server = app.listen(PORT, () => {
   logger.info({ port: PORT }, 'Server started');
 });
 
+// Start the analysis worker (in-process for MVP; can be a separate process later)
+const stopWorker = startWorker(db, logger);
+
 const shutdown = (signal: string) => {
   logger.info({ signal }, 'Shutting down...');
+  stopWorker();
   server.close(() => {
     db.close();
     process.exit(0);
