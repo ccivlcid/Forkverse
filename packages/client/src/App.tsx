@@ -16,6 +16,7 @@ import LeaderboardPage from './pages/LeaderboardPage.js';
 import MessagesPage from './pages/MessagesPage.js';
 import CreatePostPage from './pages/CreatePostPage.js';
 import ChatPage from './pages/ChatPage.js';
+import AnalysisResultPage from './pages/AnalysisResultPage.js';
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props: { children: ReactNode }) {
@@ -69,6 +70,7 @@ const router = createBrowserRouter([
   { path: '/explore', element: <ExplorePage /> },
   { path: '/settings', element: <SettingsPage /> },
   { path: '/analyze', element: <AnalyzePage /> },
+  { path: '/analysis/:id', element: <AnalysisResultPage /> },
   { path: '/github', element: <GitHubFeedPage /> },
   { path: '/activity', element: <ActivityFeedPage /> },
   { path: '/search', element: <SearchPage /> },

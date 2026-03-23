@@ -1,14 +1,14 @@
 # PROGRESS.md — Development Status
 
 > **Source of truth** for development status, phase tracking, and decision log.
-> Last updated: 2026-03-21 (APP_RELEASE.md — Android/iOS store release documentation)
+> Last updated: 2026-03-23 (Phase B2 — Analysis Result Enhancement)
 
 ---
 
-## Current Phase: B-plan Transition — Phase B1 (Complete)
+## Current Phase: B-plan — Phase B2 (Complete)
 
 A-plan (SNS-focused) Phases 0–6 are complete. Product direction pivoted to B-plan (Repo Analysis Platform).
-Phase B1 entry point transition is now complete. Phase B2 and B3 are next.
+Phase B1 entry point transition is complete. Phase B2 analysis result enhancement is complete. Phase B3 is next.
 
 ---
 
@@ -17,7 +17,7 @@ Phase B1 entry point transition is now complete. Phase B2 and B3 are next.
 | Phase | Name | Status |
 |-------|------|--------|
 | Phase B1 | Entry Point Transition | **Complete** |
-| Phase B2 | Analysis Result Enhancement | Planned |
+| Phase B2 | Analysis Result Enhancement | **Complete** |
 | Phase B3 | Mobile Web Completion + PWA | Planned |
 | Phase B4 | App Store Release (Capacitor) | Planned |
 | Phase B5 | Backend Scaling (Worker + Postgres) | Planned |
@@ -50,15 +50,20 @@ Phase B1 entry point transition is now complete. Phase B2 and B3 are next.
 
 ---
 
-## Phase B2 — Analysis Result Enhancement (Planned)
+## Phase B2 — Analysis Result Enhancement (Complete)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Sectioned result page | Planned | Summary → Stack → Architecture → Strengths → Risks → Improvements → CLI View |
-| `/analysis/:id` route | Planned | Dedicated shareable result page |
-| Section navigation | Planned | Sidebar or tab navigation within result |
-| Copy/share per section | Planned | Each section has copy and share buttons |
-| Mobile card stack | Planned | Sections as swipeable/scrollable cards on mobile |
+| Sectioned result page | **Complete** | 7 sections: Summary, Tech Stack, Architecture, Strengths, Risks, Improvements, CLI View |
+| `/analysis/:id` route | **Complete** | Public shareable result page via `GET /api/analyze/detail/:id` |
+| Section navigation | **Complete** | Desktop: sticky sidebar nav; Mobile: fixed bottom horizontal scroll nav |
+| Copy/share per section | **Complete** | Each section has copy (clipboard) and share (Web Share API / clipboard fallback) buttons |
+| Mobile card stack | **Complete** | Scrollable sections with fixed bottom section nav, IntersectionObserver active tracking |
+| Analysis star/unstar | **Complete** | `POST /api/analyze/:id/star` toggle; star count displayed in header |
+| Popular analyses API | **Complete** | `GET /api/analyze/popular?limit=&period=` with star-based ranking |
+| Structured LLM prompt | **Complete** | LLM returns JSON with 7 section keys; fallback paragraph splitting for plain text |
+| DB migration 027 | **Complete** | `result_sections_json` column + `analysis_stars` table |
+| i18n (4 languages) | **Complete** | `analysis.*` keys in en/ko/zh/ja |
 
 ---
 
@@ -161,6 +166,9 @@ All documentation, configuration files, and project scaffolding.
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-03-23 | **Structured JSON sections from LLM** | LLM prompt requests JSON with 7 keys; fallback splits plain text into paragraphs; stored in `result_sections_json` column |
+| 2026-03-23 | **Analysis result page public** | `/analysis/:id` is public (no auth) for shareability; starring requires auth |
+| 2026-03-23 | **Section nav: sidebar + mobile bottom bar** | Desktop uses sticky sidebar; mobile uses fixed bottom horizontal scroll bar with IntersectionObserver |
 | 2026-03-21 | **MARKETING.md created** | Full marketing playbook: positioning, ICP, launch strategy (HN/PH/Reddit/Korean community), growth loops, SEO, metrics, budget guidance |
 | 2026-03-21 | **APP_RELEASE.md created** | Full Android + iOS release guide: Capacitor setup, keystore/cert, Fastlane CI/CD, Play Store + App Store submission steps, push notifications (FCM/APNs), deep links, Korean store listing text |
 | 2026-03-21 | **Logout moved to profile page** | Logout button shown only on own profile (`isSelf`); removed from MobileNav dropup and Sidebar |

@@ -121,6 +121,7 @@ interface AnalysisRow {
   options_json: string;
   result_url: string | null;
   result_summary: string | null;
+  result_sections_json: string | null;
   status: string;
   progress_json: string;
   duration_ms: number | null;
@@ -144,10 +145,33 @@ function mapAnalysis(row: AnalysisRow) {
     optionsJson: JSON.parse(row.options_json) as Record<string, unknown>,
     resultUrl: row.result_url,
     resultSummary: row.result_summary,
+    sections: row.result_sections_json ? JSON.parse(row.result_sections_json) : null,
     status: row.status,
     progress: JSON.parse(row.progress_json) as AnalysisProgress[],
     durationMs: row.duration_ms,
     createdAt: row.created_at,
+  };
+}
+
+interface AnalysisWithUserRow extends AnalysisRow {
+  username: string;
+  domain: string | null;
+  display_name: string;
+  avatar_url: string | null;
+  star_count: number;
+}
+
+function mapAnalysisWithUser(row: AnalysisWithUserRow, isStarred: boolean) {
+  return {
+    ...mapAnalysis(row),
+    user: {
+      username: row.username,
+      domain: row.domain,
+      displayName: row.display_name,
+      avatarUrl: row.avatar_url,
+    },
+    starCount: row.star_count,
+    isStarred,
   };
 }
 
@@ -252,19 +276,25 @@ Repository info:
 - Open issues: ${repo.open_issues_count}
 - Default branch: ${repo.default_branch}
 ${userPrompt ? `\nUser focus: ${userPrompt}\n` : ''}
-Write a concise technical analysis (3-5 paragraphs) covering:
-1. What the project does
-2. Architecture and key patterns
-3. Code quality indicators
-4. Notable strengths
-${userPrompt ? `5. Address the user's specific focus: "${userPrompt}"` : ''}
+Respond ONLY with a valid JSON object (no markdown fences, no extra text) with these exact keys:
+{
+  "summary": "2-3 sentence overview of what the project does and its purpose",
+  "techStack": "List the main technologies, frameworks, and tools used",
+  "architecture": "Describe the project's architecture, structure, and key design patterns",
+  "strengths": "Notable strengths and well-designed aspects",
+  "risks": "Potential risks, technical debt, or areas of concern",
+  "improvements": "Suggested improvements and recommendations",
+  "cliView": "A CLI-style summary like: analyze --repo=${repoOwner}/${repoName} → <one-line verdict>"
+}
 
-Reply in ${langName}. Be specific and technical.`;
+Each value should be 2-5 sentences. Reply in ${langName}. Be specific and technical.
+${userPrompt ? `Pay special attention to: "${userPrompt}"` : ''}`;
 
     let summary = '';
+    let sectionsJson: string | null = null;
     try {
       const provider = createProvider(providerName, credentials);
-      summary = await provider.translate({
+      const rawResponse = await provider.translate({
         message: prompt,
         sourceLang: 'en',
         targetLang: lang,
@@ -272,8 +302,48 @@ Reply in ${langName}. Be specific and technical.`;
         emotion: 'neutral',
         model: llmModel,
       });
+
+      // Try to parse structured JSON sections
+      try {
+        const cleaned = rawResponse.replace(/```(?:json)?\s*/g, '').replace(/```\s*/g, '').trim();
+        const parsed = JSON.parse(cleaned) as Record<string, string>;
+        if (parsed.summary && parsed.techStack && parsed.architecture) {
+          sectionsJson = JSON.stringify(parsed);
+          // Build flat summary from sections for backward compatibility
+          summary = [parsed.summary, parsed.techStack, parsed.architecture, parsed.strengths, parsed.risks, parsed.improvements].filter(Boolean).join('\n\n');
+        } else {
+          summary = rawResponse;
+        }
+      } catch {
+        // LLM returned plain text — use as summary, auto-generate sections
+        summary = rawResponse;
+      }
     } catch {
       summary = `Analysis of ${repoOwner}/${repoName}: ${repo.description ?? 'No description available.'}`;
+    }
+
+    // If no structured sections from LLM, generate basic sections from the flat summary
+    if (!sectionsJson && summary) {
+      const fallbackSections = {
+        summary: summary.split('\n\n')[0] ?? summary,
+        techStack: '',
+        architecture: '',
+        strengths: '',
+        risks: '',
+        improvements: '',
+        cliView: `analyze --repo=${repoOwner}/${repoName} → completed`,
+      };
+      // Try to split summary into sections by paragraph
+      const paragraphs = summary.split('\n\n').filter(Boolean);
+      if (paragraphs.length >= 4) {
+        fallbackSections.summary = paragraphs[0]!;
+        fallbackSections.techStack = paragraphs[1] ?? '';
+        fallbackSections.architecture = paragraphs[2] ?? '';
+        fallbackSections.strengths = paragraphs[3] ?? '';
+        fallbackSections.risks = paragraphs[4] ?? '';
+        fallbackSections.improvements = paragraphs[5] ?? '';
+      }
+      sectionsJson = JSON.stringify(fallbackSections);
     }
 
     let resultUrl: string | null = null;
@@ -352,11 +422,12 @@ Reply in ${langName}. Be specific and technical.`;
       UPDATE analyses SET
         status = 'completed',
         result_summary = ?,
+        result_sections_json = ?,
         result_url = ?,
         progress_json = ?,
         duration_ms = ?
       WHERE id = ?
-    `).run(summary, resultUrl, JSON.stringify(progress), durationMs, analysisId);
+    `).run(summary, sectionsJson, resultUrl, JSON.stringify(progress), durationMs, analysisId);
 
   } catch (err) {
     logger.error({ err, analysisId }, 'Analysis failed');
@@ -478,6 +549,82 @@ export function createAnalyzeRouter(db: Database, logger: Logger): Router {
     } catch { /* skip attachment on error */ }
 
     res.status(201).json({ data: { postId } });
+  });
+
+  // GET /api/analyze/popular — public, no auth required
+  router.get('/popular', (req, res) => {
+    const limit = Math.min(Number(req.query.limit) || 10, 50);
+    const period = (req.query.period as string) ?? 'all';
+    const periodMap: Record<string, string> = {
+      day: "datetime('now', '-1 day')",
+      week: "datetime('now', '-7 days')",
+      month: "datetime('now', '-30 days')",
+      all: "'1970-01-01'",
+    };
+    const since = periodMap[period] ?? periodMap.all;
+
+    const rows = db.prepare(`
+      SELECT a.*, u.username, u.domain, u.display_name, u.avatar_url,
+        (SELECT COUNT(*) FROM analysis_stars WHERE analysis_id = a.id) AS star_count
+      FROM analyses a
+      JOIN users u ON u.id = a.user_id
+      WHERE a.status = 'completed' AND a.created_at >= ${since}
+      ORDER BY star_count DESC, a.created_at DESC
+      LIMIT ?
+    `).all(limit) as AnalysisWithUserRow[];
+
+    res.json({
+      data: rows.map((r) => mapAnalysisWithUser(r, false)),
+    });
+  });
+
+  // GET /api/analyze/detail/:id — public, shareable analysis detail
+  router.get('/detail/:id', (req, res) => {
+    const row = db.prepare(`
+      SELECT a.*, u.username, u.domain, u.display_name, u.avatar_url,
+        (SELECT COUNT(*) FROM analysis_stars WHERE analysis_id = a.id) AS star_count
+      FROM analyses a
+      JOIN users u ON u.id = a.user_id
+      WHERE a.id = ? AND a.status = 'completed'
+    `).get(req.params.id) as AnalysisWithUserRow | undefined;
+
+    if (!row) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Analysis not found' } });
+      return;
+    }
+
+    let isStarred = false;
+    const userId = req.session?.userId;
+    if (userId) {
+      const star = db.prepare('SELECT 1 FROM analysis_stars WHERE user_id = ? AND analysis_id = ?').get(userId, row.id);
+      isStarred = !!star;
+    }
+
+    res.json({ data: mapAnalysisWithUser(row, isStarred) });
+  });
+
+  // POST /api/analyze/:id/star — toggle star
+  router.post('/:id/star', requireAuth, (req, res) => {
+    const userId = req.session.userId!;
+    const analysisId = req.params.id;
+
+    const analysis = db.prepare('SELECT id FROM analyses WHERE id = ? AND status = ?').get(analysisId, 'completed');
+    if (!analysis) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Analysis not found' } });
+      return;
+    }
+
+    const existing = db.prepare('SELECT 1 FROM analysis_stars WHERE user_id = ? AND analysis_id = ?').get(userId, analysisId);
+
+    if (existing) {
+      db.prepare('DELETE FROM analysis_stars WHERE user_id = ? AND analysis_id = ?').run(userId, analysisId);
+    } else {
+      db.prepare('INSERT INTO analysis_stars (user_id, analysis_id) VALUES (?, ?)').run(userId, analysisId);
+    }
+
+    const count = db.prepare('SELECT COUNT(*) AS cnt FROM analysis_stars WHERE analysis_id = ?').get(analysisId) as { cnt: number };
+
+    res.json({ data: { starred: !existing, starCount: count.cnt } });
   });
 
   return router;

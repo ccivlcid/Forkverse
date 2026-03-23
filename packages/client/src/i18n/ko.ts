@@ -328,6 +328,22 @@ const ko: Record<string, string> = {
   'analyze.history.empty.result': '> 분석 결과 0개.',
   'analyze.history.empty.hint': '위에서 첫 번째 저장소를 분석해보세요.',
 
+  // Analysis Result Page
+  'analysis.section.summary': '요약',
+  'analysis.section.techStack': '기술 스택',
+  'analysis.section.architecture': '아키텍처',
+  'analysis.section.strengths': '강점',
+  'analysis.section.risks': '리스크',
+  'analysis.section.improvements': '개선 사항',
+  'analysis.section.cliView': 'CLI 뷰',
+  'analysis.copy': '섹션 복사',
+  'analysis.share': '공유',
+  'analysis.star': '분석 스타',
+  'analysis.loginToStar': '로그인 후 스타',
+  'analysis.backToAnalyze': '새 분석',
+  'analysis.backToFeed': '→ 피드',
+  'analysis.viewResult': '→ 전체 결과 보기',
+
   // Home
   'home.hero.prompt': '$ analyze --repo=',
   'home.hero.tagline': 'AI 기반 GitHub 저장소 분석.',

@@ -324,6 +324,12 @@ export default function AnalyzePage() {
                 >
                   {t('analyze.result.newAnalysis')}
                 </button>
+                <Link
+                  to={`/analysis/${activeAnalysis.id}`}
+                  className="text-[var(--accent-cyan)] font-mono text-sm hover:underline"
+                >
+                  {t('analysis.viewResult')}
+                </Link>
                 {sharedPostId ? (
                   <Link
                     to={`/post/${sharedPostId}`}

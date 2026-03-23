@@ -328,6 +328,22 @@ const zh: Record<string, string> = {
   'analyze.history.empty.result': '> 找到 0 个分析。',
   'analyze.history.empty.hint': '在上方开始您的第一次仓库分析。',
 
+  // Analysis Result Page
+  'analysis.section.summary': '摘要',
+  'analysis.section.techStack': '技术栈',
+  'analysis.section.architecture': '架构',
+  'analysis.section.strengths': '优势',
+  'analysis.section.risks': '风险',
+  'analysis.section.improvements': '改进建议',
+  'analysis.section.cliView': 'CLI 视图',
+  'analysis.copy': '复制段落',
+  'analysis.share': '分享',
+  'analysis.star': '收藏分析',
+  'analysis.loginToStar': '登录后收藏',
+  'analysis.backToAnalyze': '新分析',
+  'analysis.backToFeed': '→ 动态',
+  'analysis.viewResult': '→ 查看完整结果',
+
   // Home
   'home.hero.prompt': '$ analyze --repo=',
   'home.hero.tagline': 'AI 驱动的 GitHub 仓库分析。',

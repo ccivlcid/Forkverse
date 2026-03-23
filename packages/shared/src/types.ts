@@ -119,6 +119,32 @@ export interface AnalysisProgress {
   detail?: string;
 }
 
+export type AnalysisSectionKey = 'summary' | 'techStack' | 'architecture' | 'strengths' | 'risks' | 'improvements' | 'cliView';
+
+export interface AnalysisSections {
+  summary: string;
+  techStack: string;
+  architecture: string;
+  strengths: string;
+  risks: string;
+  improvements: string;
+  cliView: string;
+}
+
+export interface AnalysisWithSections extends Analysis {
+  progress: AnalysisProgress[];
+  sections: AnalysisSections | null;
+  user: PostUser;
+  starCount: number;
+  isStarred: boolean;
+}
+
+export interface AnalysisStar {
+  userId: string;
+  analysisId: string;
+  createdAt: string;
+}
+
 // ============================================
 // LLM
 // ============================================

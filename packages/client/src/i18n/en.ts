@@ -327,6 +327,22 @@ const en: Record<string, string> = {
   'analyze.history.empty.result': '> 0 analyses found.',
   'analyze.history.empty.hint': 'Start your first repo analysis above.',
 
+  // Analysis Result Page
+  'analysis.section.summary': 'summary',
+  'analysis.section.techStack': 'tech stack',
+  'analysis.section.architecture': 'architecture',
+  'analysis.section.strengths': 'strengths',
+  'analysis.section.risks': 'risks',
+  'analysis.section.improvements': 'improvements',
+  'analysis.section.cliView': 'cli view',
+  'analysis.copy': 'copy section',
+  'analysis.share': 'share',
+  'analysis.star': 'star this analysis',
+  'analysis.loginToStar': 'login to star',
+  'analysis.backToAnalyze': 'new analysis',
+  'analysis.backToFeed': '→ feed',
+  'analysis.viewResult': '→ view full result',
+
   // Home
   'home.hero.prompt': '$ analyze --repo=',
   'home.hero.tagline': 'AI-powered GitHub repo analysis.',

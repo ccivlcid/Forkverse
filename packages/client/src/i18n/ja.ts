@@ -328,6 +328,22 @@ const ja: Record<string, string> = {
   'analyze.history.empty.result': '> 分析結果 0 件。',
   'analyze.history.empty.hint': '上のフォームで最初のリポジトリを分析してみましょう。',
 
+  // Analysis Result Page
+  'analysis.section.summary': '概要',
+  'analysis.section.techStack': '技術スタック',
+  'analysis.section.architecture': 'アーキテクチャ',
+  'analysis.section.strengths': '強み',
+  'analysis.section.risks': 'リスク',
+  'analysis.section.improvements': '改善点',
+  'analysis.section.cliView': 'CLIビュー',
+  'analysis.copy': 'セクションをコピー',
+  'analysis.share': '共有',
+  'analysis.star': '分析をスター',
+  'analysis.loginToStar': 'ログインしてスター',
+  'analysis.backToAnalyze': '新しい分析',
+  'analysis.backToFeed': '→ フィード',
+  'analysis.viewResult': '→ 全結果を見る',
+
   // Home
   'home.hero.prompt': '$ analyze --repo=',
   'home.hero.tagline': 'AI 駆動の GitHub リポジトリ分析。',
