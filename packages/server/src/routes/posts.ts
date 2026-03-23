@@ -515,16 +515,29 @@ export function createPostsRouter(db: Database, logger: Logger): Router {
 
     const baseParams: unknown[] = [...starred.params, ...(tag ? [tag] : [])];
 
-    const posts = cursor
-      ? db.prepare(`${base} AND (SELECT COUNT(*) FROM stars s WHERE s.post_id = p.id) < ? ORDER BY (SELECT COUNT(*) FROM stars s WHERE s.post_id = p.id) DESC, p.created_at DESC LIMIT ?`).all(...baseParams, parseInt(cursor, 10), pageLimit + 1)
-      : db.prepare(`${base} ORDER BY (SELECT COUNT(*) FROM stars s WHERE s.post_id = p.id) DESC, p.created_at DESC LIMIT ?`).all(...baseParams, pageLimit + 1);
+    // Compound cursor: "starCount:createdAt" to avoid duplicates on same star count
+    let cursorStars: number | null = null;
+    let cursorDate: string | null = null;
+    if (cursor) {
+      const parts = cursor.split(':');
+      cursorStars = parseInt(parts[0]!, 10);
+      cursorDate = parts[1] ?? null;
+    }
+
+    const orderExpr = '(SELECT COUNT(*) FROM stars s WHERE s.post_id = p.id)';
+    const posts = cursorStars !== null
+      ? db.prepare(`${base} AND (${orderExpr} < ? OR (${orderExpr} = ? AND p.created_at < ?)) ORDER BY ${orderExpr} DESC, p.created_at DESC LIMIT ?`)
+          .all(...baseParams, cursorStars, cursorStars, cursorDate ?? '', pageLimit + 1)
+      : db.prepare(`${base} ORDER BY ${orderExpr} DESC, p.created_at DESC LIMIT ?`)
+          .all(...baseParams, pageLimit + 1);
 
     const rows = posts as PostRow[];
     const hasMore = rows.length > pageLimit;
     const data = rows.slice(0, pageLimit).map((r) => mapPost(r, userId, db));
-    const lastStarCount = data.length > 0 ? data[data.length - 1]?.starCount : undefined;
+    const last = data[data.length - 1];
+    const nextCursor = last ? `${last.starCount}:${last.createdAt}` : undefined;
 
-    res.json({ data, meta: { cursor: lastStarCount !== undefined ? String(lastStarCount) : undefined, hasMore } });
+    res.json({ data, meta: { cursor: nextCursor, hasMore } });
   });
 
   router.get('/by-llm/:model', (req, res) => {

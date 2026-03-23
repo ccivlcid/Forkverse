@@ -91,7 +91,7 @@ async function pushToGithub(
     let existingSha: string | undefined;
     const getRes = await fetch(
       `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`,
-      { headers },
+      { headers, signal: AbortSignal.timeout(15_000) },
     );
     if (getRes.ok) {
       const existing = (await getRes.json()) as { sha: string };
@@ -107,7 +107,7 @@ async function pushToGithub(
 
     const putRes = await fetch(
       `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`,
-      { method: 'PUT', headers, body: JSON.stringify(body) },
+      { method: 'PUT', headers, body: JSON.stringify(body), signal: AbortSignal.timeout(15_000) },
     );
 
     return putRes.ok;
@@ -150,9 +150,10 @@ export async function executeAnalysis(
   setProgress(progress);
   db.prepare("UPDATE analyses SET status = 'processing' WHERE id = ?").run(analysisId);
 
-  // Step 1: Fetch GitHub metadata
+  // Step 1: Fetch GitHub metadata (30s timeout)
   const ghRes = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}`, {
     headers: { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github.v3+json' },
+    signal: AbortSignal.timeout(30_000),
   });
   if (!ghRes.ok) throw new Error(`GitHub API error: ${ghRes.status}`);
   const repo = (await ghRes.json()) as GithubRepoResponse;
@@ -205,12 +206,20 @@ ${userPrompt ? `Pay special attention to: "${userPrompt}"` : ''}`;
 
   let summary = '';
   let sectionsJson: string | null = null;
+  let llmFailed = false;
   try {
     const provider = createProvider(providerName, credentials);
-    const rawResponse = await provider.translate({
-      message: prompt, sourceLang: 'en', targetLang: lang,
-      intent: 'formal', emotion: 'neutral', model: llmModel,
-    });
+
+    // Race LLM call against 120s timeout
+    const rawResponse = await Promise.race([
+      provider.translate({
+        message: prompt, sourceLang: 'en', targetLang: lang,
+        intent: 'formal', emotion: 'neutral', model: llmModel,
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('LLM call timed out after 120s')), 120_000),
+      ),
+    ]);
 
     try {
       const cleaned = rawResponse.replace(/```(?:json)?\s*/g, '').replace(/```\s*/g, '').trim();
@@ -222,10 +231,19 @@ ${userPrompt ? `Pay special attention to: "${userPrompt}"` : ''}`;
         summary = rawResponse;
       }
     } catch {
+      // LLM returned plain text instead of JSON — use as-is
       summary = rawResponse;
     }
-  } catch {
-    summary = `Analysis of ${repoOwner}/${repoName}: ${repo.description ?? 'No description available.'}`;
+  } catch (llmErr) {
+    llmFailed = true;
+    const errDetail = llmErr instanceof Error ? llmErr.message : 'unknown LLM error';
+    logger.error({ analysisId, provider: providerName, model: llmModel, err: errDetail }, 'LLM analysis failed');
+
+    // Mark the LLM step as failed in progress so user can see it
+    progress[2] = { name: progress[2]!.name, status: 'failed', detail: errDetail };
+    setProgress(progress);
+
+    summary = `[Analysis failed] ${errDetail}\n\nRepository: ${repoOwner}/${repoName}\nDescription: ${repo.description ?? 'No description available.'}`;
   }
 
   if (!sectionsJson && summary) {
@@ -242,9 +260,12 @@ ${userPrompt ? `Pay special attention to: "${userPrompt}"` : ''}`;
     sectionsJson = JSON.stringify(fallback);
   }
 
-  // Step 3: Generate output
+  // Step 3: Generate output (skip if LLM failed)
   let resultUrl: string | null = null;
-  if (isVideo) {
+  if (llmFailed) {
+    // Don't generate PPTX/video from failed analysis
+    progress[2] = progress[2]!; // already set as failed above
+  } else if (isVideo) {
     try {
       const { mkdirSync } = await import('node:fs');
       mkdirSync(UPLOADS_DIR, { recursive: true });
