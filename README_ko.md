@@ -653,5 +653,5 @@ MIT
 </p>
 
 <p align="center">
-  <strong>>_CLI</strong>toris &nbsp;&middot;&nbsp; terminal.social
+  <strong>⑂Fork</strong>verse &nbsp;&middot;&nbsp; terminal.social
 </p>
