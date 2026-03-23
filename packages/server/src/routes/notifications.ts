@@ -94,6 +94,22 @@ export function createNotificationRouter(db: Database): Router {
     res.json({ data: { updated: result.changes } });
   });
 
+  // POST /api/notifications/push-token — register device for push notifications
+  router.post('/push-token', requireAuth, (req, res) => {
+    const userId = req.session.userId!;
+    const { token, platform } = req.body as { token?: string; platform?: string };
+    if (!token) {
+      res.status(400).json({ error: { code: 'MISSING_TOKEN', message: 'Push token required' } });
+      return;
+    }
+    const id = generateId();
+    db.prepare(`
+      INSERT OR REPLACE INTO push_tokens (id, user_id, token, platform)
+      VALUES (?, ?, ?, ?)
+    `).run(id, userId, token, platform ?? 'capacitor');
+    res.json({ data: { registered: true } });
+  });
+
   return router;
 }
 

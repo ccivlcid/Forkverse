@@ -1,4 +1,4 @@
-// CLItoris Shared Types
+// Forkverse Shared Types
 
 // ============================================
 // User
@@ -117,6 +117,65 @@ export interface AnalysisProgress {
   name: string;
   status: 'pending' | 'active' | 'done' | 'failed';
   detail?: string;
+}
+
+export type AnalysisSectionKey = 'summary' | 'techStack' | 'architecture' | 'strengths' | 'risks' | 'improvements' | 'cliView';
+
+export interface AnalysisSections {
+  summary: string;
+  techStack: string;
+  architecture: string;
+  strengths: string;
+  risks: string;
+  improvements: string;
+  cliView: string;
+}
+
+export interface AnalysisWithSections extends Analysis {
+  progress: AnalysisProgress[];
+  sections: AnalysisSections | null;
+  user: PostUser;
+  starCount: number;
+  isStarred: boolean;
+}
+
+export interface AnalysisStar {
+  userId: string;
+  analysisId: string;
+  createdAt: string;
+}
+
+// ============================================
+// Collections (Bookmarks)
+// ============================================
+export interface Collection {
+  id: string;
+  userId: string;
+  name: string;
+  description: string | null;
+  isPublic: boolean;
+  createdAt: string;
+  itemCount: number;
+}
+
+// ============================================
+// Comparison Analysis
+// ============================================
+export interface ComparisonResult {
+  id: string;
+  repoA: string;
+  repoB: string;
+  llmModel: string;
+  lang: string;
+  result: {
+    summary: string;
+    repoAStrengths: string;
+    repoBStrengths: string;
+    recommendation: string;
+  } | null;
+  status: string;
+  durationMs: number | null;
+  createdAt: string;
 }
 
 // ============================================

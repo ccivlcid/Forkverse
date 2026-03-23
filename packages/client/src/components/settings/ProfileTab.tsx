@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../stores/authStore.js';
 import { api, ApiError } from '../../api/client.js';
-import type { ApiResponse, User } from '@clitoris/shared';
+import type { ApiResponse, User } from '@forkverse/shared';
 
 function Field({
   flag, value, onChange, placeholder, type = 'text',

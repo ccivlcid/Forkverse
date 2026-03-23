@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { api } from '../api/client.js';
 import { toastError } from './toastStore.js';
-import type { Post, ApiResponse, LlmModel } from '@clitoris/shared';
+import type { Post, ApiResponse, LlmModel } from '@forkverse/shared';
 import { GLOBAL_FEED_MOCK } from '../mocks/globalFeedMock.js';
 
 type FeedEndpoint = 'global' | 'local' | 'explore';

@@ -4,7 +4,7 @@ import AuthLayout from '../components/layout/AuthLayout.js';
 import { useAuthStore } from '../stores/authStore.js';
 import { useUiStore } from '../stores/uiStore.js';
 import { api, ApiError } from '../api/client.js';
-import type { ApiResponse, User } from '@clitoris/shared';
+import type { ApiResponse, User } from '@forkverse/shared';
 
 interface PendingProfile {
   githubUsername: string;

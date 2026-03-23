@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api, ApiError } from '../api/client.js';
-import type { Post, ApiResponse, MediaAttachment } from '@clitoris/shared';
+import type { Post, ApiResponse, MediaAttachment } from '@forkverse/shared';
 
 interface AttachedRepo {
   owner: string;

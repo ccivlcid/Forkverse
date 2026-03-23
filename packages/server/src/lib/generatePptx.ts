@@ -43,7 +43,7 @@ function footerBar(slide: PptxGenJS.Slide, pageNum: number, total: number) {
     fill: { color: C.bgDark },
     line: { color: C.bgDark, width: 0 },
   });
-  slide.addText(`CLItoris · ${pageNum}/${total}`, {
+  slide.addText(`Forkverse · ${pageNum}/${total}`, {
     x: 0.3, y: 7.1, w: 12.7, h: 0.4,
     fontSize: 9, color: C.grayDim, fontFace: FONT, valign: 'middle', align: 'right',
   });
@@ -77,7 +77,7 @@ export async function generatePptx(data: PptxData, outputDir: string, filename: 
 
   const pptx = new PptxGenJS();
   pptx.layout = 'LAYOUT_WIDE'; // 13.33" x 7.5"
-  pptx.author = 'CLItoris';
+  pptx.author = 'Forkverse';
   pptx.title = `${data.repoOwner}/${data.repoName} Analysis`;
 
   // Split summary into paragraphs (max 3 chars per slide)
@@ -284,7 +284,7 @@ export async function generatePptx(data: PptxData, outputDir: string, filename: 
       { key: 'language', value: data.language ?? 'unknown', color: C.purple },
       { key: 'stars', value: formatNum(data.stars), color: C.amber },
       { key: 'generated', value: new Date().toISOString().slice(0, 10), color: C.gray },
-      { key: 'platform', value: 'terminal.social / CLItoris', color: C.grayDim },
+      { key: 'platform', value: 'terminal.social / Forkverse', color: C.grayDim },
     ];
 
     lines.forEach((l, i) => {

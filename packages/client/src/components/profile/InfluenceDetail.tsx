@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { InfluenceScore } from '@clitoris/shared';
-import { INFLUENCE_TIERS } from '@clitoris/shared';
+import type { InfluenceScore } from '@forkverse/shared';
+import { INFLUENCE_TIERS } from '@forkverse/shared';
 import { useUiStore } from '../../stores/uiStore.js';
 
 interface Props {

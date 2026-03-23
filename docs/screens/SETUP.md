@@ -10,7 +10,7 @@
 |-----------------|--------------------------------------------------------------|
 | **Route**       | `/setup`                                                     |
 | **Title**       | `setup -- terminal.social`                                   |
-| **Description** | First-time profile configuration after GitHub OAuth. Displays data imported from GitHub (avatar, name, bio, repos count) and lets the user choose a CLItoris username. Only shown once on first connect. No sidebar -- full-width centered layout. B-plan: After setup, user is redirected to `/analyze` (not feed) to start their first repo analysis. |
+| **Description** | First-time profile configuration after GitHub OAuth. Displays data imported from GitHub (avatar, name, bio, repos count) and lets the user choose a Forkverse username. Only shown once on first connect. No sidebar -- full-width centered layout. B-plan: After setup, user is redirected to `/analyze` (not feed) to start their first repo analysis. |
 | **Auth Required** | Partial. Requires a valid GitHub OAuth session without a completed profile. Redirects to `/` if profile is already set up. Redirects to `/login` if no session. |
 
 ---

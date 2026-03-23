@@ -104,9 +104,20 @@ export function createWebhookRouter(db: Database, logger: Logger): Router {
       return;
     }
 
-    // Signature verification
+    // Signature verification (required in production)
     const webhookSecret = process.env['GITHUB_WEBHOOK_SECRET'];
-    if (webhookSecret && signature) {
+    if (!webhookSecret) {
+      if (process.env.NODE_ENV === 'production') {
+        logger.error('GITHUB_WEBHOOK_SECRET not set — rejecting webhook');
+        res.status(500).json({ error: 'Webhook secret not configured' });
+        return;
+      }
+      logger.warn('GITHUB_WEBHOOK_SECRET not set — skipping signature verification (dev mode)');
+    } else {
+      if (!signature) {
+        res.status(401).json({ error: 'Missing signature header' });
+        return;
+      }
       const body = JSON.stringify(req.body);
       const expected = 'sha256=' + createHmac('sha256', webhookSecret).update(body).digest('hex');
       try {
@@ -126,12 +137,12 @@ export function createWebhookRouter(db: Database, logger: Logger): Router {
     const payload = req.body as GithubWebhookPayload;
     const senderLogin = payload.sender.login;
 
-    // Map sender to CLItoris user
-    const clitorisUser = db.prepare(
+    // Map sender to Forkverse user
+    const forkverseUser = db.prepare(
       'SELECT id FROM users WHERE github_username = ? COLLATE NOCASE'
     ).get(senderLogin) as { id: string } | undefined;
 
-    if (!clitorisUser) {
+    if (!forkverseUser) {
       res.json({ ok: true, skipped: true });
       return;
     }
@@ -147,7 +158,7 @@ export function createWebhookRouter(db: Database, logger: Logger): Router {
       db.prepare(`
         INSERT INTO posts (id, user_id, message_raw, message_cli, lang, tags, mentions, visibility, llm_model, intent, emotion)
         VALUES (?, ?, ?, ?, 'en', ?, '[]', 'public', 'custom', ?, ?)
-      `).run(postId, clitorisUser.id, post.messageRaw, post.messageCli, JSON.stringify(post.tags), post.intent, post.emotion);
+      `).run(postId, forkverseUser.id, post.messageRaw, post.messageCli, JSON.stringify(post.tags), post.intent, post.emotion);
 
       logger.info({ postId, event, sender: senderLogin }, 'Webhook post created');
       res.json({ ok: true, postId });

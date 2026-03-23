@@ -246,7 +246,7 @@ All providers implement a unified `LlmProvider` interface. Users select a provid
 > Provider file structure: see `docs/architecture/architecture.json` (llm package).
 
 ```typescript
-// @clitoris/llm — unified interface
+// @forkverse/llm — unified interface
 
 interface LlmProvider {
   name: string;
@@ -489,7 +489,7 @@ Step-by-step flow from user action to database and back:
 |--------|------------|------------|
 | Server | `tsx watch` mode (auto-reload) | `tsx` (or compiled JS) |
 | Client | Vite dev server with HMR (`localhost:7878`, strict port) | `vite build` → static files served by Express |
-| DB | Local SQLite file (`clitoris.db`) | Local SQLite file (same) |
+| DB | Local SQLite file (`forkverse.db`) | Local SQLite file (same) |
 | Logging | `debug` level, pretty-printed output | `info` level, JSON format |
 | CORS | `localhost:7878` allowed (Vite dev server) | Same-origin (no CORS needed) |
 | Source maps | Enabled (inline) | Disabled (or external) |
@@ -510,7 +510,7 @@ Step-by-step flow from user action to database and back:
                                   │
                           ┌───────▼─────────┐
                           │ SQLite (WAL)     │
-                          │ clitoris.db      │
+                          │ forkverse.db      │
                           └─────────────────┘
 ```
 
@@ -631,4 +631,4 @@ app.use(session({
 - [schema-erd.md](./schema-erd.md) — Database entity relationship diagram
 - [PRD.md](../specs/PRD.md) — B-plan product requirements
 - [MOBILE.md](../specs/MOBILE.md) — Mobile/PWA/Capacitor strategy
-- [CLItoris_최종통합본_Part2](../specs/CLItoris_최종통합본_Part2_아키텍처_UIUX_로드맵.md) — Detailed architecture roadmap
+- [Forkverse_최종통합본_Part2](../specs/Forkverse_최종통합본_Part2_아키텍처_UIUX_로드맵.md) — Detailed architecture roadmap

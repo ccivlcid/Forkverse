@@ -1,4 +1,4 @@
-import { INFLUENCE_TIERS } from '@clitoris/shared';
+import { INFLUENCE_TIERS } from '@forkverse/shared';
 
 interface Props {
   tier: number;

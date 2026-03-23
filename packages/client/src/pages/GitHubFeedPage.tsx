@@ -4,7 +4,7 @@ import AppShell from '../components/layout/AppShell.js';
 import { useAuthStore } from '../stores/authStore.js';
 import { api } from '../api/client.js';
 import { toastError } from '../stores/toastStore.js';
-import type { ApiResponse } from '@clitoris/shared';
+import type { ApiResponse } from '@forkverse/shared';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

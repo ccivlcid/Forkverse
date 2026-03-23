@@ -56,7 +56,7 @@
 │                │  │ ■ vercel/next.js       report · claude-sonnet · 3h ago  │   │
 │                │  │   "Production-grade React framework with hybrid..."     │   │
 │                │  │                                                          │   │
-│                │  │ ■ ccivlcid/CLItoris    pptx   · gpt-4o · 1d ago        │   │
+│                │  │ ■ ccivlcid/Forkverse    pptx   · gpt-4o · 1d ago        │   │
 │                │  │   10 slides · terminal style · downloaded 2x            │   │
 │                │  │                                                          │   │
 │                │  │ ■ facebook/react       video  · gemini · 3d ago         │   │
@@ -173,7 +173,7 @@
 │ │ ■ vercel/next.js            │  │
 │ │   report · claude · 3h ago  │  │
 │ │                              │  │
-│ │ ■ ccivlcid/CLItoris         │  │
+│ │ ■ ccivlcid/Forkverse         │  │
 │ │   pptx · gpt-4o · 1d ago   │  │
 │ │                              │  │
 │ │ $ fetch --more              │  │

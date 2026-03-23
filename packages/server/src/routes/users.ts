@@ -197,7 +197,7 @@ export function createUsersRouter(db: Database): Router {
     try {
       const ghRes = await fetch(
         `https://api.github.com/users/${user.github_username}/repos?sort=stars&per_page=20&type=owner`,
-        { headers: { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github+json' } },
+        { headers: { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github+json' } },
       );
 
       if (!ghRes.ok) {
@@ -247,18 +247,22 @@ export function createUsersRouter(db: Database): Router {
       return;
     }
 
-    const existing = db.prepare('SELECT 1 FROM follows WHERE follower_id = ? AND following_id = ?').get(sessionUserId, target.id);
+    const result = db.transaction(() => {
+      const existing = db.prepare('SELECT 1 FROM follows WHERE follower_id = ? AND following_id = ?').get(sessionUserId, target.id);
 
-    if (existing) {
-      db.prepare('DELETE FROM follows WHERE follower_id = ? AND following_id = ?').run(sessionUserId, target.id);
-    } else {
-      db.prepare('INSERT INTO follows (follower_id, following_id) VALUES (?, ?)').run(sessionUserId, target.id);
-      createNotification(db, target.id, 'follow', sessionUserId, null, null);
-      createActivity(db, sessionUserId, 'follow', target.id, null);
-    }
+      if (existing) {
+        db.prepare('DELETE FROM follows WHERE follower_id = ? AND following_id = ?').run(sessionUserId, target.id);
+      } else {
+        db.prepare('INSERT INTO follows (follower_id, following_id) VALUES (?, ?)').run(sessionUserId, target.id);
+        createNotification(db, target.id, 'follow', sessionUserId, null, null);
+        createActivity(db, sessionUserId, 'follow', target.id, null);
+      }
 
-    const count = (db.prepare('SELECT COUNT(*) as c FROM follows WHERE following_id = ?').get(target.id) as { c: number }).c;
-    res.json({ data: { following: !existing, followerCount: count } });
+      const count = (db.prepare('SELECT COUNT(*) as c FROM follows WHERE following_id = ?').get(target.id) as { c: number }).c;
+      return { following: !existing, followerCount: count };
+    })();
+
+    res.json({ data: result });
   });
 
   // ── Suggested users ──────────────────────────────────────────────────
@@ -310,7 +314,7 @@ export function createUsersRouter(db: Database): Router {
 
     try {
       const ghRes = await fetch(`https://api.github.com/users/${user.github_username}`, {
-        headers: { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github+json' },
+        headers: { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github+json' },
       });
       if (!ghRes.ok) { res.status(502).json({ error: { code: 'GITHUB_ERROR', message: 'Failed to fetch GitHub profile' } }); return; }
 
@@ -323,7 +327,7 @@ export function createUsersRouter(db: Database): Router {
       // Compute top languages and star totals from repos
       const reposRes = await fetch(
         `https://api.github.com/users/${user.github_username}/repos?sort=pushed&per_page=100&type=owner`,
-        { headers: { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github+json' } },
+        { headers: { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github+json' } },
       );
       let topLanguages: string[] = [];
       let ghTotalStars = 0;
@@ -450,7 +454,7 @@ export function createUsersRouter(db: Database): Router {
     try {
       const ghRes = await fetch(
         `https://api.github.com/users/${user.github_username}/events?per_page=30`,
-        { headers: { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github+json' } },
+        { headers: { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github+json' } },
       );
       if (!ghRes.ok) { res.status(502).json({ error: { code: 'GITHUB_ERROR', message: 'Failed to fetch GitHub events' } }); return; }
 

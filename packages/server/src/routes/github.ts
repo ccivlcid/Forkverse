@@ -11,7 +11,7 @@ interface UserTokenRow {
 function ghHeaders(token: string) {
   return {
     Authorization: `Bearer ${token}`,
-    'User-Agent': 'CLItoris',
+    'User-Agent': 'Forkverse',
     Accept: 'application/vnd.github+json',
   };
 }
@@ -30,7 +30,7 @@ export function createGithubRouter(db: Database): Router {
     const user = getToken(userId);
     if (!user) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'User not found' } }); return; }
 
-    const headers: Record<string, string> = { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github.v3.star+json' };
+    const headers: Record<string, string> = { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github.v3.star+json' };
     if (user.github_access_token) headers.Authorization = `Bearer ${user.github_access_token}`;
 
     try {
@@ -235,7 +235,7 @@ export function createGithubRouter(db: Database): Router {
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'User-Agent': 'CLItoris',
+      'User-Agent': 'Forkverse',
     };
     if (token) headers.Authorization = `Bearer ${token}`;
 
@@ -376,7 +376,7 @@ export function createGithubRouter(db: Database): Router {
 
     // Use user token if authenticated, otherwise public API
     const headers: Record<string, string> = {
-      'User-Agent': 'CLItoris',
+      'User-Agent': 'Forkverse',
       Accept: 'application/vnd.github+json',
     };
     if (req.session.userId) {
@@ -440,7 +440,7 @@ export function createGithubRouter(db: Database): Router {
     }
 
     const headers: Record<string, string> = {
-      'User-Agent': 'CLItoris',
+      'User-Agent': 'Forkverse',
       Accept: 'application/vnd.github+json',
     };
     if (req.session.userId) {
@@ -486,7 +486,7 @@ export function createGithubRouter(db: Database): Router {
     const since = (req.query.since as string) ?? 'daily'; // daily, weekly, monthly
 
     const headers: Record<string, string> = {
-      'User-Agent': 'CLItoris',
+      'User-Agent': 'Forkverse',
       Accept: 'application/vnd.github+json',
     };
     if (req.session.userId) {
@@ -539,13 +539,13 @@ export function createGithubRouter(db: Database): Router {
   });
 
   // ── GET /api/github/followers ────────────────────────────────────────
-  // GitHub followers with CLItoris enrollment status
+  // GitHub followers with Forkverse enrollment status
   router.get('/followers', requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     const user = getToken(userId);
     if (!user) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'User not found' } }); return; }
 
-    const headers: Record<string, string> = { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github+json' };
+    const headers: Record<string, string> = { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github+json' };
     if (user.github_access_token) headers.Authorization = `Bearer ${user.github_access_token}`;
 
     try {
@@ -558,21 +558,21 @@ export function createGithubRouter(db: Database): Router {
       const ghUsers = await ghRes.json() as Array<{ login: string; avatar_url: string; html_url: string }>;
 
       const data = ghUsers.map((gu) => {
-        const clitorisUser = db.prepare(
+        const forkverseUser = db.prepare(
           'SELECT username FROM users WHERE github_username = ? COLLATE NOCASE'
         ).get(gu.login) as { username: string } | undefined;
 
-        const iFollow = clitorisUser
+        const iFollow = forkverseUser
           ? Boolean(db.prepare(
               'SELECT 1 FROM follows WHERE follower_id = ? AND following_id = (SELECT id FROM users WHERE username = ?)'
-            ).get(userId, clitorisUser.username))
+            ).get(userId, forkverseUser.username))
           : false;
 
         return {
           githubUsername: gu.login,
           avatarUrl: gu.avatar_url,
           profileUrl: gu.html_url,
-          clitorisUsername: clitorisUser?.username ?? null,
+          forkverseUsername: forkverseUser?.username ?? null,
           iFollow,
         };
       });
@@ -584,13 +584,13 @@ export function createGithubRouter(db: Database): Router {
   });
 
   // ── GET /api/github/following ─────────────────────────────────────────
-  // GitHub following list with CLItoris enrollment status
+  // GitHub following list with Forkverse enrollment status
   router.get('/following', requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     const user = getToken(userId);
     if (!user) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'User not found' } }); return; }
 
-    const headers: Record<string, string> = { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github+json' };
+    const headers: Record<string, string> = { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github+json' };
     if (user.github_access_token) headers.Authorization = `Bearer ${user.github_access_token}`;
 
     try {
@@ -606,23 +606,23 @@ export function createGithubRouter(db: Database): Router {
         html_url: string;
       }>;
 
-      // Check CLItoris enrollment + follow status for each GitHub user
+      // Check Forkverse enrollment + follow status for each GitHub user
       const data = ghUsers.map((gu) => {
-        const clitorisUser = db.prepare(
+        const forkverseUser = db.prepare(
           'SELECT username FROM users WHERE github_username = ? COLLATE NOCASE'
         ).get(gu.login) as { username: string } | undefined;
 
-        const isFollowing = clitorisUser
+        const isFollowing = forkverseUser
           ? Boolean(db.prepare(
               'SELECT 1 FROM follows WHERE follower_id = ? AND following_id = (SELECT id FROM users WHERE username = ?)'
-            ).get(userId, clitorisUser.username))
+            ).get(userId, forkverseUser.username))
           : false;
 
         return {
           githubUsername: gu.login,
           avatarUrl: gu.avatar_url,
           profileUrl: gu.html_url,
-          clitorisUsername: clitorisUser?.username ?? null,
+          forkverseUsername: forkverseUser?.username ?? null,
           isFollowing,
         };
       });
@@ -634,13 +634,13 @@ export function createGithubRouter(db: Database): Router {
   });
 
   // ── POST /api/github/sync-follows ────────────────────────────────────
-  // Auto-follow CLItoris users from GitHub following list
+  // Auto-follow Forkverse users from GitHub following list
   router.post('/sync-follows', requireAuth, async (req, res) => {
     const userId = req.session.userId!;
     const user = getToken(userId);
     if (!user) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'User not found' } }); return; }
 
-    const headers: Record<string, string> = { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github+json' };
+    const headers: Record<string, string> = { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github+json' };
     if (user.github_access_token) headers.Authorization = `Bearer ${user.github_access_token}`;
 
     try {

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { api } from '../api/client.js';
 import { toastError } from './toastStore.js';
-import type { Notification, ApiResponse } from '@clitoris/shared';
+import type { Notification, ApiResponse } from '@forkverse/shared';
 
 interface NotificationState {
   notifications: Notification[];

@@ -4,7 +4,7 @@ import { useAuthStore } from '../../stores/authStore.js';
 import { useUiStore, type UiLang } from '../../stores/uiStore.js';
 import { api } from '../../api/client.js';
 import { toastError } from '../../stores/toastStore.js';
-import type { ApiResponse } from '@clitoris/shared';
+import type { ApiResponse } from '@forkverse/shared';
 
 interface LlmProviderRow { provider: string; source: string }
 interface LlmEntry { id: string; model: string }

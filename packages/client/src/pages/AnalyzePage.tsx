@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/authStore.js';
 import { useUiStore } from '../stores/uiStore.js';
 import { api } from '../api/client.js';
 import { toastError } from '../stores/toastStore.js';
-import type { ApiResponse, Analysis, AnalysisProgress } from '@clitoris/shared';
+import type { ApiResponse, Analysis, AnalysisProgress } from '@forkverse/shared';
 
 type OutputType = 'report' | 'pptx' | 'video';
 
@@ -324,6 +324,12 @@ export default function AnalyzePage() {
                 >
                   {t('analyze.result.newAnalysis')}
                 </button>
+                <Link
+                  to={`/analysis/${activeAnalysis.id}`}
+                  className="text-[var(--accent-cyan)] font-mono text-sm hover:underline"
+                >
+                  {t('analysis.viewResult')}
+                </Link>
                 {sharedPostId ? (
                   <Link
                     to={`/post/${sharedPostId}`}
@@ -367,7 +373,7 @@ export default function AnalyzePage() {
                     <button
                       key={t}
                       onClick={() => setOutputType(t)}
-                      className={`px-3 py-1.5 font-mono text-xs border transition-colors ${
+                      className={`flex-1 sm:flex-none px-3 py-2.5 sm:py-1.5 font-mono text-sm sm:text-xs border transition-colors active:scale-95 ${
                         outputType === t
                           ? 'bg-[var(--accent-green)]/10 text-[var(--accent-green)] border-[var(--accent-green)]/30'
                           : 'text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text)] hover:border-[var(--border-hover)]'
@@ -426,13 +432,13 @@ export default function AnalyzePage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <div className="flex items-center gap-2">
-                  <span className="text-[var(--text-muted)] font-mono text-xs">{t('analyze.modelLabel')}</span>
+                  <span className="text-[var(--text-muted)] font-mono text-xs shrink-0">{t('analyze.modelLabel')}</span>
                   <select
                     value={llmModel}
                     onChange={(e) => setLlmModel(e.target.value)}
-                    className="bg-[#0d1117] border border-[var(--border)] text-[var(--text)] font-mono text-xs px-2 py-1.5 focus:outline-none"
+                    className="flex-1 sm:flex-none bg-[#0d1117] border border-[var(--border)] text-[var(--text)] font-mono text-[16px] sm:text-xs px-2 py-2 sm:py-1.5 focus:outline-none"
                   >
                     {modelOptions.length === 0 ? (
                       <option value="">{t('analyze.modelEmpty')}</option>
@@ -442,11 +448,11 @@ export default function AnalyzePage() {
                   </select>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[var(--text-muted)] font-mono text-xs">{t('analyze.langLabel')}</span>
+                  <span className="text-[var(--text-muted)] font-mono text-xs shrink-0">{t('analyze.langLabel')}</span>
                   <select
                     value={lang}
                     onChange={(e) => setLang(e.target.value)}
-                    className="bg-[#0d1117] border border-[var(--border)] text-[var(--text)] font-mono text-xs px-2 py-1.5 focus:outline-none"
+                    className="bg-[#0d1117] border border-[var(--border)] text-[var(--text)] font-mono text-[16px] sm:text-xs px-2 py-2 sm:py-1.5 focus:outline-none"
                   >
                     <option value="en">en</option>
                     <option value="ko">ko</option>
@@ -473,7 +479,7 @@ export default function AnalyzePage() {
                 <button
                   onClick={handleStart}
                   disabled={!repo.trim() || !llmModel.trim() || isStarting}
-                  className="bg-[var(--accent-green)]/10 text-[var(--accent-green)] border border-[var(--accent-green)]/30 px-4 py-2 font-mono text-sm hover:bg-[var(--accent-green)]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto bg-[var(--accent-green)]/10 text-[var(--accent-green)] border border-[var(--accent-green)]/30 px-4 py-3 sm:py-2 font-mono text-sm hover:bg-[var(--accent-green)]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-[0.98]"
                 >
                   {isStarting ? t('analyze.starting') : t('analyze.start')}
                 </button>

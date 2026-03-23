@@ -24,7 +24,7 @@ function createTestDb(): Database.Database {
 ### Mocking LLM Providers
 
 ```typescript
-import type { LlmProvider, TransformRequest, TransformResponse } from '@clitoris/llm';
+import type { LlmProvider, TransformRequest, TransformResponse } from '@forkverse/llm';
 
 const mockProvider: LlmProvider = {
   async transform(input: TransformRequest): Promise<TransformResponse> {
@@ -60,7 +60,7 @@ mockFetch({ data: [mockPost], meta: { cursor: null, hasMore: false } });
 
 ```typescript
 // tests/factories.ts
-import type { Post, User } from '@clitoris/shared';
+import type { Post, User } from '@forkverse/shared';
 
 let counter = 0;
 

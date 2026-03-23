@@ -10,10 +10,10 @@ dist/
 .env.*.local
 
 # Database
-clitoris.db
-clitoris.db-journal
-clitoris.db-wal
-clitoris.db-shm
+forkverse.db
+forkverse.db-journal
+forkverse.db-wal
+forkverse.db-shm
 *.sqlite
 *.sqlite3
 

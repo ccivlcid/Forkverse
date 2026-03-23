@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api, ApiError } from '../api/client.js';
-import type { User, ApiResponse } from '@clitoris/shared';
+import type { User, ApiResponse } from '@forkverse/shared';
 
 export type ConnectionStatus = 'idle' | 'redirecting' | 'callback' | 'success' | 'error';
 

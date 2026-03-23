@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client.js';
-import type { SuggestedUser, ApiResponse } from '@clitoris/shared';
+import type { SuggestedUser, ApiResponse } from '@forkverse/shared';
 
 export default function SuggestedUsers() {
   const [users, setUsers] = useState<SuggestedUser[]>([]);

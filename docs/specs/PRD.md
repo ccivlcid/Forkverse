@@ -1,11 +1,11 @@
-# CLItoris — Product Requirements Document
+# Forkverse — Product Requirements Document
 
 > **Source of truth** for product requirements, feature specifications, and MVP scope.
 > Updated: 2026-03-21 — Pivoted to B-plan (Repo Analysis Platform).
 
 ## 1. Product Overview
 
-**CLItoris** is a **Repo Analysis Platform** with a terminal/CLI aesthetic.
+**Forkverse** is a **Repo Analysis Platform** with a terminal/CLI aesthetic.
 Users analyze GitHub repositories using AI, and the results are transformed into structured developer insights — reports, presentations, and video walkthroughs.
 Analysis results can be shared, starred, and forked within a developer-oriented social layer.
 
@@ -27,7 +27,7 @@ Analysis results can be shared, starred, and forked within a developer-oriented 
 
 ## 3. Product Layers
 
-CLItoris has three layers, in priority order:
+Forkverse has three layers, in priority order:
 
 ### 3.1 Analyze Layer (Primary)
 The core entry point and main value proposition.
@@ -390,8 +390,8 @@ RepoAttachment { post_id, repo_owner, repo_name, repo_stars, repo_forks, repo_la
 
 ## See Also
 
-- [CLItoris_최종통합본_Part1](./CLItoris_최종통합본_Part1_제품전략_공개전략.md) — Product strategy & open-source strategy
-- [CLItoris_최종통합본_Part2](./CLItoris_최종통합본_Part2_아키텍처_UIUX_로드맵.md) — Architecture, UI/UX, tech roadmap
+- [Forkverse_최종통합본_Part1](./Forkverse_최종통합본_Part1_제품전략_공개전략.md) — Product strategy & open-source strategy
+- [Forkverse_최종통합본_Part2](./Forkverse_최종통합본_Part2_아키텍처_UIUX_로드맵.md) — Architecture, UI/UX, tech roadmap
 - [MOBILE.md](./MOBILE.md) — Mobile strategy (PWA → Capacitor → Native)
 - [API.md](./API.md) — Full REST API documentation
 - [DATABASE.md](./DATABASE.md) — Database schema and queries

@@ -1,10 +1,10 @@
 {
-  "name": "clitoris",
+  "name": "forkverse",
   "private": true,
   "scripts": {
-    "dev": "concurrently -k -n client,server \"pnpm --filter @clitoris/client dev\" \"pnpm --filter @clitoris/server dev\"",
-    "dev:client": "pnpm --filter @clitoris/client dev",
-    "dev:server": "pnpm --filter @clitoris/server dev",
+    "dev": "concurrently -k -n client,server \"pnpm --filter @forkverse/client dev\" \"pnpm --filter @forkverse/server dev\"",
+    "dev:client": "pnpm --filter @forkverse/client dev",
+    "dev:server": "pnpm --filter @forkverse/server dev",
     "build": "pnpm -r run build",
     "test": "vitest",
     "test:e2e": "playwright test",

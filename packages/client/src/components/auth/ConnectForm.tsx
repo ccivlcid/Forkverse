@@ -36,7 +36,7 @@ export default function ConnectForm({ errorFromCallback }: ConnectFormProps) {
     <div
       data-testid="connect-form"
       role="form"
-      aria-label="Connect to CLItoris via GitHub"
+      aria-label="Connect to Forkverse via GitHub"
       className="w-full max-w-md border border-[var(--border)] bg-[var(--bg-elevated)] p-10"
       onKeyDown={handleKeyDown}
       tabIndex={-1}

@@ -230,7 +230,7 @@ const ko: Record<string, string> = {
   'detail.mentionHint': '@ 멘션',
 
   // Leaderboard
-  'leaderboard.subtitle': 'GitHub 활동 + CLItoris 활동으로 순위 매긴 개발자',
+  'leaderboard.subtitle': 'GitHub 활동 + Forkverse 활동으로 순위 매긴 개발자',
   'leaderboard.empty': '아직 점수가 계산되지 않았습니다.',
   'leaderboard.emptyHint': '프로필에서 GitHub를 동기화하여 시작하세요.',
   'leaderboard.loading': '리더보드 불러오는 중...',
@@ -248,13 +248,13 @@ const ko: Record<string, string> = {
 
   // GitHub follow sync
   'ghSync.title': 'github 팔로우',
-  'ghSync.onPlatform': 'CLItoris에 {n}명',
+  'ghSync.onPlatform': 'Forkverse에 {n}명',
   'ghSync.syncing': '동기화 중...',
   'ghSync.syncAll': '전체 동기화 ({n})',
   'ghSync.following': '팔로잉 ({n})',
   'ghSync.followers': '팔로워 ({n})',
-  'ghSync.onClit': 'CLItoris 가입 ({n})',
-  'ghSync.notOnClit': 'CLItoris 미가입 ({n})',
+  'ghSync.onClit': 'Forkverse 가입 ({n})',
+  'ghSync.notOnClit': 'Forkverse 미가입 ({n})',
   'ghSync.unfollow': '언팔로우',
   'ghSync.follow': '팔로우',
   'ghSync.more': '+{n}명 더',
@@ -271,7 +271,7 @@ const ko: Record<string, string> = {
   'github.featureProfile': '프로필 동기화 (아바타, 소개, 저장소)',
   'github.featureRepos': '프로필에 저장소 목록 표시',
   'github.featureContrib': '기여 그래프 (잔디)',
-  'github.featureFollowSync': '팔로우 동기화 (GitHub ↔ CLItoris)',
+  'github.featureFollowSync': '팔로우 동기화 (GitHub ↔ Forkverse)',
   'github.featureReviews': 'PR 리뷰 요청 목록',
   'github.featureInfluence': '영향력 점수 계산',
   'github.reviewSubtitle': '내 리뷰를 기다리는 PR',
@@ -327,6 +327,22 @@ const ko: Record<string, string> = {
   'analyze.history.empty.cmd': '$ analyses --list',
   'analyze.history.empty.result': '> 분석 결과 0개.',
   'analyze.history.empty.hint': '위에서 첫 번째 저장소를 분석해보세요.',
+
+  // Analysis Result Page
+  'analysis.section.summary': '요약',
+  'analysis.section.techStack': '기술 스택',
+  'analysis.section.architecture': '아키텍처',
+  'analysis.section.strengths': '강점',
+  'analysis.section.risks': '리스크',
+  'analysis.section.improvements': '개선 사항',
+  'analysis.section.cliView': 'CLI 뷰',
+  'analysis.copy': '섹션 복사',
+  'analysis.share': '공유',
+  'analysis.star': '분석 스타',
+  'analysis.loginToStar': '로그인 후 스타',
+  'analysis.backToAnalyze': '새 분석',
+  'analysis.backToFeed': '→ 피드',
+  'analysis.viewResult': '→ 전체 결과 보기',
 
   // Home
   'home.hero.prompt': '$ analyze --repo=',

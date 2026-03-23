@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { api } from '../api/client.js';
 import { toastError } from './toastStore.js';
-import type { SearchResult, ApiResponse } from '@clitoris/shared';
+import type { SearchResult, ApiResponse } from '@forkverse/shared';
 
 let searchSeq = 0;
 

@@ -1,5 +1,5 @@
 import type { Database } from 'better-sqlite3';
-import { INFLUENCE_TIERS } from '@clitoris/shared';
+import { INFLUENCE_TIERS } from '@forkverse/shared';
 
 interface ScoreComponents {
   ghRepos: number;

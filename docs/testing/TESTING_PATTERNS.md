@@ -14,7 +14,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { PostCard } from './post-card';
-import type { Post } from '@clitoris/shared';
+import type { Post } from '@forkverse/shared';
 
 const mockPost: Post = {
   id: '01912345-aaaa-7bbb-cccc-dddddddddddd',
@@ -368,7 +368,7 @@ import Database from 'better-sqlite3';
 import { randomUUID } from 'node:crypto';
 
 function seedTestData(): void {
-  const db = new Database('clitoris-test.db');
+  const db = new Database('forkverse-test.db');
   // Run migrations
   // Insert test user
   db.prepare(`INSERT INTO users (id, username, github_id, github_username, display_name)

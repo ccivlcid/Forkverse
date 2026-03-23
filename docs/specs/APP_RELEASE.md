@@ -1,6 +1,6 @@
 # APP_RELEASE.md — Android & iOS 출시 가이드
 
-> CLItoris 앱 스토어 출시를 위한 실전 가이드.
+> Forkverse 앱 스토어 출시를 위한 실전 가이드.
 > 전략 전체는 [MOBILE.md](./MOBILE.md) 참고.
 > Last updated: 2026-03-21
 
@@ -68,8 +68,8 @@ Capacitor 래핑 전, PWA가 먼저 완성되어야 합니다.
 
 ```json
 {
-  "name": "CLItoris — Repo Analysis Platform",
-  "short_name": "CLItoris",
+  "name": "Forkverse — Repo Analysis Platform",
+  "short_name": "Forkverse",
   "description": "AI-powered GitHub repo analysis. Understand any codebase instantly.",
   "start_url": "/analyze",
   "display": "standalone",
@@ -121,7 +121,7 @@ Capacitor 래핑 전, PWA가 먼저 완성되어야 합니다.
 <meta name="theme-color" content="#3fb950" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="CLItoris" />
+<meta name="apple-mobile-web-app-title" content="Forkverse" />
 <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 ```
 
@@ -129,7 +129,7 @@ Capacitor 래핑 전, PWA가 먼저 완성되어야 합니다.
 
 터미널 미학을 유지하는 아이콘 디자인 기준:
 - 배경: `#08090d` (최대한 어두운 void)
-- 로고: `>_CLI` 또는 `>_` 심볼 + 초록 강조 `#3fb950`
+- 로고: `⑂Fork` 또는 `⑂` 심볼 + 초록 강조 `#3fb950`
 - 단순하고 작은 크기에서도 읽힘
 
 ```
@@ -183,7 +183,7 @@ pnpm add @capacitor/clipboard
 cd packages/client
 
 # 초기화 (프로젝트 루트에서 실행)
-npx cap init "CLItoris" "social.terminal.app" --web-dir dist
+npx cap init "Forkverse" "social.terminal.app" --web-dir dist
 ```
 
 ### 3.3 capacitor.config.ts
@@ -196,7 +196,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const config: CapacitorConfig = {
   appId: 'social.terminal.app',
-  appName: 'CLItoris',
+  appName: 'Forkverse',
   webDir: 'dist',
   server: {
     androidScheme: 'https',
@@ -207,7 +207,7 @@ const config: CapacitorConfig = {
   android: {
     buildOptions: {
       keystorePath: 'release.keystore',
-      keystoreAlias: 'clitoris',
+      keystoreAlias: 'forkverse',
     },
   },
   ios: {
@@ -313,7 +313,7 @@ keytool -genkeypair \
   -v \
   -storetype PKCS12 \
   -keystore release.keystore \
-  -alias clitoris \
+  -alias forkverse \
   -keyalg RSA \
   -keysize 2048 \
   -validity 10000
@@ -333,7 +333,7 @@ android {
     release {
       storeFile file('../release.keystore')
       storePassword System.getenv("KEYSTORE_PASSWORD")
-      keyAlias 'clitoris'
+      keyAlias 'forkverse'
       keyPassword System.getenv("KEY_PASSWORD")
     }
   }
@@ -374,7 +374,7 @@ export KEY_PASSWORD="your-key-password"
 
 ```
 1. play.google.com/console → 앱 만들기
-   - 앱 이름: CLItoris
+   - 앱 이름: Forkverse
    - 기본 언어: 한국어 (ko) 또는 English (en)
    - 앱 유형: 앱 (게임 아님)
    - 유료/무료: 무료
@@ -413,7 +413,7 @@ AI로 아무 GitHub 레포나 즉시 분석. 개발자를 위한 인사이트와
 
 **전체 설명 (한국어)**
 ```
-CLItoris는 AI 기반 GitHub 레포지토리 분석 플랫폼입니다.
+Forkverse는 AI 기반 GitHub 레포지토리 분석 플랫폼입니다.
 
 🔍 레포 분석
 GitHub 레포 주소 하나만 입력하면 AI가 아키텍처, 기술 스택, 강점, 리스크, 개선 방향을 분석합니다. 리포트, PPTX 슬라이드, 또는 애니메이션 워크스루로 결과를 받으세요.
@@ -442,7 +442,7 @@ Anthropic Claude, OpenAI GPT, Google Gemini, Ollama(로컬), OpenRouter, Togethe
 
 2. Identifiers → App IDs → +
    - Bundle ID: social.terminal.app
-   - Description: CLItoris
+   - Description: Forkverse
    - Capabilities: Push Notifications 체크
 
 3. Certificates → +
@@ -497,12 +497,12 @@ xcodebuild \
   -workspace ios/App/App.xcworkspace \
   -scheme App \
   -configuration Release \
-  -archivePath ./build/CLItoris.xcarchive \
+  -archivePath ./build/Forkverse.xcarchive \
   archive
 
 xcodebuild \
   -exportArchive \
-  -archivePath ./build/CLItoris.xcarchive \
+  -archivePath ./build/Forkverse.xcarchive \
   -exportPath ./build/export \
   -exportOptionsPlist ExportOptions.plist
 ```
@@ -530,10 +530,10 @@ xcodebuild \
 ```
 1. appstoreconnect.apple.com → 내 앱 → +
    - 플랫폼: iOS
-   - 이름: CLItoris
+   - 이름: Forkverse
    - 기본 언어: 한국어
    - 번들 ID: social.terminal.app
-   - SKU: clitoris-ios-001
+   - SKU: forkverse-ios-001
 
 2. 앱 정보
    - 카테고리: 개발자 도구 (Developer Tools)

@@ -145,7 +145,7 @@ export function createActivityRouter(db: Database): Router {
 
     if (!user) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'User not found' } }); return; }
 
-    const headers: Record<string, string> = { 'User-Agent': 'CLItoris', Accept: 'application/vnd.github+json' };
+    const headers: Record<string, string> = { 'User-Agent': 'Forkverse', Accept: 'application/vnd.github+json' };
     if (user.github_access_token) headers.Authorization = `Bearer ${user.github_access_token}`;
 
     try {

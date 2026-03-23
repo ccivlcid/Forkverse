@@ -1,8 +1,8 @@
-%% Frontend Import Graph — @clitoris/client
+%% Frontend Import Graph — @forkverse/client
 %% Shows how client modules import from each other
 
 graph TD
-    subgraph "@clitoris/client"
+    subgraph "@forkverse/client"
         MAIN["main.tsx<br/>(entry point)"]
         APP_C["App.tsx<br/>(ErrorBoundary + Router)"]
 
@@ -86,7 +86,7 @@ graph TD
         end
     end
 
-    subgraph "@clitoris/shared"
+    subgraph "@forkverse/shared"
         TYPES["types.ts"]
     end
 

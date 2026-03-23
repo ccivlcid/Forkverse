@@ -1,4 +1,4 @@
-# DESIGN GUIDE — CLItoris Visual System
+# DESIGN GUIDE — Forkverse Visual System
 
 > **Source of truth** for all visual design, colors, typography, component specs, and UI states.
 > Every pixel must feel like a terminal. If it looks like a generic web app, it's wrong.

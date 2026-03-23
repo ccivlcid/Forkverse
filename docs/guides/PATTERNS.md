@@ -1,6 +1,6 @@
 # PATTERNS.md — Implementation Patterns Reference
 
-> **Source of truth** for implementation patterns used throughout the CLItoris codebase.
+> **Source of truth** for implementation patterns used throughout the Forkverse codebase.
 > AI agents and developers must follow these patterns when writing new features or modifying existing code.
 
 ---
@@ -921,7 +921,7 @@ All features must meet these performance targets. Measure with browser DevTools 
 
 ## Ownership
 
-This document is maintained alongside the CLItoris codebase. All implementation code must conform to these patterns. When adding a new pattern, include a full TypeScript example, a "When to use" note, and a "Key rules" checklist.
+This document is maintained alongside the Forkverse codebase. All implementation code must conform to these patterns. When adding a new pattern, include a full TypeScript example, a "When to use" note, and a "Key rules" checklist.
 
 ---
 

@@ -16,6 +16,7 @@ import LeaderboardPage from './pages/LeaderboardPage.js';
 import MessagesPage from './pages/MessagesPage.js';
 import CreatePostPage from './pages/CreatePostPage.js';
 import ChatPage from './pages/ChatPage.js';
+import AnalysisResultPage from './pages/AnalysisResultPage.js';
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props: { children: ReactNode }) {
@@ -33,9 +34,9 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
         <div className="min-h-screen bg-[var(--bg-void)] flex items-center justify-center p-8">
           <div className="font-mono text-center max-w-md">
             <div className="font-mono text-xl font-bold mb-4">
-              <span className="text-white">{'>'}_</span>
-              <span className="text-[#3fb950]">CLI</span>
-              <span className="text-white">toris</span>
+              <span className="text-[#3fb950]">⑂</span>
+              <span className="text-white">Fork</span>
+              <span className="text-[#3fb950]">verse</span>
             </div>
             <div className="text-[var(--accent-red,#f87171)] text-lg mb-2">$ error --fatal</div>
             <div className="text-[var(--text-muted)] text-sm mb-6">
@@ -69,6 +70,7 @@ const router = createBrowserRouter([
   { path: '/explore', element: <ExplorePage /> },
   { path: '/settings', element: <SettingsPage /> },
   { path: '/analyze', element: <AnalyzePage /> },
+  { path: '/analysis/:id', element: <AnalysisResultPage /> },
   { path: '/github', element: <GitHubFeedPage /> },
   { path: '/activity', element: <ActivityFeedPage /> },
   { path: '/search', element: <SearchPage /> },

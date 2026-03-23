@@ -1,4 +1,4 @@
-// CLItoris Shared Types
+// Forkverse Shared Types
 // Source of truth for all interfaces used across client/server/shared packages
 
 // ============================================

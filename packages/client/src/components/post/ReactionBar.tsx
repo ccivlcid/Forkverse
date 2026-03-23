@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { useAuthStore } from '../../stores/authStore.js';
 import { toastError } from '../../stores/toastStore.js';
-import type { PostReactions, ReactionEmoji, ApiResponse } from '@clitoris/shared';
-import { REACTION_DISPLAY } from '@clitoris/shared';
+import type { PostReactions, ReactionEmoji, ApiResponse } from '@forkverse/shared';
+import { REACTION_DISPLAY } from '@forkverse/shared';
 
 interface ReactionBarProps {
   postId: string;

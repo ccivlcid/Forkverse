@@ -4,12 +4,15 @@ import Sidebar from './Sidebar.js';
 import MobileNav from './MobileNav.js';
 import KeyboardHelpModal from './KeyboardHelpModal.js';
 import ToastContainer from './ToastContainer.js';
+import PullToRefreshIndicator from './PullToRefreshIndicator.js';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts.js';
+import { usePullToRefresh } from '../../hooks/usePullToRefresh.js';
 import { useAuthStore } from '../../stores/authStore.js';
 
 interface AppShellProps {
   children: ReactNode;
   breadcrumb?: string;
+  onRefresh?: () => Promise<void> | void;
 }
 
 function KeyboardShortcutsProvider({ onToggleHelp }: { onToggleHelp: () => void }) {
@@ -17,10 +20,18 @@ function KeyboardShortcutsProvider({ onToggleHelp }: { onToggleHelp: () => void 
   return null;
 }
 
-export default function AppShell({ children }: AppShellProps) {
+export default function AppShell({ children, onRefresh }: AppShellProps) {
   const [showHelp, setShowHelp] = useState(false);
   const toggleHelp = useCallback(() => setShowHelp((v) => !v), []);
   const { checkSession, isAuthenticated, isLoading } = useAuthStore();
+
+  const defaultRefresh = useCallback(async () => {
+    window.location.reload();
+  }, []);
+
+  const { containerRef, pullDistance, refreshing } = usePullToRefresh({
+    onRefresh: onRefresh ?? defaultRefresh,
+  });
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -34,7 +45,8 @@ export default function AppShell({ children }: AppShellProps) {
       <HeaderBar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto pb-16 sm:pb-0">
+        <main ref={containerRef} className="flex-1 overflow-y-auto pb-16 sm:pb-0">
+          <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} />
           <div className="max-w-3xl mx-auto">{children}</div>
         </main>
       </div>

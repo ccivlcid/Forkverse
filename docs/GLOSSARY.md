@@ -1,6 +1,6 @@
 # GLOSSARY.md — Unified Terminology Index
 
-> **Source of truth** for all domain-specific terms used across CLItoris documentation.
+> **Source of truth** for all domain-specific terms used across Forkverse documentation.
 > AI agents should reference this file when encountering unfamiliar terms.
 > Updated: 2026-03-21 — Reorganized for B-plan (Repo Analysis Platform).
 

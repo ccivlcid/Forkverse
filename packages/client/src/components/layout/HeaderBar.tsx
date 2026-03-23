@@ -34,9 +34,9 @@ export default function HeaderBar() {
       {/* ── Left: Logo ── */}
       <Link to="/feed" className="hover:opacity-90 transition-opacity shrink-0">
         <span className="font-mono text-[13px] sm:text-sm font-bold text-white tracking-tight">
-          <span className="text-white">{'>'}&#x5f;</span>
-          <span className="text-[var(--accent-green)]">CLI</span>
-          <span className="text-white">toris</span>
+          <span className="text-[var(--accent-green)]">⑂</span>
+          <span className="text-white">Fork</span>
+          <span className="text-[var(--accent-green)]">verse</span>
         </span>
       </Link>
 

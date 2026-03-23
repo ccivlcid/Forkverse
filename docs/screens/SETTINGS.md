@@ -120,7 +120,7 @@ $ set --default-post-lang=
   ○ ja
 ```
 
-**State:** `uiStore.lang` (client-only, persisted to `localStorage('clitoris:ui-lang')`)
+**State:** `uiStore.lang` (client-only, persisted to `localStorage('forkverse:ui-lang')`)
 **API:** none — purely client-side setting. Survives page reload; default `en` if no stored value.
 
 ---

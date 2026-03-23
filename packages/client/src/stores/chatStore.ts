@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api } from '../api/client.js';
-import type { ApiResponse } from '@clitoris/shared';
+import type { ApiResponse } from '@forkverse/shared';
 
 export interface ChatAgent {
   id: string;

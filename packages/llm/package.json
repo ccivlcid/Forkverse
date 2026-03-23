@@ -1,5 +1,5 @@
 {
-  "name": "@clitoris/llm",
+  "name": "@forkverse/llm",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "@clitoris/shared": "workspace:*",
+    "@forkverse/shared": "workspace:*",
     "@google/genai": "^1.46.0",
     "openai": "^4.80.0"
   },

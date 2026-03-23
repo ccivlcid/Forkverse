@@ -7,7 +7,7 @@ import { useUiStore } from '../stores/uiStore.js';
 import { useFeedStore } from '../stores/feedStore.js';
 import { api } from '../api/client.js';
 import { toastError } from '../stores/toastStore.js';
-import type { ApiResponse } from '@clitoris/shared';
+import type { ApiResponse } from '@forkverse/shared';
 
 type FeedTab = 'global' | 'local';
 
@@ -88,8 +88,13 @@ export default function GlobalFeedPage() {
     return () => document.removeEventListener('keydown', onKey);
   }, [navigate, focusedPostId, focusNext, focusPrev, focusPost, handleStar, isAuthenticated]);
 
+  const handleRefresh = useCallback(async () => {
+    reset();
+    await fetchFeed(tab);
+  }, [tab, reset, fetchFeed]);
+
   return (
-    <AppShell>
+    <AppShell onRefresh={handleRefresh}>
       <div className="max-w-[680px] mx-auto">
         {/* Feed header — search + tabs */}
         <div className="sticky top-0 z-10 bg-[var(--bg-void)]/95 backdrop-blur-sm border-b border-[var(--border)]/30">

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api } from '../api/client.js';
-import type { Post, PostUser, ApiResponse, LlmModel } from '@clitoris/shared';
+import type { Post, PostUser, ApiResponse, LlmModel } from '@forkverse/shared';
 
 interface ForkedFrom {
   id: string;

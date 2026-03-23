@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="docs/design/clitoris.png" alt="CLItoris" width="520" />
+  <img src="docs/design/forkverse.png" alt="Forkverse" width="520" />
 </p>
 
 <p align="center">
   <a href="https://terminal.social"><strong>terminal.social</strong></a> &middot;
   <a href="./README.md"><strong>English</strong></a> &middot;
   <a href="./docs/PROGRESS.md"><strong>로드맵</strong></a> &middot;
-  <a href="https://discord.gg/clitoris"><strong>Discord</strong></a>
+  <a href="https://discord.gg/forkverse"><strong>Discord</strong></a>
 </p>
 
 <br/>
@@ -26,7 +26,7 @@
 
 대부분의 개발자 도구는 소셜을 부록처럼 붙입니다. 대부분의 소셜 네트워크는 개발자를 창작자가 아닌 사용자로 봅니다.
 
-CLItoris는 다른 전제에서 출발합니다.
+Forkverse는 다른 전제에서 출발합니다.
 
 **개발자가 공유할 수 있는 가장 가치 있는 것은 의견이 아닙니다. 코드베이스 분석입니다.**
 
@@ -34,7 +34,7 @@ CLItoris는 다른 전제에서 출발합니다.
 
 나머지는 이 전제에서 따라옵니다:
 
-- **GitHub이 정체성** — 단순한 로그인이 아닙니다. 내 스타, 내 포크, 기여 히스토리, 팔로우 그래프. CLItoris에서 따로 프로필을 만들지 않습니다. GitHub을 가져오면 그게 프로필이 됩니다.
+- **GitHub이 정체성** — 단순한 로그인이 아닙니다. 내 스타, 내 포크, 기여 히스토리, 팔로우 그래프. Forkverse에서 따로 프로필을 만들지 않습니다. GitHub을 가져오면 그게 프로필이 됩니다.
 - **내 키, 내 모델** — AI 호출을 프록시하거나 프롬프트를 저장하지 않습니다. 분석에 쓸 API 키를 직접 가져옵니다. 모델을 직접 선택합니다. Ollama로 돌리면 아무것도 PC 밖으로 나가지 않습니다.
 - **알고리즘 없음** — 피드는 사람들이 올린 것을 시간순으로 보여줍니다. 참여도 최적화 없음. 표면으로 떠오르는 콘텐츠는 개발자들이 공유할 가치가 있다고 판단한 것들입니다.
 - **CLI 어휘 일관성** — `fork` (리트윗 아님). `star` (좋아요 아님). `grep` (검색 아님). `$ post --new` (글쓰기 아님). 이건 미학이 아닙니다. 맞는 언어로 맞는 사람들에게 말하는 것입니다.
@@ -48,7 +48,7 @@ CLItoris는 다른 전제에서 출발합니다.
 
 <br/>
 
-## CLItoris가 하는 일
+## Forkverse가 하는 일
 
 ```
 $ analyze --repo=vercel/next.js     → AI 분석: 아키텍처, 스택, 리스크, 개선 방향
@@ -130,7 +130,7 @@ Ollama로 실행하면 → 데이터가 내 PC 밖으로 나가지 않습니다.
 
 ## `$ chat` — 내 AI 에이전트 통합
 
-이미 여러 AI 도구를 씁니다. CLItoris가 그것들을 하나의 터미널 인터페이스로 통합합니다.
+이미 여러 AI 도구를 씁니다. Forkverse가 그것들을 하나의 터미널 인터페이스로 통합합니다.
 
 ```bash
 $ agent --connect
@@ -161,7 +161,7 @@ $ agent --provider=groq       --model=<any>
 - 컨텍스트 손실 없이 에이전트 전환
 - 모바일 최적화 채팅 인터페이스
 
-에이전트는 내가 가져옵니다. CLItoris가 집이 되어줍니다.
+에이전트는 내가 가져옵니다. Forkverse가 집이 되어줍니다.
 
 <br/>
 
@@ -171,7 +171,7 @@ $ agent --provider=groq       --model=<any>
 
 ## `$ post --new` — 글쓰기
 
-CLItoris에서 글 쓰는 것은 다른 소셜 플랫폼과 다릅니다.
+Forkverse에서 글 쓰는 것은 다른 소셜 플랫폼과 다릅니다.
 
 ```bash
 $ post --new
@@ -210,7 +210,7 @@ $ feed --local      # 팔로잉하는 사람들만
 ```
 
 ```
-┌─ GitHub이 보여주는 것 ──────────────┐  ┌─ CLItoris가 보여주는 것 ─────────────┐
+┌─ GitHub이 보여주는 것 ──────────────┐  ┌─ Forkverse가 보여주는 것 ─────────────┐
 │  vercel/next.js                    │  │  "next.js 분석 완료 — RSC 구현이     │
 │  ★ 127k  🍴 27k  TypeScript        │  │   생각보다 훨씬 깔끔하다. 추상화      │
 │                                    │  │   레이어가 놀랍도록 얇음. 읽을 가치   │
@@ -255,7 +255,7 @@ $ explore
 ```
 
 - **트렌딩 분석** — 이번 주 가장 많이 스타/토론된 분석 포스트
-- **트렌딩 레포** — CLItoris에서 가장 많이 분석된 레포
+- **트렌딩 레포** — Forkverse에서 가장 많이 분석된 레포
 - **트렌딩 태그** — 가장 활발한 해시태그
 - **추천 사용자** — 팔로우할 개발자 추천
 - **GitHub 트렌딩** — GitHub 트렌딩 레포 직접 가져오기, 원클릭 분석
@@ -268,14 +268,14 @@ $ explore
 
 ## `$ gh --status` — GitHub 깊은 연동
 
-CLItoris는 GitHub을 단순한 인증 제공자가 아닌 인프라로 다룹니다.
+Forkverse는 GitHub을 단순한 인증 제공자가 아닌 인프라로 다룹니다.
 
 ```bash
 $ gh --status
 ```
 
 **웹훅 자동 포스팅:**
-GitHub 웹훅을 한 번 설정하면 끝. main에 push, PR 머지, 릴리스 배포 — 자동으로 CLItoris 포스트가 됩니다. 해시태그를 붙이고, 팀원을 멘션하고, 컨텍스트를 써두세요. 수동 노력 없이 코딩 생활이 피드가 됩니다.
+GitHub 웹훅을 한 번 설정하면 끝. main에 push, PR 머지, 릴리스 배포 — 자동으로 Forkverse 포스트가 됩니다. 해시태그를 붙이고, 팀원을 멘션하고, 컨텍스트를 써두세요. 수동 노력 없이 코딩 생활이 피드가 됩니다.
 
 ```
 push → main @ vercel/next.js            → post --type=push --repo=vercel/next.js ¶ ...
@@ -340,7 +340,7 @@ GitHub 활동을 소셜 타임라인으로 — 날것의 이벤트 덤프가 아
 
 - **일별 그룹** — 오늘 / 어제 / 이번 주 / 이전
 - **스마트 축소** — 같은 레포에 연속 push 7회 → 개수 표시 한 줄로
-- **필터 탭** — 전체 / 소셜 (CLItoris 포스트) / GitHub (원본 이벤트)
+- **필터 탭** — 전체 / 소셜 (Forkverse 포스트) / GitHub (원본 이벤트)
 - **아바타 + 색상 배지** — `push` `pr_merge` `release` `star` `fork` 각각 고유한 시각적 처리
 - **펼치기** — 축소된 그룹 클릭으로 개별 이벤트 확인
 
@@ -513,41 +513,41 @@ $ profile --user=@username
 <tr>
 <td align="center" width="50%">
 <p><strong>프로필</strong><br/><sub>기여 그래프, 영향력 점수, 에이전트 챗, 메시지, GitHub.</sub></p>
-<img src="docs/screens/모바일1.png" width="300" alt="CLItoris 모바일: 프로필" />
+<img src="docs/screens/모바일1.png" width="300" alt="Forkverse 모바일: 프로필" />
 </td>
 <td align="center" width="50%">
 <p><strong>에이전트 연결</strong><br/><sub><code>$ agent --connect</code> — OpenClaw, Dify, Coze, OpenAI, Anthropic, Ollama, 커스텀.</sub></p>
-<img src="docs/screens/모바일2.png" width="300" alt="CLItoris 모바일: 에이전트 설정" />
+<img src="docs/screens/모바일2.png" width="300" alt="Forkverse 모바일: 에이전트 설정" />
 </td>
 </tr>
 <tr>
 <td align="center" width="50%">
 <p><strong>레포 분석</strong><br/><sub><code>$ analyze</code> — report, PPTX, video 선택. 올리기 전 캡션 검수.</sub></p>
-<img src="docs/screens/모바일3.png" width="300" alt="CLItoris 모바일: 분석" />
+<img src="docs/screens/모바일3.png" width="300" alt="Forkverse 모바일: 분석" />
 </td>
 <td align="center" width="50%">
 <p><strong>글로벌 피드</strong><br/><sub>grep 검색, 듀얼 포맷 포스트, 스타, 포크, 리액션.</sub></p>
-<img src="docs/screens/모바일4.png" width="300" alt="CLItoris 모바일: 피드" />
+<img src="docs/screens/모바일4.png" width="300" alt="Forkverse 모바일: 피드" />
 </td>
 </tr>
 <tr>
 <td align="center" width="50%">
 <p><strong>글쓰기</strong><br/><sub><code>$ post --new</code> — 작성, 레포 첨부, CLI 프리뷰 실시간 빌드. AI 키 불필요.</sub></p>
-<img src="docs/screens/모바일5.png" width="300" alt="CLItoris 모바일: 글쓰기" />
+<img src="docs/screens/모바일5.png" width="300" alt="Forkverse 모바일: 글쓰기" />
 </td>
 <td align="center" width="50%">
 <p><strong>GitHub 탐색</strong><br/><sub>트렌딩 레포, 원클릭 분석, 스타, 알림.</sub></p>
-<img src="docs/screens/모바일6.png" width="300" alt="CLItoris 모바일: GitHub" />
+<img src="docs/screens/모바일6.png" width="300" alt="Forkverse 모바일: GitHub" />
 </td>
 </tr>
 <tr>
 <td align="center" width="50%">
 <p><strong>피드 & 멘션</strong><br/><sub><code>@</code> 자동완성, 답글 스레드, 리액션.</sub></p>
-<img src="docs/screens/모바일7.png" width="300" alt="CLItoris 모바일: 멘션" />
+<img src="docs/screens/모바일7.png" width="300" alt="Forkverse 모바일: 멘션" />
 </td>
 <td align="center" width="50%">
 <p><strong>사용자 프로필</strong><br/><sub>posts / starred / repos — 팔로우, 메시지, GitHub 정체성.</sub></p>
-<img src="docs/screens/모바일8.png" width="300" alt="CLItoris 모바일: 프로필" />
+<img src="docs/screens/모바일8.png" width="300" alt="Forkverse 모바일: 프로필" />
 </td>
 </tr>
 </table>
@@ -569,7 +569,7 @@ $ profile --user=@username
 - ✅ 마우스를 싫어하는 분 — **키보드 우선** 네비게이션
 - ✅ **오픈 소스**로 직접 운영하고 싶은 분
 
-## CLItoris가 아닌 것
+## Forkverse가 아닌 것
 
 | | |
 |--|--|
@@ -588,8 +588,8 @@ $ profile --user=@username
 ## 빠른 시작
 
 ```bash
-git clone https://github.com/ccivlcid/CLItoris.git
-cd CLItoris
+git clone https://github.com/ccivlcid/Forkverse.git
+cd Forkverse
 cp .env.example .env     # GitHub OAuth 자격증명 추가
 pnpm install
 pnpm dev
@@ -637,8 +637,8 @@ pnpm seed       # 샘플 데이터 로드
 
 ## 커뮤니티
 
-- [Discord](https://discord.gg/clitoris) — 커뮤니티 참여
-- [GitHub Issues](https://github.com/ccivlcid/CLItoris/issues) — 버그 및 기능 요청
+- [Discord](https://discord.gg/forkverse) — 커뮤니티 참여
+- [GitHub Issues](https://github.com/ccivlcid/Forkverse/issues) — 버그 및 기능 요청
 
 ## 라이선스
 
@@ -653,5 +653,5 @@ MIT
 </p>
 
 <p align="center">
-  <strong>>_CLI</strong>toris &nbsp;&middot;&nbsp; terminal.social
+  <strong>⑂Fork</strong>verse &nbsp;&middot;&nbsp; terminal.social
 </p>

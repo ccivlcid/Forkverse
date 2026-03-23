@@ -112,11 +112,11 @@ export default defineConfig({
 
 | Layer | Target | Metric |
 |-------|--------|--------|
-| `@clitoris/shared` | 95% | Statements |
-| `@clitoris/server` (routes) | 85% | Statements |
-| `@clitoris/llm` | 80% | Statements |
-| `@clitoris/client` (stores) | 85% | Statements |
-| `@clitoris/client` (components) | 70% | Statements |
+| `@forkverse/shared` | 95% | Statements |
+| `@forkverse/server` (routes) | 85% | Statements |
+| `@forkverse/llm` | 80% | Statements |
+| `@forkverse/client` (stores) | 85% | Statements |
+| `@forkverse/client` (components) | 70% | Statements |
 
 ---
 

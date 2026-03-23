@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="docs/design/clitoris.png" alt="CLItoris" width="520" />
+  <img src="docs/design/forkverse.png" alt="Forkverse" width="520" />
 </p>
 
 <p align="center">
   <a href="https://terminal.social"><strong>terminal.social</strong></a> &middot;
   <a href="./README_ko.md"><strong>한국어</strong></a> &middot;
   <a href="./docs/PROGRESS.md"><strong>Roadmap</strong></a> &middot;
-  <a href="https://discord.gg/clitoris"><strong>Discord</strong></a>
+  <a href="https://discord.gg/forkverse"><strong>Discord</strong></a>
 </p>
 
 <br/>
@@ -26,7 +26,7 @@
 
 Most developer tools treat social as an afterthought. Most social networks treat developers as users, not creators.
 
-CLItoris starts from a different premise:
+Forkverse starts from a different premise:
 
 **The most interesting thing a developer can share isn't an opinion. It's a codebase breakdown.**
 
@@ -34,7 +34,7 @@ When you analyze a repo with AI, you generate something genuinely useful — arc
 
 Everything else follows from this:
 
-- **GitHub is your identity** — not just your login. Your stars, your forks, your contribution history, your follow graph. You don't create a profile on CLItoris. You bring your GitHub and it becomes your profile.
+- **GitHub is your identity** — not just your login. Your stars, your forks, your contribution history, your follow graph. You don't create a profile on Forkverse. You bring your GitHub and it becomes your profile.
 - **Your key, your model** — We don't proxy your AI calls or store your prompts. You bring your own API key for analysis. You choose the model. You can run the whole thing on Ollama and nothing ever leaves your machine.
 - **No algorithm** — The feed shows what people posted, in order, with no engagement optimization. The content that surfaces is the content that developers find worth sharing.
 - **CLI vocabulary everywhere** — `fork` not retweet. `star` not like. `grep` not search. `$ post --new` not compose. This isn't aesthetic. It's about speaking the right language to the right people.
@@ -48,7 +48,7 @@ Everything else follows from this:
 
 <br/>
 
-## What CLItoris does
+## What Forkverse does
 
 ```
 $ analyze --repo=vercel/next.js     → AI breakdown: arch, stack, risks, improvements
@@ -71,7 +71,7 @@ $ rank --board                      → influence leaderboard
 
 ## `$ analyze` — AI Repo Analysis
 
-The primary feature. Point CLItoris at any public GitHub repo.
+The primary feature. Point Forkverse at any public GitHub repo.
 
 ```bash
 $ analyze --repo=vercel/next.js --output=report --model=claude-sonnet-4-6
@@ -130,7 +130,7 @@ Run with Ollama → zero data leaves your machine. Full analysis, full privacy.
 
 ## `$ chat` — Your AI Agents, Unified
 
-You already use multiple AI tools. CLItoris brings them into one terminal-aesthetic interface.
+You already use multiple AI tools. Forkverse brings them into one terminal-aesthetic interface.
 
 ```bash
 $ agent --connect
@@ -161,7 +161,7 @@ $ agent --provider=groq       --model=<any>
 - Switch between agents without losing context
 - Mobile-optimized chat interface
 
-You bring the agents. CLItoris gives them a home.
+You bring the agents. Forkverse gives them a home.
 
 <br/>
 
@@ -171,7 +171,7 @@ You bring the agents. CLItoris gives them a home.
 
 ## `$ post --new` — The Composer
 
-Writing a post in CLItoris is different from any other social platform.
+Writing a post in Forkverse is different from any other social platform.
 
 ```bash
 $ post --new
@@ -210,7 +210,7 @@ $ feed --local      # People you follow
 ```
 
 ```
-┌─ GitHub shows ──────────────────────┐  ┌─ CLItoris shows ───────────────────┐
+┌─ GitHub shows ──────────────────────┐  ┌─ Forkverse shows ───────────────────┐
 │  vercel/next.js                     │  │  "Analyzed next.js — RSC impl is   │
 │  ★ 127k  🍴 27k  TypeScript         │  │   cleaner than expected. Thin       │
 │                                     │  │   abstractions. Worth reading.      │
@@ -255,7 +255,7 @@ $ explore
 ```
 
 - **Trending analyses** — most starred/discussed analysis posts this week
-- **Trending repos** — repos most frequently analyzed on CLItoris
+- **Trending repos** — repos most frequently analyzed on Forkverse
 - **Trending tags** — hashtags with the most activity
 - **Suggested users** — developers to follow based on your interests
 - **GitHub trending** — pull GitHub's trending repos directly, analyze any with one click
@@ -268,14 +268,14 @@ $ explore
 
 ## `$ gh --status` — GitHub, Deeply Integrated
 
-CLItoris treats GitHub as infrastructure, not just an auth provider.
+Forkverse treats GitHub as infrastructure, not just an auth provider.
 
 ```bash
 $ gh --status
 ```
 
 **Webhook auto-posting:**
-Set up a GitHub webhook once. Every push to main, every merged PR, every release — automatically becomes a CLItoris post. Add hashtags, mention teammates, write context. Your coding life becomes a feed without manual effort.
+Set up a GitHub webhook once. Every push to main, every merged PR, every release — automatically becomes a Forkverse post. Add hashtags, mention teammates, write context. Your coding life becomes a feed without manual effort.
 
 ```
 push → main @ vercel/next.js            → post --type=push --repo=vercel/next.js ¶ ...
@@ -340,7 +340,7 @@ Your GitHub activity as a social timeline — not a raw event dump.
 
 - **Day-grouped** — Today / Yesterday / This week / Earlier
 - **Smart collapse** — 7 consecutive pushes to the same repo → one line with count
-- **Filter tabs** — All / Social (CLItoris posts) / GitHub (raw events)
+- **Filter tabs** — All / Social (Forkverse posts) / GitHub (raw events)
 - **Avatar + color badges** — `push` `pr_merge` `release` `star` `fork` each have distinct visual treatment
 - **Expandable** — click any collapsed group to see each individual event
 
@@ -513,41 +513,41 @@ Every profile is a GitHub identity:
 <tr>
 <td align="center" width="50%">
 <p><strong>Profile</strong><br/><sub>Contribution graph, influence score, agent chat, messages, GitHub.</sub></p>
-<img src="docs/screens/모바일1.png" width="300" alt="CLItoris mobile: profile" />
+<img src="docs/screens/모바일1.png" width="300" alt="Forkverse mobile: profile" />
 </td>
 <td align="center" width="50%">
 <p><strong>Agent connect</strong><br/><sub><code>$ agent --connect</code> — OpenClaw, Dify, Coze, OpenAI, Anthropic, Ollama, custom.</sub></p>
-<img src="docs/screens/모바일2.png" width="300" alt="CLItoris mobile: agent setup" />
+<img src="docs/screens/모바일2.png" width="300" alt="Forkverse mobile: agent setup" />
 </td>
 </tr>
 <tr>
 <td align="center" width="50%">
 <p><strong>Repo analysis</strong><br/><sub><code>$ analyze</code> — report, PPTX, or video. Review before posting.</sub></p>
-<img src="docs/screens/모바일3.png" width="300" alt="CLItoris mobile: analyze" />
+<img src="docs/screens/모바일3.png" width="300" alt="Forkverse mobile: analyze" />
 </td>
 <td align="center" width="50%">
 <p><strong>Global feed</strong><br/><sub><code>grep</code> search, dual-format posts, star, fork, react.</sub></p>
-<img src="docs/screens/모바일4.png" width="300" alt="CLItoris mobile: feed" />
+<img src="docs/screens/모바일4.png" width="300" alt="Forkverse mobile: feed" />
 </td>
 </tr>
 <tr>
 <td align="center" width="50%">
 <p><strong>Post composer</strong><br/><sub><code>$ post --new</code> — write, attach repo, CLI preview auto-builds. No AI key needed.</sub></p>
-<img src="docs/screens/모바일5.png" width="300" alt="CLItoris mobile: composer" />
+<img src="docs/screens/모바일5.png" width="300" alt="Forkverse mobile: composer" />
 </td>
 <td align="center" width="50%">
 <p><strong>GitHub explore</strong><br/><sub>Trending repos, one-click analyze, stars, notifications.</sub></p>
-<img src="docs/screens/모바일6.png" width="300" alt="CLItoris mobile: GitHub" />
+<img src="docs/screens/모바일6.png" width="300" alt="Forkverse mobile: GitHub" />
 </td>
 </tr>
 <tr>
 <td align="center" width="50%">
 <p><strong>Feed &amp; mentions</strong><br/><sub><code>@</code> autocomplete, reply threads, reactions.</sub></p>
-<img src="docs/screens/모바일7.png" width="300" alt="CLItoris mobile: feed mentions" />
+<img src="docs/screens/모바일7.png" width="300" alt="Forkverse mobile: feed mentions" />
 </td>
 <td align="center" width="50%">
 <p><strong>User profile</strong><br/><sub>Posts, starred, repos — follow, message, GitHub identity.</sub></p>
-<img src="docs/screens/모바일8.png" width="300" alt="CLItoris mobile: profile" />
+<img src="docs/screens/모바일8.png" width="300" alt="Forkverse mobile: profile" />
 </td>
 </tr>
 </table>
@@ -558,7 +558,7 @@ Every profile is a GitHub identity:
 
 <br/>
 
-## Who CLItoris is for
+## Who Forkverse is for
 
 - ✅ You want to **understand any repo in minutes**, not hours
 - ✅ You want to **share AI-generated analysis** with developers who care
@@ -569,7 +569,7 @@ Every profile is a GitHub identity:
 - ✅ You hate the mouse — **keyboard-first** navigation everywhere
 - ✅ You want an **open source platform** you can self-host and own
 
-## What CLItoris is not
+## What Forkverse is not
 
 | | |
 |--|--|
@@ -588,8 +588,8 @@ Every profile is a GitHub identity:
 ## Quickstart
 
 ```bash
-git clone https://github.com/ccivlcid/CLItoris.git
-cd CLItoris
+git clone https://github.com/ccivlcid/Forkverse.git
+cd Forkverse
 cp .env.example .env     # Add GitHub OAuth credentials
 pnpm install
 pnpm dev
@@ -637,8 +637,8 @@ Read [CLAUDE.md](./CLAUDE.md) and [CONVENTIONS.md](./docs/guides/CONVENTIONS.md)
 
 ## Community
 
-- [Discord](https://discord.gg/clitoris) — Community
-- [GitHub Issues](https://github.com/ccivlcid/CLItoris/issues) — Bugs and feature requests
+- [Discord](https://discord.gg/forkverse) — Community
+- [GitHub Issues](https://github.com/ccivlcid/Forkverse/issues) — Bugs and feature requests
 
 ## License
 
@@ -653,5 +653,5 @@ MIT
 </p>
 
 <p align="center">
-  <strong>>_CLI</strong>toris &nbsp;&middot;&nbsp; terminal.social
+  <strong>⑂Fork</strong>verse &nbsp;&middot;&nbsp; terminal.social
 </p>

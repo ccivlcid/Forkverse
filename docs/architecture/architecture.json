@@ -1,5 +1,5 @@
 {
-  "project": "CLItoris",
+  "project": "Forkverse",
   "domain": "terminal.social",
   "description": "Terminal-themed social network with dual-format posts (natural language + CLI)",
   "architecture": {
@@ -11,7 +11,7 @@
   },
   "layers": {
     "client": {
-      "package": "@clitoris/client",
+      "package": "@forkverse/client",
       "path": "packages/client",
       "type": "SPA",
       "framework": "React 19",
@@ -22,8 +22,8 @@
       "entryPoint": "src/main.tsx",
       "port": 5173,
       "dependencies": [
-        "@clitoris/shared",
-        "@clitoris/llm"
+        "@forkverse/shared",
+        "@forkverse/llm"
       ],
       "structure": {
         "src/components/feed": "Feed list, post card components",
@@ -38,7 +38,7 @@
       }
     },
     "server": {
-      "package": "@clitoris/server",
+      "package": "@forkverse/server",
       "path": "packages/server",
       "type": "REST API",
       "framework": "Express",
@@ -50,8 +50,8 @@
       "entryPoint": "src/index.ts",
       "port": 3000,
       "dependencies": [
-        "@clitoris/shared",
-        "@clitoris/llm"
+        "@forkverse/shared",
+        "@forkverse/llm"
       ],
       "structure": {
         "src/index.ts": "Server entry point",
@@ -70,7 +70,7 @@
       }
     },
     "shared": {
-      "package": "@clitoris/shared",
+      "package": "@forkverse/shared",
       "path": "packages/shared",
       "type": "Library",
       "entryPoint": "src/index.ts",
@@ -86,12 +86,12 @@
       }
     },
     "llm": {
-      "package": "@clitoris/llm",
+      "package": "@forkverse/llm",
       "path": "packages/llm",
       "type": "Library",
       "entryPoint": "src/index.ts",
       "dependencies": [
-        "@clitoris/shared"
+        "@forkverse/shared"
       ],
       "structure": {
         "src/index.ts": "Unified LLM interface and provider factory",
@@ -137,7 +137,7 @@
   "database": {
     "engine": "SQLite 3",
     "driver": "better-sqlite3 (synchronous)",
-    "file": "clitoris.db",
+    "file": "forkverse.db",
     "idStrategy": "UUID v7",
     "timestamps": "ISO 8601 TEXT",
     "migrations": "Sequential .sql files (append-only)",

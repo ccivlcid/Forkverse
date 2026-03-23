@@ -1,8 +1,8 @@
-%% Backend Dependencies — @clitoris/server
+%% Backend Dependencies — @forkverse/server
 %% Shows how server modules depend on each other and external packages
 
 graph TD
-    subgraph "@clitoris/server"
+    subgraph "@forkverse/server"
         INDEX["index.ts<br/>(entry, port 3771)"]
 
         subgraph Routes
@@ -35,11 +35,11 @@ graph TD
         end
     end
 
-    subgraph "@clitoris/shared"
+    subgraph "@forkverse/shared"
         TYPES["types.ts<br/>Post, User, ApiResponse,<br/>Reactions, Notifications"]
     end
 
-    subgraph "@clitoris/llm"
+    subgraph "@forkverse/llm"
         LLM_INDEX["index.ts<br/>(provider factory)"]
         PROVIDERS["providers/<br/>anthropic, openai, gemini,<br/>ollama, api"]
         PROMPT["prompt.ts + parser.ts"]

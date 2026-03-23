@@ -1,5 +1,5 @@
 /**
- * Seed script — populates CLItoris DB with mock data for UI preview.
+ * Seed script — populates Forkverse DB with mock data for UI preview.
  * Run: pnpm seed
  */
 import Database from 'better-sqlite3';
@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.join(__dirname, '../packages/server/clitoris.db');
+const DB_PATH = path.join(__dirname, '../packages/server/forkverse.db');
 
 const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');

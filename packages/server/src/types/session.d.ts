@@ -1,5 +1,5 @@
 import 'express-session';
-import type { GitHubProfile } from '@clitoris/shared';
+import type { GitHubProfile } from '@forkverse/shared';
 
 declare module 'express-session' {
   interface SessionData {

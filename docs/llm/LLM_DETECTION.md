@@ -125,7 +125,7 @@ When `parseCliCommand` throws a `ParseError`, the caller (provider `transform` m
 
 ## 3. Ollama Detection
 
-CLItoris detects Ollama running locally at server startup. Cloud API keys are user-managed via Settings.
+Forkverse detects Ollama running locally at server startup. Cloud API keys are user-managed via Settings.
 
 > **Key policy**: API keys (Anthropic, OpenAI, Gemini, etc.) are NOT read from environment variables. Each user enters their own keys in Settings. Keys are stored in the `user_llm_keys` database table and looked up per-request.
 

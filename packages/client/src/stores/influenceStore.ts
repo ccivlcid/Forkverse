@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api } from '../api/client.js';
-import type { ApiResponse, InfluenceScore, LeaderboardEntry } from '@clitoris/shared';
+import type { ApiResponse, InfluenceScore, LeaderboardEntry } from '@forkverse/shared';
 
 interface InfluenceState {
   leaderboard: LeaderboardEntry[];

@@ -4,7 +4,7 @@ import type { Logger } from 'pino';
 import { z } from 'zod';
 import { generateId } from '../lib/id.js';
 import { requireAuth } from '../middleware/auth.js';
-import type { GitHubProfile } from '@clitoris/shared';
+import type { GitHubProfile } from '@forkverse/shared';
 
 interface GithubTokenResponse {
   access_token?: string;
@@ -131,7 +131,7 @@ export function createAuthRouter(db: Database, logger: Logger): Router {
       }
 
       const userRes = await fetch('https://api.github.com/user', {
-        headers: { Authorization: `Bearer ${tokenData.access_token}`, 'User-Agent': 'CLItoris' },
+        headers: { Authorization: `Bearer ${tokenData.access_token}`, 'User-Agent': 'Forkverse' },
       });
       const githubUser = (await userRes.json()) as GithubUserResponse;
 

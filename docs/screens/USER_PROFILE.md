@@ -275,8 +275,8 @@ interface Post {
 | Page load        | `/api/users/@:username`               | GET    | Fetch profile data              |
 | Page load        | `/api/users/@:username/posts`         | GET    | Fetch user's posts (default tab)|
 | Page load        | `/api/github/contributions/:username` | GET    | Fetch contribution graph data (all users) |
-| Page load (own profile) | `/api/github/following`        | GET    | Fetch GitHub following + CLItoris status |
-| Page load (own profile) | `/api/github/followers`        | GET    | Fetch GitHub followers + CLItoris status |
+| Page load (own profile) | `/api/github/following`        | GET    | Fetch GitHub following + Forkverse status |
+| Page load (own profile) | `/api/github/followers`        | GET    | Fetch GitHub followers + Forkverse status |
 
 ### On User Interaction
 
@@ -291,8 +291,8 @@ interface Post {
 | Click star on post      | `/api/posts/:id/star`                       | POST   | Toggle star on a post           |
 | Click fork on post      | `/api/posts/:id/fork`                       | POST   | Fork a post                     |
 | Click reply on post     | Navigate to `/post/:id` or open reply composer | --  | Start reply flow                |
-| Click "sync all follows" | `/api/github/sync-follows`                 | POST   | Bulk-follow GitHub following on CLItoris (own profile only) |
-| Click "follow →" in sync list | `/api/users/@:username/follow`        | POST   | Follow individual CLItoris user from sync list |
+| Click "sync all follows" | `/api/github/sync-follows`                 | POST   | Bulk-follow GitHub following on Forkverse (own profile only) |
+| Click "follow →" in sync list | `/api/users/@:username/follow`        | POST   | Follow individual Forkverse user from sync list |
 
 ---
 
@@ -555,11 +555,11 @@ Displayed below the Contribution Graph when viewing the authenticated user's own
 [following]  [followers]
 ─────────────────────────────────────────────────────────────────
 
-octocat        github.com/octocat    [not on CLItoris]
+octocat        github.com/octocat    [not on Forkverse]
 jiyeon-kim     @jiyeon_dev           [follow →]
 tsdev          @tsdev                [following ✓]
 
-[sync all follows]   // follows all CLItoris users from GitHub following list
+[sync all follows]   // follows all Forkverse users from GitHub following list
 ```
 
 **Following subtab columns:**
@@ -567,16 +567,16 @@ tsdev          @tsdev                [following ✓]
 | Column | Description |
 |--------|-------------|
 | GitHub login | GitHub username (links to github.com profile) |
-| CLItoris user | `@username` if registered, `[not on CLItoris]` if not |
-| Action | `[follow →]` if not yet following; `[following ✓]` if already following; blank if not on CLItoris |
+| Forkverse user | `@username` if registered, `[not on Forkverse]` if not |
+| Action | `[follow →]` if not yet following; `[following ✓]` if already following; blank if not on Forkverse |
 
 **Followers subtab columns:**
 
 | Column | Description |
 |--------|-------------|
 | GitHub login | GitHub username |
-| CLItoris user | `@username` or `[not on CLItoris]` |
-| Action | `[follow back →]` if not following back; `[mutual ✓]` if mutual; blank if not on CLItoris |
+| Forkverse user | `@username` or `[not on Forkverse]` |
+| Action | `[follow back →]` if not following back; `[mutual ✓]` if mutual; blank if not on Forkverse |
 
 **Sync all follows button:** Calls `POST /api/github/sync-follows`. Shows result: `✓ N users followed`.
 

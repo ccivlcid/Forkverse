@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import type { Post, PostReactions } from '@clitoris/shared';
+import type { Post, PostReactions } from '@forkverse/shared';
 import DualPanel from './DualPanel.js';
 import ActionBar from './ActionBar.js';
 import RepoCard from './RepoCard.js';
@@ -11,7 +11,7 @@ import { useAuthStore } from '../../stores/authStore.js';
 import { useFeedStore } from '../../stores/feedStore.js';
 import { api } from '../../api/client.js';
 import { toastError, toastSuccess } from '../../stores/toastStore.js';
-import type { ApiResponse } from '@clitoris/shared';
+import type { ApiResponse } from '@forkverse/shared';
 
 interface PostCardProps {
   post: Post;

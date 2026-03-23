@@ -2,6 +2,9 @@
 
 /* ── Design System: CSS Variables (Single Source of Truth) ── */
 :root {
+  /* Capacitor keyboard height (set by native.ts) */
+  --keyboard-height: 0px;
+
   /* Backgrounds — layered depth */
   --bg-void: #08090d;
   --bg-surface: #0d1117;

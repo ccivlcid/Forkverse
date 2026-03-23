@@ -4,7 +4,7 @@ import AppShell from '../components/layout/AppShell.js';
 import { useActivityStore } from '../stores/activityStore.js';
 import { useAuthStore } from '../stores/authStore.js';
 import { toastSuccess } from '../stores/toastStore.js';
-import type { ActivityEvent } from '@clitoris/shared';
+import type { ActivityEvent } from '@forkverse/shared';
 
 function timeAgo(isoDate: string): string {
   const diff = Date.now() - new Date(isoDate).getTime();

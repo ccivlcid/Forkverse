@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '../../stores/authStore.js';
 import { api } from '../../api/client.js';
-import type { ApiResponse } from '@clitoris/shared';
+import type { ApiResponse } from '@forkverse/shared';
 
 export default function OAuthTab() {
   const { user, checkSession } = useAuthStore();

@@ -1,12 +1,12 @@
 # CLAUDE.md
 
-Guidance for AI assistants working with the CLItoris repository.
+Guidance for AI assistants working with the Forkverse repository.
 
 > **Source of truth** for project overview, tech stack, and documentation index.
 
 ## Project Overview
 
-**CLItoris** is a **Repo Analysis Platform** with a terminal/CLI aesthetic.
+**Forkverse** is a **Repo Analysis Platform** with a terminal/CLI aesthetic.
 Users analyze GitHub repositories using AI, and the results are transformed into structured developer insights — reports, presentations, and video walkthroughs.
 Analysis results can be shared, starred, and forked within a developer-oriented social layer.
 
@@ -36,10 +36,16 @@ pnpm workspaces monorepo.
 
 ```
 packages/
-├── client/    # @clitoris/client — React frontend (Vite + Tailwind)
-├── server/    # @clitoris/server — Express API server (tsx)
-├── shared/    # @clitoris/shared — Shared types, constants
-└── llm/       # @clitoris/llm — LLM provider integration (Anthropic, OpenAI, Ollama)
+├── client/    # @forkverse/client — React frontend (Vite + Tailwind)
+│   ├── src/lib/native.ts          # Capacitor native plugin integration (lazy-loaded)
+│   ├── src/hooks/usePullToRefresh.ts  # Pull-to-refresh touch hook
+│   └── capacitor.config.ts        # Capacitor native app config
+├── server/    # @forkverse/server — Express API server (tsx)
+│   ├── src/lib/worker.ts          # Analysis job queue worker (polling, retry, backoff)
+│   ├── src/lib/llmGateway.ts      # Centralized LLM call routing with logging
+│   └── src/lib/crypto.ts          # AES-256-GCM encryption for API keys at rest
+├── shared/    # @forkverse/shared — Shared types, constants
+└── llm/       # @forkverse/llm — LLM provider integration (Anthropic, OpenAI, Ollama)
 docs/          # All project documentation (organized by subfolder)
 tests/         # unit (Vitest), e2e (Playwright)
 scripts/       # Build/deploy scripts
@@ -122,14 +128,14 @@ pnpm dev
 ```
 
 ### Implementation Order
-1. `@clitoris/shared` — Types first (Analysis, Post, User, ApiResponse)
-2. `@clitoris/server` — DB setup + API routes + Analysis Job pipeline
-3. `@clitoris/llm` — LLM providers + analyzer + transformer
-4. `@clitoris/client` — Shell layout → Analyze page → Result page → Social pages
+1. `@forkverse/shared` — Types first (Analysis, Post, User, ApiResponse)
+2. `@forkverse/server` — DB setup + API routes + Analysis Job pipeline
+3. `@forkverse/llm` — LLM providers + analyzer + transformer
+4. `@forkverse/client` — Shell layout → Analyze page → Result page → Social pages
 
 ### Product Strategy
-- **Product**: Repo Analysis Platform (B-plan) — see `docs/specs/CLItoris_최종통합본_Part1_제품전략_공개전략.md`
-- **Architecture**: API + Worker separation planned — see `docs/specs/CLItoris_최종통합본_Part2_아키텍처_UIUX_로드맵.md`
+- **Product**: Repo Analysis Platform (B-plan) — see `docs/specs/Forkverse_최종통합본_Part1_제품전략_공개전략.md`
+- **Architecture**: API + Worker separation planned — see `docs/specs/Forkverse_최종통합본_Part2_아키텍처_UIUX_로드맵.md`
 - **Business**: Open Core + SaaS hosting
 - **Mobile**: PWA → Capacitor (App Store) → Native (if needed) — see `docs/specs/MOBILE.md`
 
@@ -150,7 +156,8 @@ docs/
 │   ├── ENV.md                         # Environment variables reference
 │   ├── I18N.md                        # Internationalization (4 languages)
 │   ├── error.md                       # Error handling guide
-│   └── TROUBLESHOOTING.md            # Common issues & solutions for local development
+│   ├── TROUBLESHOOTING.md            # Common issues & solutions for local development
+│   └── DEPLOY_MOBILE.md             # Android & iOS 배포 실전 가이드
 ├── design/                            # Visual design system
 │   ├── DESIGN_GUIDE.md               # Visual system index — colors, typography, layout
 │   ├── DESIGN_COMPONENTS.md          # Component specs (Post Card, Sidebar, Composer, etc.)
@@ -184,8 +191,8 @@ docs/
 │   ├── API.md                         # REST API documentation (73 endpoints, error formats, rate limits)
 │   ├── api-schema.json                # OpenAPI 3.1 schema (machine-readable)
 │   ├── types.ts                       # Shared type definitions
-│   ├── CLItoris_최종통합본_Part1_제품전략_공개전략.md    # Product strategy & open-source strategy
-│   └── CLItoris_최종통합본_Part2_아키텍처_UIUX_로드맵.md # Architecture, UI/UX, tech roadmap
+│   ├── Forkverse_최종통합본_Part1_제품전략_공개전략.md    # Product strategy & open-source strategy
+│   └── Forkverse_최종통합본_Part2_아키텍처_UIUX_로드맵.md # Architecture, UI/UX, tech roadmap
 ├── llm/                               # LLM integration documentation
 │   ├── LLM_INTEGRATION.md            # LLM overview, system prompt, provider interface, execution modes
 │   ├── LLM_PROVIDERS.md              # 7 provider implementations (Anthropic, OpenAI, Gemini, Ollama, etc.)
@@ -202,8 +209,8 @@ docs/
 
 **Required reading (priority order):**
 1. `CLAUDE.md` — Project summary (this file)
-2. `docs/specs/CLItoris_최종통합본_Part1_제품전략_공개전략.md` — Product strategy (B-plan direction)
-3. `docs/specs/CLItoris_최종통합본_Part2_아키텍처_UIUX_로드맵.md` — Architecture & roadmap
+2. `docs/specs/Forkverse_최종통합본_Part1_제품전략_공개전략.md` — Product strategy (B-plan direction)
+3. `docs/specs/Forkverse_최종통합본_Part2_아키텍처_UIUX_로드맵.md` — Architecture & roadmap
 4. `docs/specs/PRD.md` — Product requirements (Repo Analysis Platform)
 5. `docs/specs/MOBILE.md` — Mobile strategy (PWA → Capacitor → Native)
 6. `docs/setup/CONFIGS.md` — Config files to bootstrap the project

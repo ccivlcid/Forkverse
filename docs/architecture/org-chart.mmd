@@ -1,8 +1,8 @@
-%% CLItoris Project Organization Chart
+%% Forkverse Project Organization Chart
 %% Monorepo package structure and folder hierarchy
 
 graph TB
-    ROOT["CLItoris<br/>pnpm monorepo"]
+    ROOT["Forkverse<br/>pnpm monorepo"]
 
     subgraph "Root Config"
         PKG_ROOT["package.json"]
@@ -23,7 +23,7 @@ graph TB
     end
 
     subgraph "packages/"
-        subgraph "@clitoris/client"
+        subgraph "@forkverse/client"
             CLIENT_PKG["package.json"]
             CLIENT_VITE["vite.config.ts"]
             CLIENT_TW["tailwind.config.ts"]
@@ -41,7 +41,7 @@ graph TB
             end
         end
 
-        subgraph "@clitoris/server"
+        subgraph "@forkverse/server"
             SERVER_PKG["package.json"]
 
             subgraph "server/src/"
@@ -53,7 +53,7 @@ graph TB
             end
         end
 
-        subgraph "@clitoris/shared"
+        subgraph "@forkverse/shared"
             SHARED_PKG["package.json"]
 
             subgraph "shared/src/"
@@ -62,7 +62,7 @@ graph TB
             end
         end
 
-        subgraph "@clitoris/llm"
+        subgraph "@forkverse/llm"
             LLM_PKG["package.json"]
 
             subgraph "llm/src/"

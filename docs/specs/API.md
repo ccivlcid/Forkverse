@@ -82,7 +82,7 @@ Complete profile setup for new GitHub users.
 **Request Body:**
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| username | string | Yes | CLItoris username (3+ chars, [a-z0-9_]) |
+| username | string | Yes | Forkverse username (3+ chars, [a-z0-9_]) |
 | displayName | string | No | Display name (max 50 chars) |
 | bio | string | No | Bio text (max 300 chars) |
 
@@ -704,13 +704,13 @@ Returns the user's pinned GitHub repositories.
 {
   "data": [
     {
-      "name": "CLItoris",
+      "name": "Forkverse",
       "owner": "ccivlcid",
       "description": "CLI-themed SNS",
       "stars": 42,
       "forks": 12,
       "language": "TypeScript",
-      "url": "https://github.com/ccivlcid/CLItoris"
+      "url": "https://github.com/ccivlcid/Forkverse"
     }
   ]
 }
@@ -1092,7 +1092,7 @@ Marks a single GitHub notification thread as read.
 
 ### GET `/api/github/following`
 
-Returns the list of GitHub users the authenticated user follows, with CLItoris membership status for each.
+Returns the list of GitHub users the authenticated user follows, with Forkverse membership status for each.
 
 **Auth:** Yes (requires `read:user` scope)
 
@@ -1104,11 +1104,11 @@ Returns the list of GitHub users the authenticated user follows, with CLItoris m
       "githubLogin": "octocat",
       "avatarUrl": "https://github.com/octocat.png",
       "profileUrl": "https://github.com/octocat",
-      "clitorisUser": {
+      "forkverseUser": {
         "username": "octocat_dev",
         "displayName": "Octocat"
       },
-      "isFollowingOnClitoris": false
+      "isFollowingOnForkverse": false
     }
   ]
 }
@@ -1124,7 +1124,7 @@ Returns the list of GitHub users the authenticated user follows, with CLItoris m
 
 ### POST `/api/github/sync-follows`
 
-Bulk-follows all GitHub following users who are registered on CLItoris. Skips users already followed. Returns created and skipped counts.
+Bulk-follows all GitHub following users who are registered on Forkverse. Skips users already followed. Returns created and skipped counts.
 
 **Auth:** Yes
 
@@ -1149,7 +1149,7 @@ Bulk-follows all GitHub following users who are registered on CLItoris. Skips us
 
 ### GET `/api/github/followers`
 
-Returns the list of GitHub users who follow the authenticated user, with CLItoris membership status and mutual-follow status.
+Returns the list of GitHub users who follow the authenticated user, with Forkverse membership status and mutual-follow status.
 
 **Auth:** Yes (requires `read:user` scope)
 
@@ -1161,12 +1161,12 @@ Returns the list of GitHub users who follow the authenticated user, with CLItori
       "githubLogin": "jiyeon-kim",
       "avatarUrl": "https://github.com/jiyeon-kim.png",
       "profileUrl": "https://github.com/jiyeon-kim",
-      "clitorisUser": {
+      "forkverseUser": {
         "username": "jiyeon_dev",
         "displayName": "Jiyeon Kim"
       },
-      "isFollowingOnClitoris": true,
-      "isFollowedBackOnClitoris": false
+      "isFollowingOnForkverse": true,
+      "isFollowedBackOnForkverse": false
     }
   ]
 }
@@ -1725,9 +1725,9 @@ GET /api/posts/feed/global?cursor=2026-03-19T12:15:00Z&limit=20
 | `POST` | `/api/github/notifications/:id/mark-read` | Yes | Mark notification as read |
 | `GET` | `/api/github/contributions/:username` | Optional | GitHub contribution graph (heatmap) |
 | `GET` | `/api/github/reviews` | Yes | PR review requests |
-| `GET` | `/api/github/followers` | Yes | GitHub followers + CLItoris status |
-| `GET` | `/api/github/following` | Yes | GitHub following + CLItoris status |
-| `POST` | `/api/github/sync-follows` | Yes | Bulk-follow GitHub following on CLItoris |
+| `GET` | `/api/github/followers` | Yes | GitHub followers + Forkverse status |
+| `GET` | `/api/github/following` | Yes | GitHub following + Forkverse status |
+| `POST` | `/api/github/sync-follows` | Yes | Bulk-follow GitHub following on Forkverse |
 | **Notifications (4)** | | | |
 | `GET` | `/api/notifications` | Yes | User's notifications (paginated) |
 | `GET` | `/api/notifications/unread-count` | Yes | Unread notification count |
@@ -1860,12 +1860,60 @@ Register a device push notification token.
 
 ### B-plan Endpoint Summary
 
-| Method | Endpoint | Auth | Purpose |
-|--------|----------|------|---------|
-| `GET` | `/api/analyze/popular` | No | Popular analyses for Home page |
-| `GET` | `/api/analysis/:id` | No | Full analysis result with sections |
-| `POST` | `/api/analysis/:id/star` | Yes | Star/unstar an analysis |
-| `POST` | `/api/notifications/register` | Yes | Register push token (Phase B4) |
+| Method | Endpoint | Auth | Phase | Purpose |
+|--------|----------|------|-------|---------|
+| `GET` | `/api/analyze/popular` | No | B2 | Popular analyses ranked by stars |
+| `GET` | `/api/analyze/detail/:id` | No | B2 | Full analysis result with structured sections |
+| `POST` | `/api/analyze/:id/star` | Yes | B2 | Star/unstar an analysis |
+| `GET` | `/api/analyze/:id/progress` | No | B5 | SSE stream for real-time analysis progress |
+| `POST` | `/api/analyze/compare` | Yes | B6 | Start side-by-side repo comparison |
+| `GET` | `/api/analyze/compare/:id` | No | B6 | Get comparison result |
+| `GET` | `/api/collections` | Yes | B6 | List user's collections |
+| `POST` | `/api/collections` | Yes | B6 | Create a collection |
+| `DELETE` | `/api/collections/:id` | Yes | B6 | Delete a collection |
+| `GET` | `/api/collections/:id/items` | Mixed | B6 | List analyses in collection (public or owner) |
+| `POST` | `/api/collections/:id/items` | Yes | B6 | Add analysis to collection |
+| `DELETE` | `/api/collections/:id/items/:analysisId` | Yes | B6 | Remove analysis from collection |
+| `POST` | `/api/notifications/push-token` | Yes | B4 | Register device push token |
+
+#### SSE Progress Streaming
+
+```
+GET /api/analyze/:id/progress
+Content-Type: text/event-stream
+
+data: {"status":"processing","progress":[{"name":"fetching repo metadata","status":"done"},{"name":"analyzing structure","status":"active"},...]}
+
+data: {"status":"completed","progress":[...]}
+```
+
+#### Comparison Analysis
+
+```json
+// POST /api/analyze/compare
+{
+  "repoA": "facebook/react",
+  "repoB": "vuejs/core",
+  "llmModel": "claude-sonnet-4-20250514",
+  "lang": "en"
+}
+// → 201 { data: { id, analysisAId, analysisBId, status: "pending" } }
+
+// GET /api/analyze/compare/:id
+// → 200 { data: { id, repoA, repoB, result: {...} | null, status, durationMs } }
+```
+
+#### Collections
+
+```json
+// POST /api/collections
+{ "name": "My best analyses", "description": "...", "isPublic": true }
+// → 201 { data: { id, name, description, isPublic, itemCount: 0 } }
+
+// POST /api/collections/:id/items
+{ "analysisId": "abc123" }
+// → 200 { data: { added: true } }
+```
 
 ---
 

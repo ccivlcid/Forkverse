@@ -6,7 +6,7 @@ import ja from '../i18n/ja.js';
 
 export type UiLang = 'en' | 'ko' | 'zh' | 'ja';
 
-const LANG_STORAGE_KEY = 'clitoris:ui-lang';
+const LANG_STORAGE_KEY = 'forkverse:ui-lang';
 const VALID_LANGS: UiLang[] = ['en', 'ko', 'zh', 'ja'];
 
 function loadLang(): UiLang {

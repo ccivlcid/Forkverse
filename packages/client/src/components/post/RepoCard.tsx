@@ -1,4 +1,4 @@
-import type { RepoAttachment } from '@clitoris/shared';
+import type { RepoAttachment } from '@forkverse/shared';
 
 interface RepoCardProps {
   repo: RepoAttachment;

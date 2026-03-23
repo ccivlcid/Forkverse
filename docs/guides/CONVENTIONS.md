@@ -101,7 +101,7 @@ type Visibility = typeof VISIBILITY[keyof typeof VISIBILITY];
 // 1. Imports (external → internal → types)
 import { useState } from 'react';
 import { usePostStore } from '../stores/post-store';
-import type { Post } from '@clitoris/shared';
+import type { Post } from '@forkverse/shared';
 
 // 2. Props interface (directly above component)
 interface PostCardProps {
@@ -184,7 +184,7 @@ function handleSubmit(e: React.FormEvent): void { ... }
 ```typescript
 // ✅ Route files export a single router
 import { Router } from 'express';
-import type { ApiResponse, Post } from '@clitoris/shared';
+import type { ApiResponse, Post } from '@forkverse/shared';
 
 export const postsRouter = Router();
 
@@ -255,7 +255,7 @@ function validate(schema: z.ZodSchema) {
 
 ```typescript
 // ✅ Use better-sqlite3 synchronous API only (no async wrappers)
-const db = new Database('clitoris.db');
+const db = new Database('forkverse.db');
 
 // ✅ Use prepared statements only (SQL injection prevention)
 const stmt = db.prepare('SELECT * FROM posts WHERE id = ?');
@@ -297,16 +297,16 @@ import { Router } from 'express';
 import { z } from 'zod';
 
 // 3. Monorepo internal packages
-import type { Post, User } from '@clitoris/shared';
-import { transformToCli } from '@clitoris/llm';
+import type { Post, User } from '@forkverse/shared';
+import { transformToCli } from '@forkverse/llm';
 
 // 4. Project internal modules (relative paths)
 import { usePostStore } from '../stores/post-store';
 import { PostCard } from '../components/post/post-card';
 
 // ✅ Type-only imports required (when importing types only)
-import type { Post } from '@clitoris/shared';       // ✅
-import { Post } from '@clitoris/shared';             // ❌ (when only used as type)
+import type { Post } from '@forkverse/shared';       // ✅
+import { Post } from '@forkverse/shared';             // ❌ (when only used as type)
 
 // ❌ Wildcard imports forbidden
 import * as utils from '../utils';                   // forbidden

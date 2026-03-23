@@ -8,7 +8,7 @@ import { toastError, toastSuccess } from '../stores/toastStore.js';
 import ContributionGraph from '../components/profile/ContributionGraph.js';
 import GithubFollowSync from '../components/profile/GithubFollowSync.js';
 import ApiTab from '../components/settings/ApiTab.js';
-import type { UserProfile, Post, ApiResponse } from '@clitoris/shared';
+import type { UserProfile, Post, ApiResponse } from '@forkverse/shared';
 import InfluenceBadge from '../components/profile/InfluenceBadge.js';
 import InfluenceDetail from '../components/profile/InfluenceDetail.js';
 import { useInfluenceStore } from '../stores/influenceStore.js';

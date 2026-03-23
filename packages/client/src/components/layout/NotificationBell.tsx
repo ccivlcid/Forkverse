@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useNotificationStore } from '../../stores/notificationStore.js';
-import type { Notification } from '@clitoris/shared';
+import type { Notification } from '@forkverse/shared';
 
 function timeAgo(isoDate: string): string {
   const diff = Date.now() - new Date(isoDate).getTime();

@@ -27,7 +27,7 @@ cd node_modules/.pnpm/better-sqlite3@<version>/node_modules/better-sqlite3
 npx node-gyp rebuild
 
 # Or from project root (finds the correct version automatically)
-pnpm --filter @clitoris/server exec node-gyp rebuild --directory node_modules/better-sqlite3
+pnpm --filter @forkverse/server exec node-gyp rebuild --directory node_modules/better-sqlite3
 ```
 
 **Requirements:** Python 3 + Visual Studio Build Tools (Windows) or `build-essential` (Linux).
@@ -61,30 +61,30 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 |---------|-------|----------|
 | `Error: SESSION_SECRET is required` | Missing env var | Set `SESSION_SECRET` in `.env` |
 | `EADDRINUSE: port 3771` | Port already in use | Kill process: `lsof -ti:3771 \| xargs kill` or change `PORT` in `.env` |
-| `Cannot find module '@clitoris/shared'` | Missing build | Run `pnpm build` first, or use `pnpm dev` (auto-builds) |
-| `SQLITE_CANTOPEN` | Invalid DB path | Check `DATABASE_URL` in `.env`. Default `clitoris.db` creates in project root |
+| `Cannot find module '@forkverse/shared'` | Missing build | Run `pnpm build` first, or use `pnpm dev` (auto-builds) |
+| `SQLITE_CANTOPEN` | Invalid DB path | Check `DATABASE_URL` in `.env`. Default `forkverse.db` creates in project root |
 
 ### Database issues
 
 ```bash
 # Reset database (delete and let migrations re-create)
-rm clitoris.db
+rm forkverse.db
 pnpm dev:server
 # Migrations auto-run on server start
 
 # Check if DB file exists and has correct permissions
-ls -la clitoris.db
+ls -la forkverse.db
 
 # Manually inspect DB
-sqlite3 clitoris.db ".tables"
-sqlite3 clitoris.db ".schema users"
+sqlite3 forkverse.db ".tables"
+sqlite3 forkverse.db ".schema users"
 ```
 
 | Symptom | Cause | Solution |
 |---------|-------|----------|
 | `SQLITE_BUSY` | Concurrent writes | This is normal with WAL mode; retry logic handles it |
 | `FOREIGN KEY constraint failed` | Invalid reference | Check that referenced user/post exists before insert |
-| Migration errors | Schema mismatch | Delete `clitoris.db` and restart server |
+| Migration errors | Schema mismatch | Delete `forkverse.db` and restart server |
 
 ---
 
@@ -228,16 +228,16 @@ pnpm test:e2e -- tests/e2e/feed.spec.ts
 | Symptom | Cause | Solution |
 |---------|-------|----------|
 | TypeScript errors | Type mismatch | Fix the type error (don't use `any`) |
-| `Cannot find module '@clitoris/shared'` | Build order | Build shared first: `pnpm --filter @clitoris/shared build` |
+| `Cannot find module '@forkverse/shared'` | Build order | Build shared first: `pnpm --filter @forkverse/shared build` |
 | `Out of memory` during build | Large bundle | Increase memory: `NODE_OPTIONS=--max-old-space-size=4096 pnpm build` |
 | ESLint errors blocking build | Lint violations | Fix lint: `pnpm lint --fix` |
 
 ```bash
 # Build in correct order
-pnpm --filter @clitoris/shared build
-pnpm --filter @clitoris/llm build
-pnpm --filter @clitoris/server build
-pnpm --filter @clitoris/client build
+pnpm --filter @forkverse/shared build
+pnpm --filter @forkverse/llm build
+pnpm --filter @forkverse/server build
+pnpm --filter @forkverse/client build
 
 # Or build all (respects workspace dependency order)
 pnpm build
@@ -284,10 +284,10 @@ lsof -i :7878    # client
 node -e "require('dotenv').config(); console.log(Object.keys(process.env).filter(k => k.startsWith('ANTHROPIC') || k === 'SESSION_SECRET'))"
 
 # Check DB exists
-ls -la clitoris.db
+ls -la forkverse.db
 
 # Full clean restart
-rm -rf node_modules packages/*/node_modules packages/*/dist clitoris.db
+rm -rf node_modules packages/*/node_modules packages/*/dist forkverse.db
 pnpm install
 pnpm build
 pnpm dev

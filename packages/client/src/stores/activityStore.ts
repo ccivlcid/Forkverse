@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { api } from '../api/client.js';
 import { toastError } from './toastStore.js';
-import type { ActivityEvent, ApiResponse } from '@clitoris/shared';
+import type { ActivityEvent, ApiResponse } from '@forkverse/shared';
 
 type FeedType = 'feed' | 'global';
 

@@ -3,7 +3,7 @@ import CliHighlighter from './CliHighlighter.js';
 import { useUiStore } from '../../stores/uiStore.js';
 import { api } from '../../api/client.js';
 import { toastError } from '../../stores/toastStore.js';
-import type { ApiResponse, TranslateResponse } from '@clitoris/shared';
+import type { ApiResponse, TranslateResponse } from '@forkverse/shared';
 
 interface DualPanelProps {
   postId: string;

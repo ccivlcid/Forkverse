@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { api } from '../api/client.js';
 import { toastError } from './toastStore.js';
-import type { ApiResponse, DirectMessage, Conversation } from '@clitoris/shared';
+import type { ApiResponse, DirectMessage, Conversation } from '@forkverse/shared';
 
 interface MessageState {
   conversations: Conversation[];

@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import type { Database } from 'better-sqlite3';
 import { z } from 'zod';
-import { createProvider } from '@clitoris/llm';
+import { createProvider } from '@forkverse/llm';
 import { requireAuth } from '../middleware/auth.js';
 import { generateId } from '../lib/id.js';
+import { encrypt, decrypt } from '../lib/crypto.js';
 import type { Logger } from 'pino';
 
 const transformSchema = z.object({
@@ -37,7 +38,7 @@ function resolveProvider(model: string, userId: string, database: Database): { p
     const row = database.prepare(
       'SELECT api_key, base_url FROM user_llm_keys WHERE user_id = ? AND provider = ?'
     ).get(userId, direct) as LlmKeyRow | undefined;
-    if (row) return { provider: direct, apiKey: row.api_key, baseUrl: row.base_url };
+    if (row) return { provider: direct, apiKey: decrypt(row.api_key), baseUrl: row.base_url };
   }
 
   // 2. Check all user's providers and try to find one that has this model
@@ -48,14 +49,14 @@ function resolveProvider(model: string, userId: string, database: Database): { p
   // Prefer the 'api' provider (custom) or any OpenAI-compatible provider
   for (const row of allKeys) {
     if (['openrouter', 'together', 'groq', 'cerebras', 'ollama', 'api'].includes(row.provider)) {
-      return { provider: row.provider, apiKey: row.api_key, baseUrl: row.base_url };
+      return { provider: row.provider, apiKey: decrypt(row.api_key), baseUrl: row.base_url };
     }
   }
 
   // 3. Try first available provider
   if (allKeys.length > 0) {
     const first = allKeys[0]!;
-    return { provider: first.provider, apiKey: first.api_key, baseUrl: first.base_url };
+    return { provider: first.provider, apiKey: decrypt(first.api_key), baseUrl: first.base_url };
   }
 
   return null;
@@ -214,17 +215,18 @@ export function createLlmRouter(db: Database, logger: Logger): Router {
       });
       return;
     }
+    const apiKey = decrypt(row.api_key);
     try {
       let models: string[] = [];
       if (provider === 'anthropic') {
-        models = await listAnthropicModelsForKey(row.api_key);
+        models = await listAnthropicModelsForKey(apiKey);
       } else if (provider === 'openai') {
-        models = await listOpenAIModelsForKey(row.api_key, row.base_url);
+        models = await listOpenAIModelsForKey(apiKey, row.base_url);
       } else if (provider === 'gemini') {
-        models = await listGeminiModelsForKey(row.api_key);
+        models = await listGeminiModelsForKey(apiKey);
       } else {
         // OpenAI-compatible providers (openrouter, together, groq, cerebras, ollama, api)
-        const p = createProvider(provider, { apiKey: row.api_key, ...(row.base_url ? { baseUrl: row.base_url } : {}) });
+        const p = createProvider(provider, { apiKey, ...(row.base_url ? { baseUrl: row.base_url } : {}) });
         models = await p.listModels();
       }
       res.json({ data: models });
@@ -263,7 +265,7 @@ export function createLlmRouter(db: Database, logger: Logger): Router {
         api_key = excluded.api_key,
         label = excluded.label,
         base_url = excluded.base_url
-    `).run(generateId(), userId, provider, apiKey, label ?? null, baseUrl ?? null);
+    `).run(generateId(), userId, provider, encrypt(apiKey), label ?? null, baseUrl ?? null);
 
     res.status(201).json({ data: { provider, label: label ?? null } });
   });

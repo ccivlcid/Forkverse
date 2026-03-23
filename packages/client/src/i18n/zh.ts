@@ -230,7 +230,7 @@ const zh: Record<string, string> = {
   'detail.mentionHint': '@ 提及',
 
   // Leaderboard
-  'leaderboard.subtitle': '基于 GitHub 活跃度 + CLItoris 活动排名的开发者',
+  'leaderboard.subtitle': '基于 GitHub 活跃度 + Forkverse 活动排名的开发者',
   'leaderboard.empty': '暂无计算分数。',
   'leaderboard.emptyHint': '前往个人主页同步 GitHub 开始使用。',
   'leaderboard.loading': '加载排行榜...',
@@ -248,13 +248,13 @@ const zh: Record<string, string> = {
 
   // GitHub follow sync
   'ghSync.title': 'github 关注',
-  'ghSync.onPlatform': 'CLItoris 上 {n} 人',
+  'ghSync.onPlatform': 'Forkverse 上 {n} 人',
   'ghSync.syncing': '同步中...',
   'ghSync.syncAll': '全部同步 ({n})',
   'ghSync.following': '关注 ({n})',
   'ghSync.followers': '粉丝 ({n})',
-  'ghSync.onClit': '在 CLItoris ({n})',
-  'ghSync.notOnClit': '不在 CLItoris ({n})',
+  'ghSync.onClit': '在 Forkverse ({n})',
+  'ghSync.notOnClit': '不在 Forkverse ({n})',
   'ghSync.unfollow': '取消关注',
   'ghSync.follow': '关注',
   'ghSync.more': '+{n} 更多',
@@ -271,7 +271,7 @@ const zh: Record<string, string> = {
   'github.featureProfile': '个人资料同步（头像、简介、仓库）',
   'github.featureRepos': '个人主页显示仓库列表',
   'github.featureContrib': '贡献图表（绿色方块）',
-  'github.featureFollowSync': '关注同步（GitHub ↔ CLItoris）',
+  'github.featureFollowSync': '关注同步（GitHub ↔ Forkverse）',
   'github.featureReviews': 'PR 审查请求列表',
   'github.featureInfluence': '影响力分数计算',
   'github.reviewSubtitle': '等待你审查的 PR',
@@ -327,6 +327,22 @@ const zh: Record<string, string> = {
   'analyze.history.empty.cmd': '$ analyses --list',
   'analyze.history.empty.result': '> 找到 0 个分析。',
   'analyze.history.empty.hint': '在上方开始您的第一次仓库分析。',
+
+  // Analysis Result Page
+  'analysis.section.summary': '摘要',
+  'analysis.section.techStack': '技术栈',
+  'analysis.section.architecture': '架构',
+  'analysis.section.strengths': '优势',
+  'analysis.section.risks': '风险',
+  'analysis.section.improvements': '改进建议',
+  'analysis.section.cliView': 'CLI 视图',
+  'analysis.copy': '复制段落',
+  'analysis.share': '分享',
+  'analysis.star': '收藏分析',
+  'analysis.loginToStar': '登录后收藏',
+  'analysis.backToAnalyze': '新分析',
+  'analysis.backToFeed': '→ 动态',
+  'analysis.viewResult': '→ 查看完整结果',
 
   // Home
   'home.hero.prompt': '$ analyze --repo=',

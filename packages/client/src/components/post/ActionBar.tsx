@@ -5,8 +5,8 @@ import { useAuthStore } from '../../stores/authStore.js';
 import { useFeedStore } from '../../stores/feedStore.js';
 import { useUiStore } from '../../stores/uiStore.js';
 import { toastError } from '../../stores/toastStore.js';
-import type { ApiResponse, PostReactions, ReactionEmoji } from '@clitoris/shared';
-import { REACTION_DISPLAY } from '@clitoris/shared';
+import type { ApiResponse, PostReactions, ReactionEmoji } from '@forkverse/shared';
+import { REACTION_DISPLAY } from '@forkverse/shared';
 
 interface ActionBarProps {
   postId: string;

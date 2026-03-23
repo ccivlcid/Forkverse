@@ -1,14 +1,14 @@
 # PROGRESS.md — Development Status
 
 > **Source of truth** for development status, phase tracking, and decision log.
-> Last updated: 2026-03-21 (APP_RELEASE.md — Android/iOS store release documentation)
+> Last updated: 2026-03-23 (Phase B6 — Extended Features)
 
 ---
 
-## Current Phase: B-plan Transition — Phase B1 (Complete)
+## Current Phase: B-plan — Phase B6 (Complete)
 
-A-plan (SNS-focused) Phases 0–6 are complete. Product direction pivoted to B-plan (Repo Analysis Platform).
-Phase B1 entry point transition is now complete. Phase B2 and B3 are next.
+A-plan (SNS-focused) Phases 0–6 are complete. Product direction pivoted to B-plan (Developer SNS with Repo Analysis).
+All B-plan phases (B1–B6) complete.
 
 ---
 
@@ -17,11 +17,11 @@ Phase B1 entry point transition is now complete. Phase B2 and B3 are next.
 | Phase | Name | Status |
 |-------|------|--------|
 | Phase B1 | Entry Point Transition | **Complete** |
-| Phase B2 | Analysis Result Enhancement | Planned |
-| Phase B3 | Mobile Web Completion + PWA | Planned |
-| Phase B4 | App Store Release (Capacitor) | Planned |
-| Phase B5 | Backend Scaling (Worker + Postgres) | Planned |
-| Phase B6 | Extended Features | Planned |
+| Phase B2 | Analysis Result Enhancement | **Complete** |
+| Phase B3 | Mobile Web Completion + PWA | **Complete** |
+| Phase B4 | App Store Release (Capacitor) | **Complete** |
+| Phase B5 | Backend Scaling (Worker + Postgres) | **Complete** |
+| Phase B6 | Extended Features | **Complete** |
 
 ---
 
@@ -50,63 +50,80 @@ Phase B1 entry point transition is now complete. Phase B2 and B3 are next.
 
 ---
 
-## Phase B2 — Analysis Result Enhancement (Planned)
+## Phase B2 — Analysis Result Enhancement (Complete)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Sectioned result page | Planned | Summary → Stack → Architecture → Strengths → Risks → Improvements → CLI View |
-| `/analysis/:id` route | Planned | Dedicated shareable result page |
-| Section navigation | Planned | Sidebar or tab navigation within result |
-| Copy/share per section | Planned | Each section has copy and share buttons |
-| Mobile card stack | Planned | Sections as swipeable/scrollable cards on mobile |
+| Sectioned result page | **Complete** | 7 sections: Summary, Tech Stack, Architecture, Strengths, Risks, Improvements, CLI View |
+| `/analysis/:id` route | **Complete** | Public shareable result page via `GET /api/analyze/detail/:id` |
+| Section navigation | **Complete** | Desktop: sticky sidebar nav; Mobile: fixed bottom horizontal scroll nav |
+| Copy/share per section | **Complete** | Each section has copy (clipboard) and share (Web Share API / clipboard fallback) buttons |
+| Mobile card stack | **Complete** | Scrollable sections with fixed bottom section nav, IntersectionObserver active tracking |
+| Analysis star/unstar | **Complete** | `POST /api/analyze/:id/star` toggle; star count displayed in header |
+| Popular analyses API | **Complete** | `GET /api/analyze/popular?limit=&period=` with star-based ranking |
+| Structured LLM prompt | **Complete** | LLM returns JSON with 7 section keys; fallback paragraph splitting for plain text |
+| DB migration 027 | **Complete** | `result_sections_json` column + `analysis_stars` table |
+| i18n (4 languages) | **Complete** | `analysis.*` keys in en/ko/zh/ja |
 
 ---
 
-## Phase B3 — Mobile Web Completion + PWA (Planned)
+## Phase B3 — Mobile Web Completion + PWA (Complete)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Analyze input mobile UX | Planned | Single-column form, large touch targets |
-| Result viewing mobile | Planned | Card stack, collapsible sections |
-| PWA manifest + SW | Planned | Installable, offline shell, app icon |
-| Touch interactions | Planned | Swipe, pull-to-refresh, haptic feedback |
+| Analyze input mobile UX | **Complete** | Full-width buttons, stacked model/lang selectors, 16px font inputs, active:scale feedback |
+| Result viewing mobile | **Complete** | Section cards with bottom horizontal nav (done in B2) |
+| PWA manifest + SW | **Complete** | manifest.json, SVG icons (192/512/maskable), vite-plugin-pwa with Workbox |
+| Service Worker caching | **Complete** | Cache-first for fonts/avatars, network-first for API, 14 precached entries |
+| Apple PWA meta tags | **Complete** | apple-mobile-web-app-capable, status-bar-style, apple-touch-icon |
+| Pull-to-refresh | **Complete** | Custom hook (usePullToRefresh) + indicator in AppShell; integrated in GlobalFeedPage |
+| Touch feedback | **Complete** | active:scale-95 on buttons, active:scale-[0.98] on CTA |
 
 ---
 
-## Phase B4 — App Store Release (Planned)
+## Phase B4 — App Store Release (Complete)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Capacitor integration | Planned | Wrap web app as native shell |
-| Push notifications | Planned | FCM (Android) / APNs (iOS) |
-| Deep links | Planned | `terminal.social/*` → app |
-| Android Play Store | Planned | APK/AAB build + listing |
-| iOS App Store | Planned | IPA build + listing |
+| Capacitor integration | **Complete** | `@capacitor/core` + 8 plugins installed; `capacitor.config.ts` created |
+| Native plugin integration | **Complete** | `lib/native.ts` — StatusBar, SplashScreen, Haptics, Keyboard, Share, Clipboard, App |
+| Push notifications | **Complete** | Token registration API (`POST /api/notifications/push-token`); DB migration 028; native listener in `initPushNotifications` |
+| Deep links | **Complete** | `/.well-known/assetlinks.json` (Android) + `apple-app-site-association` (iOS) on server |
+| Back button handling | **Complete** | Android hardware back → history.back() or exitApp() |
+| Keyboard-aware layout | **Complete** | `--keyboard-height` CSS var updated by native Keyboard listener |
+| Cap scripts | **Complete** | `cap:sync`, `cap:android`, `cap:ios`, `cap:build` in package.json |
+| Android Play Store | Pending | Requires `keytool` signing + Play Console account ($25) |
+| iOS App Store | Pending | Requires Apple Developer account ($99/yr) + Xcode archive |
 | Release documentation | **Complete** | `docs/specs/APP_RELEASE.md` — full guide: Capacitor, signing, CI/CD, store submissions |
 
 ---
 
-## Phase B5 — Backend Scaling (Planned)
+## Phase B5 — Backend Scaling (Complete)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| API + Worker separation | Planned | Analysis jobs processed by Worker, not API server |
-| Job Queue | Planned | BullMQ or similar; analysis_job lifecycle management |
-| SQLite → Postgres | Planned | Migration for concurrent users, search, analytics |
-| LLM Gateway | Planned | Provider abstraction, cost/latency tracking, prompt versioning |
-| Redis | Planned | Cache, queue backend, session store |
+| API + Worker separation | **Complete** | `lib/worker.ts` — extracted analysis logic; worker runs in-process via polling, can be separated later |
+| Job Queue | **Complete** | `analysis_jobs` table with state machine: pending → active → completed/failed/dead; migration 029 |
+| Retry mechanism | **Complete** | 3 retries with exponential backoff (2^n seconds); dead letter after max retries |
+| SSE progress streaming | **Complete** | `GET /api/analyze/:id/progress` — Server-Sent Events for real-time progress |
+| LLM Gateway | **Complete** | `lib/llmGateway.ts` — centralized LLM calls with latency/cost logging via pino |
+| Database indexes | **Complete** | Indexes on `analyses(status, created_at)`, `posts(created_at)`, `posts(user_id, created_at)` |
+| Graceful shutdown | **Complete** | Worker stops cleanly on SIGINT/SIGTERM; current job finishes |
+| SQLite → Postgres | Pending | Requires external Postgres instance; current SQLite schema is migration-ready |
+| Redis | Pending | Requires external Redis; current SQLite-based queue works for MVP scale |
 
 ---
 
-## Phase B6 — Extended Features (Planned)
+## Phase B6 — Extended Features (Complete)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Comparison analysis | Planned | Side-by-side repo comparison |
-| Private repo analysis | Planned | Paid feature, requires expanded GitHub OAuth scope |
-| Team workspaces | Planned | Shared analysis history, access control |
-| Collections/bookmarks | Planned | Organize saved analyses |
-| React Native migration | Planned | If Capacitor performance is insufficient |
+| Comparison analysis | **Complete** | `POST /api/analyze/compare` + `GET /api/analyze/compare/:id`; DB migration 031 |
+| Collections/bookmarks | **Complete** | Full CRUD: `GET/POST/DELETE /api/collections`, `GET/POST/DELETE /api/collections/:id/items`; migration 030 |
+| Shared types | **Complete** | `Collection`, `ComparisonResult` types in @forkverse/shared |
+| Private repo analysis | Pending | Requires expanded GitHub OAuth scope (`repo`) — paid feature |
+| Team workspaces | Pending | Requires org/team model — future enterprise feature |
+| React Native migration | Deferred | Capacitor performance is sufficient for current needs |
 
 ---
 
@@ -161,6 +178,26 @@ All documentation, configuration files, and project scaffolding.
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-03-23 | **API keys encrypted at rest** | AES-256-GCM via ENCRYPTION_KEY env var; backward-compatible (plaintext passthrough in dev) |
+| 2026-03-23 | **Fork self-fork blocked** | Added user_id check — cannot fork own post (400 BAD_REQUEST) |
+| 2026-03-23 | **Follow endpoint atomic** | Wrapped in db.transaction() to prevent race conditions on concurrent follow/unfollow |
+| 2026-03-23 | **Webhook secret enforced** | Production rejects if GITHUB_WEBHOOK_SECRET not set; dev mode warns but allows |
+| 2026-03-23 | **Media extension forced by MIME** | MIME→extension map prevents malicious file extensions (.exe uploads blocked) |
+| 2026-03-23 | **LLM timeout + error exposure** | 120s timeout on LLM, 30s on GitHub; failures visible in progress UI instead of silent fallback |
+| 2026-03-23 | **Explore feed compound cursor** | Changed from star_count-only to starCount:createdAt compound cursor |
+| 2026-03-23 | **Collections API** | Full CRUD for organizing/bookmarking analyses; public/private visibility; migration 030 |
+| 2026-03-23 | **Comparison analysis** | Side-by-side repo comparison endpoint; comparisons table; migration 031 |
+| 2026-03-23 | **Worker: SQLite-based job queue** | In-process polling worker with analysis_jobs table; can be separated into standalone process for horizontal scaling |
+| 2026-03-23 | **SSE progress streaming** | Replaces polling for analysis progress; server pushes events via text/event-stream |
+| 2026-03-23 | **LLM Gateway logging** | All LLM calls routed through gateway with pino-logged latency/provider/model metrics |
+| 2026-03-23 | **Capacitor: dynamic import plugins** | All native plugins lazy-loaded via `import()` — zero bundle cost on web; only loads on native platform |
+| 2026-03-23 | **Rename CLItoris → Forkverse** | Fork/share-centric SNS branding; 118 files updated, 0 remaining old references |
+| 2026-03-23 | **PWA: vite-plugin-pwa + Workbox** | Auto-generated SW with cache-first for fonts/avatars, network-first for API; manifest.json with SVG icons |
+| 2026-03-23 | **Pull-to-refresh custom hook** | usePullToRefresh with touch events, resistance curve, threshold-based trigger; AppShell onRefresh prop |
+| 2026-03-23 | **Manifest: SNS not Platform** | User clarified product is "developer SNS" not "platform"; updated manifest and descriptions |
+| 2026-03-23 | **Structured JSON sections from LLM** | LLM prompt requests JSON with 7 keys; fallback splits plain text into paragraphs; stored in `result_sections_json` column |
+| 2026-03-23 | **Analysis result page public** | `/analysis/:id` is public (no auth) for shareability; starring requires auth |
+| 2026-03-23 | **Section nav: sidebar + mobile bottom bar** | Desktop uses sticky sidebar; mobile uses fixed bottom horizontal scroll bar with IntersectionObserver |
 | 2026-03-21 | **MARKETING.md created** | Full marketing playbook: positioning, ICP, launch strategy (HN/PH/Reddit/Korean community), growth loops, SEO, metrics, budget guidance |
 | 2026-03-21 | **APP_RELEASE.md created** | Full Android + iOS release guide: Capacitor setup, keystore/cert, Fastlane CI/CD, Play Store + App Store submission steps, push notifications (FCM/APNs), deep links, Korean store listing text |
 | 2026-03-21 | **Logout moved to profile page** | Logout button shown only on own profile (`isSelf`); removed from MobileNav dropup and Sidebar |

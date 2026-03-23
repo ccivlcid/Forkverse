@@ -1,8 +1,8 @@
 # LLM_INTEGRATION.md -- LLM Integration Logic
 
-> **Owner:** CLItoris Core Team
+> **Owner:** Forkverse Core Team
 > **Status:** Source of Truth
-> **Purpose:** Defines how CLItoris uses LLM providers for three operations: **analyze** (repo analysis — primary), **transform** (post CLI conversion), and **translate** (tone-aware translation). Core interface, prompts, execution modes, and provider registration live here.
+> **Purpose:** Defines how Forkverse uses LLM providers for three operations: **analyze** (repo analysis — primary), **transform** (post CLI conversion), and **translate** (tone-aware translation). Core interface, prompts, execution modes, and provider registration live here.
 > Updated: 2026-03-21 — B-plan: `analyze()` operation added as primary LLM use case.
 
 ---
@@ -23,7 +23,7 @@
 
 ## 1. Overview
 
-CLItoris uses LLMs for three operations, in priority order:
+Forkverse uses LLMs for three operations, in priority order:
 
 ### 1.0 `analyze()` — Repo analysis (B-plan PRIMARY)
 
@@ -289,7 +289,7 @@ All LLM operations use cloud API providers. Users select a provider and model, a
 All providers are registered in a central factory. Adding a new provider requires:
 1. Create `packages/llm/src/providers/{name}.ts` implementing `LlmProviderInterface`
 2. Register in the factory in `provider-factory.ts`
-3. Add the provider enum to `LlmProvider` type in `@clitoris/shared`
+3. Add the provider enum to `LlmProvider` type in `@forkverse/shared`
 4. Add key management UI in the Settings screen
 
 > **Key policy**: API keys are NEVER stored in environment variables. They are provided by the user through the Settings UI (`/settings`) and stored per-user in the `user_llm_keys` database table. The factory receives credentials as a parameter.

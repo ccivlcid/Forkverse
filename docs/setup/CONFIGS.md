@@ -1,8 +1,8 @@
 # CONFIGS.md -- Project Configuration Reference
 
-> **Owner:** CLItoris Core Team
+> **Owner:** Forkverse Core Team
 > **Status:** Source of Truth
-> **Purpose:** Complete, copy-paste-ready configuration for every file needed to bootstrap the CLItoris monorepo. AI agents and new contributors start here.
+> **Purpose:** Complete, copy-paste-ready configuration for every file needed to bootstrap the Forkverse monorepo. AI agents and new contributors start here.
 
 ---
 
@@ -26,12 +26,12 @@ Path: `/package.json`
 
 ```json
 {
-  "name": "clitoris",
+  "name": "forkverse",
   "private": true,
   "scripts": {
     "dev": "pnpm --parallel -r run dev",
-    "dev:client": "pnpm --filter @clitoris/client dev",
-    "dev:server": "pnpm --filter @clitoris/server dev",
+    "dev:client": "pnpm --filter @forkverse/client dev",
+    "dev:server": "pnpm --filter @forkverse/server dev",
     "build": "pnpm -r run build",
     "test": "vitest",
     "test:e2e": "playwright test",
@@ -115,7 +115,7 @@ All strict options enabled explicitly so that downstream packages inherit them w
 
 ```json
 {
-  "name": "@clitoris/client",
+  "name": "@forkverse/client",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -128,7 +128,7 @@ All strict options enabled explicitly so that downstream packages inherit them w
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zustand": "^5.0.0",
-    "@clitoris/shared": "workspace:*"
+    "@forkverse/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
@@ -146,7 +146,7 @@ All strict options enabled explicitly so that downstream packages inherit them w
 
 ```json
 {
-  "name": "@clitoris/server",
+  "name": "@forkverse/server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -162,8 +162,8 @@ All strict options enabled explicitly so that downstream packages inherit them w
     "pino-pretty": "^13.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.0",
-    "@clitoris/shared": "workspace:*",
-    "@clitoris/llm": "workspace:*"
+    "@forkverse/shared": "workspace:*",
+    "@forkverse/llm": "workspace:*"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
@@ -179,7 +179,7 @@ All strict options enabled explicitly so that downstream packages inherit them w
 
 ```json
 {
-  "name": "@clitoris/shared",
+  "name": "@forkverse/shared",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -201,7 +201,7 @@ All strict options enabled explicitly so that downstream packages inherit them w
 
 ```json
 {
-  "name": "@clitoris/llm",
+  "name": "@forkverse/llm",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -213,7 +213,7 @@ All strict options enabled explicitly so that downstream packages inherit them w
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "openai": "^4.80.0",
-    "@clitoris/shared": "workspace:*"
+    "@forkverse/shared": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0"
@@ -406,9 +406,9 @@ dist/
 .env.*.local
 
 # Database
-clitoris.db
-clitoris.db-journal
-clitoris.db-wal
+forkverse.db
+forkverse.db-journal
+forkverse.db-wal
 *.sqlite
 *.sqlite3
 

@@ -7,7 +7,7 @@
 
 ## 1. Overview
 
-CLItoris follows a **progressive mobile strategy**: start with responsive web, add PWA capabilities, wrap with Capacitor for app stores, and consider native only if needed at scale.
+Forkverse follows a **progressive mobile strategy**: start with responsive web, add PWA capabilities, wrap with Capacitor for app stores, and consider native only if needed at scale.
 
 ```
 Phase B3: Mobile Web + PWA (cost: low, reuses existing code)
@@ -95,7 +95,7 @@ Post creation moves to:
 │                                  │
 │  // recent analyses              │
 │  ■ vercel/next.js · report · 3h │
-│  ■ ccivlcid/CLItoris · pptx · 1d│
+│  ■ ccivlcid/Forkverse · pptx · 1d│
 │                                  │
 ├─────────────────────────────────┤
 │  ~    ◆    [▶]    ●    @       │
@@ -163,8 +163,8 @@ Analysis results displayed as scrollable section cards:
 
 ```json
 {
-  "name": "CLItoris — Repo Analysis Platform",
-  "short_name": "CLItoris",
+  "name": "Forkverse — Repo Analysis Platform",
+  "short_name": "Forkverse",
   "description": "AI-powered GitHub repo analysis with developer insights",
   "start_url": "/",
   "display": "standalone",
@@ -227,7 +227,7 @@ Capacitor is the right choice because:
 # Add Capacitor to the client package
 cd packages/client
 pnpm add @capacitor/core @capacitor/cli
-npx cap init "CLItoris" "social.terminal.app" --web-dir dist
+npx cap init "Forkverse" "social.terminal.app" --web-dir dist
 
 # Add platforms
 npx cap add android
@@ -245,7 +245,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'social.terminal.app',
-  appName: 'CLItoris',
+  appName: 'Forkverse',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

@@ -80,7 +80,7 @@
       "id": "01JTEST000000000000000102",
       "userId": "01JTEST000000000000000002",
       "messageRaw": "This project structure is pretty good. #open-source",
-      "messageCli": "post --user=jiyeon.kim --repo=ccivlcid/CLItoris --tags=open-source --visibility=public",
+      "messageCli": "post --user=jiyeon.kim --repo=ccivlcid/Forkverse --tags=open-source --visibility=public",
       "lang": "ko",
       "tags": ["open-source"],
       "mentions": [],
@@ -91,7 +91,7 @@
       "createdAt": "2026-03-19T14:00:00Z",
       "repoAttachment": {
         "repoOwner": "ccivlcid",
-        "repoName": "CLItoris",
+        "repoName": "Forkverse",
         "repoStars": 42,
         "repoForks": 12,
         "repoLanguage": "TypeScript"
@@ -217,10 +217,10 @@
     }
   },
   "repoAttachments": {
-    "clitorisRepo": {
+    "forkverseRepo": {
       "postId": "01JTEST000000000000000102",
       "repoOwner": "ccivlcid",
-      "repoName": "CLItoris",
+      "repoName": "Forkverse",
       "repoStars": 42,
       "repoForks": 12,
       "repoLanguage": "TypeScript",
@@ -247,7 +247,7 @@
       "id": "01JTEST000000000000000202",
       "userId": "01JTEST000000000000000002",
       "repoOwner": "ccivlcid",
-      "repoName": "CLItoris",
+      "repoName": "Forkverse",
       "outputType": "pptx",
       "llmModel": "gpt-4o",
       "lang": "ko",

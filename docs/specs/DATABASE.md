@@ -13,7 +13,7 @@
 |----------|-------|
 | Engine | SQLite 3 |
 | Driver | `better-sqlite3` (synchronous API) |
-| File | `clitoris.db` (project root, gitignored) |
+| File | `forkverse.db` (project root, gitignored) |
 | Migrations | Sequential `.sql` files under `packages/server/src/db/migrations/` |
 | ID strategy | UUID v7 (text, sortable by creation time) |
 | Timestamps | ISO 8601 text via `datetime('now')` |
@@ -1208,6 +1208,106 @@ WHERE a.status = 'completed'
 ORDER BY star_count DESC, share_count DESC, a.created_at DESC
 LIMIT 10;
 ```
+
+### B2–B6 New Tables (Migrations 027–031)
+
+#### 027 — Analysis Sections + Stars
+
+```sql
+-- Add structured sections JSON to analyses table
+ALTER TABLE analyses ADD COLUMN result_sections_json TEXT;
+
+-- Star/bookmark analyses
+CREATE TABLE analysis_stars (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  analysis_id TEXT NOT NULL REFERENCES analyses(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (user_id, analysis_id)
+);
+CREATE INDEX idx_analysis_stars_analysis ON analysis_stars(analysis_id);
+```
+
+#### 028 — Push Notification Tokens
+
+```sql
+CREATE TABLE push_tokens (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token TEXT NOT NULL,
+  platform TEXT NOT NULL DEFAULT 'capacitor',
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(user_id, token)
+);
+CREATE INDEX idx_push_tokens_user ON push_tokens(user_id);
+```
+
+#### 029 — Analysis Job Queue
+
+```sql
+CREATE TABLE analysis_jobs (
+  id TEXT PRIMARY KEY,
+  analysis_id TEXT NOT NULL REFERENCES analyses(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'pending',  -- pending, active, completed, failed, dead
+  retries INTEGER NOT NULL DEFAULT 0,
+  max_retries INTEGER NOT NULL DEFAULT 3,
+  error TEXT,
+  started_at TEXT,
+  completed_at TEXT,
+  next_retry_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX idx_analysis_jobs_status ON analysis_jobs(status, next_retry_at);
+CREATE INDEX idx_analysis_jobs_analysis ON analysis_jobs(analysis_id);
+
+-- Performance indexes
+CREATE INDEX idx_analyses_status_created ON analyses(status, created_at DESC);
+CREATE INDEX idx_posts_created ON posts(created_at DESC);
+CREATE INDEX idx_posts_user_created ON posts(user_id, created_at DESC);
+```
+
+#### 030 — Collections (Bookmarks)
+
+```sql
+CREATE TABLE collections (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT,
+  is_public INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE collection_items (
+  collection_id TEXT NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
+  analysis_id TEXT NOT NULL REFERENCES analyses(id) ON DELETE CASCADE,
+  added_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (collection_id, analysis_id)
+);
+CREATE INDEX idx_collections_user ON collections(user_id);
+CREATE INDEX idx_collection_items_analysis ON collection_items(analysis_id);
+```
+
+#### 031 — Comparison Analyses
+
+```sql
+CREATE TABLE comparisons (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  repo_a_owner TEXT NOT NULL,
+  repo_a_name TEXT NOT NULL,
+  repo_b_owner TEXT NOT NULL,
+  repo_b_name TEXT NOT NULL,
+  llm_model TEXT NOT NULL,
+  lang TEXT NOT NULL DEFAULT 'en',
+  result_json TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',
+  duration_ms INTEGER,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX idx_comparisons_user ON comparisons(user_id);
+```
+
+---
 
 ### B5. Future: Postgres Migration Plan
 

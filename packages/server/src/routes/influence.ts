@@ -68,7 +68,7 @@ export function createInfluenceRouter(db: Database): Router {
 
     try {
       // Fetch followers count from GitHub API
-      const headers: Record<string, string> = { 'User-Agent': 'CLItoris/1.0', Accept: 'application/vnd.github+json' };
+      const headers: Record<string, string> = { 'User-Agent': 'Forkverse/1.0', Accept: 'application/vnd.github+json' };
       if (user.github_access_token) headers['Authorization'] = `Bearer ${user.github_access_token}`;
 
       const profileRes = await fetch(`https://api.github.com/users/${user.github_username}`, { headers });

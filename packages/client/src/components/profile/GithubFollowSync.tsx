@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { useUiStore } from '../../stores/uiStore.js';
 import { toastError } from '../../stores/toastStore.js';
-import type { ApiResponse } from '@clitoris/shared';
+import type { ApiResponse } from '@forkverse/shared';
 
 interface FollowingEntry {
   githubUsername: string;
   avatarUrl: string;
   profileUrl: string;
-  clitorisUsername: string | null;
+  forkverseUsername: string | null;
   isFollowing: boolean;
 }
 
@@ -17,7 +17,7 @@ interface FollowerEntry {
   githubUsername: string;
   avatarUrl: string;
   profileUrl: string;
-  clitorisUsername: string | null;
+  forkverseUsername: string | null;
   iFollow: boolean;
 }
 
@@ -69,7 +69,7 @@ export default function GithubFollowSync({ onToast, defaultTab = 'following' }: 
       const res = await api.post<ApiResponse<{ followed: number; alreadyFollowing: number }>>('/github/sync-follows');
       const { followed, alreadyFollowing } = res.data;
       onToast?.(`Followed ${followed} users (already following: ${alreadyFollowing})`);
-      setFollowing((prev) => prev.map((e) => e.clitorisUsername ? { ...e, isFollowing: true } : e));
+      setFollowing((prev) => prev.map((e) => e.forkverseUsername ? { ...e, isFollowing: true } : e));
     } catch {
       toastError(t('ghSync.syncFailed'));
     } finally { setIsSyncing(false); }
@@ -79,18 +79,18 @@ export default function GithubFollowSync({ onToast, defaultTab = 'following' }: 
     setInFlight((s) => new Set(s).add(username));
     const next = !currently;
     if (src === 'following') {
-      setFollowing((p) => p.map((e) => e.clitorisUsername === username ? { ...e, isFollowing: next } : e));
+      setFollowing((p) => p.map((e) => e.forkverseUsername === username ? { ...e, isFollowing: next } : e));
     } else {
-      setFollowers((p) => p.map((e) => e.clitorisUsername === username ? { ...e, iFollow: next } : e));
+      setFollowers((p) => p.map((e) => e.forkverseUsername === username ? { ...e, iFollow: next } : e));
     }
     try {
       await api.post(`/users/@${username}/follow`);
     } catch {
       toastError(t('ghSync.followFailed'));
       if (src === 'following') {
-        setFollowing((p) => p.map((e) => e.clitorisUsername === username ? { ...e, isFollowing: !next } : e));
+        setFollowing((p) => p.map((e) => e.forkverseUsername === username ? { ...e, isFollowing: !next } : e));
       } else {
-        setFollowers((p) => p.map((e) => e.clitorisUsername === username ? { ...e, iFollow: !next } : e));
+        setFollowers((p) => p.map((e) => e.forkverseUsername === username ? { ...e, iFollow: !next } : e));
       }
     } finally {
       setInFlight((s) => { const ns = new Set(s); ns.delete(username); return ns; });
@@ -98,9 +98,9 @@ export default function GithubFollowSync({ onToast, defaultTab = 'following' }: 
   };
 
   const list = subTab === 'following' ? following : followers;
-  const onClit = list.filter((e) => e.clitorisUsername);
-  const notOnClit = list.filter((e) => !e.clitorisUsername);
-  const unsynced = following.filter((e) => e.clitorisUsername && !e.isFollowing);
+  const onClit = list.filter((e) => e.forkverseUsername);
+  const notOnClit = list.filter((e) => !e.forkverseUsername);
+  const unsynced = following.filter((e) => e.forkverseUsername && !e.isFollowing);
 
   return (
     <div className="border border-[var(--border)] bg-[var(--bg-input)]">
@@ -109,7 +109,7 @@ export default function GithubFollowSync({ onToast, defaultTab = 'following' }: 
         <div>
           <span className="text-[var(--text-muted)] font-mono text-[12px]">{t('ghSync.title')}</span>
           <span className="text-[var(--text-faint)] font-mono text-[11px] ml-2">
-            {t('ghSync.onPlatform', { n: String(following.filter((e) => e.clitorisUsername).length) })}
+            {t('ghSync.onPlatform', { n: String(following.filter((e) => e.forkverseUsername).length) })}
           </span>
         </div>
         {subTab === 'following' && !isLoading && unsynced.length > 0 && (
@@ -149,7 +149,7 @@ export default function GithubFollowSync({ onToast, defaultTab = 'following' }: 
         </div>
       )}
 
-      {/* On CLItoris */}
+      {/* On Forkverse */}
       {!isLoading && onClit.length > 0 && (
         <div>
           <p className="text-[var(--text-faint)] font-mono text-[10px] px-4 pt-2 pb-1">{t('ghSync.onClit', { n: String(onClit.length) })}</p>
@@ -161,21 +161,21 @@ export default function GithubFollowSync({ onToast, defaultTab = 'following' }: 
               <div key={entry.githubUsername} className="flex items-center gap-3 px-4 py-2.5 border-b border-[var(--bg-surface)] hover:bg-[var(--bg-surface)] transition-colors">
                 <img src={entry.avatarUrl} alt={entry.githubUsername} className="w-6 h-6 rounded-sm shrink-0 object-cover" />
                 <div className="flex-1 min-w-0">
-                  <Link to={`/@${entry.clitorisUsername}`} className="font-mono text-[12px] text-[var(--accent-amber)] hover:text-amber-300 transition-colors">
-                    @{entry.clitorisUsername}
+                  <Link to={`/@${entry.forkverseUsername}`} className="font-mono text-[12px] text-[var(--accent-amber)] hover:text-amber-300 transition-colors">
+                    @{entry.forkverseUsername}
                   </Link>
                   <span className="text-[var(--text-faint)] font-mono text-[10px] ml-2">{entry.githubUsername}</span>
                 </div>
                 <button
-                  onClick={() => void toggleFollow(entry.clitorisUsername!, isFollowing, subTab)}
-                  disabled={inFlight.has(entry.clitorisUsername!)}
+                  onClick={() => void toggleFollow(entry.forkverseUsername!, isFollowing, subTab)}
+                  disabled={inFlight.has(entry.forkverseUsername!)}
                   className={`font-mono text-[10px] px-2.5 py-0.5 border transition-colors disabled:opacity-40 shrink-0 ${
                     isFollowing
                       ? 'text-[var(--text-muted)] border-[var(--border)] hover:text-red-400 hover:border-red-400/30'
                       : 'text-[var(--accent-green)] border-[var(--accent-green)]/20 bg-[var(--accent-green)]/5 hover:bg-[var(--accent-green)]/15'
                   }`}
                 >
-                  {inFlight.has(entry.clitorisUsername!) ? '...' : isFollowing ? t('ghSync.unfollow') : t('ghSync.follow')}
+                  {inFlight.has(entry.forkverseUsername!) ? '...' : isFollowing ? t('ghSync.unfollow') : t('ghSync.follow')}
                 </button>
               </div>
             );
@@ -183,7 +183,7 @@ export default function GithubFollowSync({ onToast, defaultTab = 'following' }: 
         </div>
       )}
 
-      {/* Not on CLItoris */}
+      {/* Not on Forkverse */}
       {!isLoading && notOnClit.length > 0 && (
         <div>
           <p className="text-[var(--text-faint)] font-mono text-[10px] px-4 pt-2 pb-1">{t('ghSync.notOnClit', { n: String(notOnClit.length) })}</p>

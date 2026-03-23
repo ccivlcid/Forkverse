@@ -6,7 +6,7 @@ import { usePostDetailStore } from '../stores/postDetailStore.js';
 import { useAuthStore } from '../stores/authStore.js';
 import { useUiStore } from '../stores/uiStore.js';
 import { api } from '../api/client.js';
-import type { ApiResponse, Post } from '@clitoris/shared';
+import type { ApiResponse, Post } from '@forkverse/shared';
 
 // ── Types ─────────────────────────────────────────────────────
 

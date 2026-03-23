@@ -1,4 +1,4 @@
-import type { Post } from '@clitoris/shared';
+import type { Post } from '@forkverse/shared';
 
 const now = new Date();
 const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000).toISOString();

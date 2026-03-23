@@ -1,4 +1,4 @@
-# CLItoris — Marketing Strategy
+# Forkverse — Marketing Strategy
 
 > Marketing playbook for terminal.social — a developer-first Repo Analysis Platform.
 > Updated: 2026-03-21
@@ -11,7 +11,7 @@
 **"Analyze any GitHub repo with AI. Share the results with developers who care."**
 
 ### Elevator Pitch (30 seconds)
-CLItoris is a repo analysis platform for developers. Point it at any public GitHub repo — AI generates a structured breakdown of the architecture, stack, strengths, and risks. You get a report, a PPTX deck, or an animated video. Then share it. Other developers discover it, star it, fork it, discuss it. GitHub identity. Terminal aesthetic. No algorithmic noise.
+Forkverse is a repo analysis platform for developers. Point it at any public GitHub repo — AI generates a structured breakdown of the architecture, stack, strengths, and risks. You get a report, a PPTX deck, or an animated video. Then share it. Other developers discover it, star it, fork it, discuss it. GitHub identity. Terminal aesthetic. No algorithmic noise.
 
 ### Category
 Developer Tool + Social Platform. "Perplexity for repos" meets "dev-native social layer."
@@ -66,13 +66,13 @@ Developer Tool + Social Platform. "Perplexity for repos" meets "dev-native socia
 | You need a deck for the team | PPTX output, terminal-themed, 5 slides | GIF: one-click deck download |
 
 ### Key Differentiators (vs. competitors)
-| vs. | CLItoris wins because |
+| vs. | Forkverse wins because |
 |-----|-----------------------|
-| GitHub itself | GitHub shows stats. CLItoris explains the code. |
-| ChatGPT / Claude direct | CLItoris is a product, not a prompt. Structured output, shareable, social. |
-| SourceGraph / Sourcegraph Cody | Code navigation tool. CLItoris generates shareable summaries for non-deep-divers. |
-| Daily.dev / dev.to | They curate links. CLItoris generates original AI-based insight from the source. |
-| Linear/Notion for devs | Project management. CLItoris is a repo intelligence layer. |
+| GitHub itself | GitHub shows stats. Forkverse explains the code. |
+| ChatGPT / Claude direct | Forkverse is a product, not a prompt. Structured output, shareable, social. |
+| SourceGraph / Sourcegraph Cody | Code navigation tool. Forkverse generates shareable summaries for non-deep-divers. |
+| Daily.dev / dev.to | They curate links. Forkverse generates original AI-based insight from the source. |
+| Linear/Notion for devs | Project management. Forkverse is a repo intelligence layer. |
 
 ---
 
@@ -115,16 +115,16 @@ Good: "$ analyze --repo=vercel/next.js → stack, architecture, risks. Shareable
 
 | Platform | Action | Timing |
 |----------|--------|--------|
-| **Hacker News** | "Show HN: CLItoris – AI repo analysis + developer social feed" | Tuesday-Thursday, 8-10am PT |
+| **Hacker News** | "Show HN: Forkverse – AI repo analysis + developer social feed" | Tuesday-Thursday, 8-10am PT |
 | **Product Hunt** | Full product listing with GIF demo, hunter outreach 2 weeks prior | Same week as HN |
 | **Twitter/X** | Launch thread — problem → solution → demo → link | Same day as HN |
 | **Reddit r/programming** | Post as discussion: "I built an AI repo analyzer — here's what it found on vercel/next.js" | 1 day after HN |
 | **Reddit r/selfhosted** | Self-hosted angle: SQLite, no cloud required, Ollama support | Same week |
-| **Dev.to / Hashnode** | Long-form: "How CLItoris analyzes a GitHub repo and what it found" | Week of launch |
+| **Dev.to / Hashnode** | Long-form: "How Forkverse analyzes a GitHub repo and what it found" | Week of launch |
 
 **HN post strategy:**
 ```
-Show HN: CLItoris — Analyze any GitHub repo with AI, share results as social posts
+Show HN: Forkverse — Analyze any GitHub repo with AI, share results as social posts
 
 Point it at any public repo → AI (Claude, GPT-4o, Gemini, or local Ollama) generates:
 - Architecture breakdown
@@ -137,7 +137,7 @@ Results post to a developer feed (GitHub OAuth identity, no algo noise).
 Self-hosted, SQLite, MIT.
 
 Demo: [GIF of analyzing vercel/next.js]
-GitHub: github.com/ccivlcid/CLItoris
+GitHub: github.com/ccivlcid/Forkverse
 ```
 
 ### Phase 3 — Post-launch (first 4 weeks after)
@@ -147,7 +147,7 @@ GitHub: github.com/ccivlcid/CLItoris
 - [ ] Reply to every comment on HN, Product Hunt, Reddit personally
 - [ ] Share "what people are analyzing" weekly — top repos analyzed that week
 - [ ] Ship fast: address top-voted feedback within 48 hours
-- [ ] Changelog posts: "This week in CLItoris" in Discord + GitHub releases
+- [ ] Changelog posts: "This week in Forkverse" in Discord + GitHub releases
 - [ ] Reach out directly to users who share interesting analyses
 
 ---
@@ -158,7 +158,7 @@ GitHub: github.com/ccivlcid/CLItoris
 
 #### Hacker News
 - "Show HN" posts for major features (analysis, PPTX, video output)
-- Comment on threads about GitHub, AI tools, open source discovery — mention CLItoris naturally
+- Comment on threads about GitHub, AI tools, open source discovery — mention Forkverse naturally
 - Target: 100+ points = ~10k visitors, 3-5% conversion to signup
 
 #### Twitter/X
@@ -193,7 +193,7 @@ GitHub: github.com/ccivlcid/CLItoris
 Every week, pick a trending or interesting repo, analyze it, publish:
 - Twitter thread with screenshots
 - Full blog post on dev.to / Hashnode
-- Share to the CLItoris feed (dogfooding)
+- Share to the Forkverse feed (dogfooding)
 
 Topics to analyze for maximum engagement:
 - New LLM frameworks (LangChain, LlamaIndex, etc.) — AI community interest
@@ -218,7 +218,7 @@ Topics with high search/share potential:
 **Tier 1 — Direct outreach (personalized)**
 - Find devs who write about GitHub tools, open source, or AI dev tools
 - Send them a pre-analyzed report of one of their own repos
-- "I analyzed your repo `username/repo-name` with CLItoris — found some interesting patterns. Thought you'd want to see this."
+- "I analyzed your repo `username/repo-name` with Forkverse — found some interesting patterns. Thought you'd want to see this."
 - This is personalized, useful, and not spam
 
 **Tier 2 — Seeding**
@@ -256,16 +256,16 @@ User analyzes a repo
 ### Secondary Loop: GitHub Activity → Posts → Awareness
 ```
 User connects GitHub webhook
-  → pushes/PRs auto-post to CLItoris feed
+  → pushes/PRs auto-post to Forkverse feed
     → posts visible in user's GitHub profile bio (linked)
-      → GitHub visitors click through to CLItoris
+      → GitHub visitors click through to Forkverse
         → new user signup
 ```
 
 ### Viral Loop: Analysis Sharing
 ```
 User analyzes a popular repo (e.g., a viral GitHub project)
-  → shares result on Twitter with "analyzed X with CLItoris"
+  → shares result on Twitter with "analyzed X with Forkverse"
     → original repo's audience sees it
       → they click to see the analysis
         → some sign up to analyze repos they're curious about
@@ -294,7 +294,7 @@ All marketing starts from the product looking good when screenshotted. Ensure:
 | Direct search | "github repo analyzer", "github repo ai analysis", "analyze github repository" |
 | Comparison | "github code analysis tool", "ai code review tool", "open source repo analyzer" |
 | Long-tail | "how to understand a new codebase quickly", "AI tool to explain github repo" |
-| Brand | "CLItoris", "terminal.social" |
+| Brand | "Forkverse", "terminal.social" |
 
 ### Content SEO
 - Each shared analysis result (`terminal.social/analysis/:id`) should be indexable
@@ -363,7 +363,7 @@ terminal.social
 
 ### HN / Reddit (substance-first)
 ```
-Built CLItoris over the past few weeks — it's a repo analysis tool.
+Built Forkverse over the past few weeks — it's a repo analysis tool.
 Point it at any GitHub repo, AI (your key, your model — Claude/GPT/Gemini/Ollama)
 generates a structured breakdown: stack, architecture, strengths, risks, improvements.
 Results post to a developer feed. Self-hosted, SQLite, MIT.
@@ -375,7 +375,7 @@ Happy to talk about the analysis approach or any of the tech choices.
 ```
 Tagline: "AI-powered repo analysis. Developer-native social feed."
 
-Description: CLItoris analyzes any public GitHub repo with AI and turns the results into
+Description: Forkverse analyzes any public GitHub repo with AI and turns the results into
 shareable developer content. Pick your LLM (Claude, GPT-4o, Gemini, or local Ollama),
 run the analysis, export as report/PPTX/video, post to the developer feed.
 GitHub OAuth identity. Terminal aesthetic. Open source.
@@ -428,13 +428,13 @@ The GitHub repo IS a marketing asset. Rules:
 - "Star us on GitHub" CTA on the landing page
 - Use GitHub Releases properly — each release is a marketing moment
 - Contributors get credited visibly (CONTRIBUTORS.md or README)
-- "Built with CLItoris" badge for repos that have been analyzed and shared
+- "Built with Forkverse" badge for repos that have been analyzed and shared
 
 ---
 
 ## See Also
 
 - [PRD.md](./PRD.md) — Product requirements (B-plan)
-- [CLItoris_최종통합본_Part1_제품전략_공개전략.md](./CLItoris_최종통합본_Part1_제품전략_공개전략.md) — Product strategy & open strategy
+- [Forkverse_최종통합본_Part1_제품전략_공개전략.md](./Forkverse_최종통합본_Part1_제품전략_공개전략.md) — Product strategy & open strategy
 - [APP_RELEASE.md](./APP_RELEASE.md) — Android/iOS store release guide
 - [MOBILE.md](./MOBILE.md) — Mobile strategy

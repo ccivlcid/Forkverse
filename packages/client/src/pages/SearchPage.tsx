@@ -5,7 +5,7 @@ import PostCard from '../components/post/PostCard.js';
 import { useSearchStore } from '../stores/searchStore.js';
 import { useUiStore } from '../stores/uiStore.js';
 import { api } from '../api/client.js';
-import type { ApiResponse } from '@clitoris/shared';
+import type { ApiResponse } from '@forkverse/shared';
 
 interface TrendingTag { tag: string; count: number }
 

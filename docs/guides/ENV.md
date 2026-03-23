@@ -7,24 +7,27 @@
 
 ## 1. Complete Variable List
 
-### Server (`@clitoris/server`)
+### Server (`@forkverse/server`)
 
 | Variable | Type | Default | Required | Description |
 |----------|------|---------|----------|-------------|
 | `PORT` | number | `3771` | No | Express server port |
 | `NODE_ENV` | string | `development` | No | `development` or `production` |
-| `DATABASE_URL` | string | `clitoris.db` | No | SQLite database file path |
+| `DATABASE_URL` | string | `forkverse.db` | No | SQLite database file path |
 | `SESSION_SECRET` | string | — | **Yes** | Express session secret (min 32 chars) |
 | `LOG_LEVEL` | string | `info` | No | Pino log level: `debug`, `info`, `warn`, `error` |
 | `CORS_ORIGIN` | string | `http://localhost:7878` | No | Allowed CORS origin |
 | `GITHUB_WEBHOOK_SECRET` | string | — | No | HMAC-SHA256 secret for verifying GitHub webhook payloads (`X-Hub-Signature-256`). Required when using the `POST /api/webhook/github` endpoint. Must match the secret configured in GitHub repository webhook settings. |
 | `GITHUB_TOKEN` | string | — | No | Server-side fallback GitHub personal access token. Used by `GET /api/github/contributions/:username` when the requesting user is unauthenticated. Without this, unauthenticated contribution graph requests will fail. |
+| `ENCRYPTION_KEY` | string (64 hex chars) | — | **Prod** | AES-256-GCM key for encrypting user API keys at rest. Generate with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Without this, keys are stored as plaintext (acceptable in dev). |
+| `ANDROID_CERT_FINGERPRINT` | string | — | No | SHA256 fingerprint of Android signing keystore. Used in `/.well-known/assetlinks.json` for Android App Links deep link verification. |
+| `APPLE_TEAM_ID` | string | — | No | Apple Developer Team ID. Used in `/.well-known/apple-app-site-association` for iOS Universal Links deep link verification. |
 
 > **LLM API keys are not environment variables.** Each user enters their own API keys in Settings (`/settings`). Keys are stored per-user in the `user_llm_keys` database table. See [LLM_DETECTION.md](../llm/LLM_DETECTION.md) for the key management flow.
 >
 > Locally running runtimes (Ollama on `localhost:11434`) are auto-detected and require no key.
 
-### Client (`@clitoris/client`)
+### Client (`@forkverse/client`)
 
 | Variable | Type | Default | Required | Description |
 |----------|------|---------|----------|-------------|
@@ -40,7 +43,7 @@
 # Server
 PORT=3771
 NODE_ENV=development
-DATABASE_URL=clitoris.db
+DATABASE_URL=forkverse.db
 SESSION_SECRET=replace-with-random-string-at-least-32-chars
 LOG_LEVEL=info
 CORS_ORIGIN=http://localhost:7878
@@ -64,6 +67,15 @@ CLIENT_URL=http://localhost:7878
 # Required for GET /api/github/contributions/:username without user auth
 # GITHUB_TOKEN=ghp_...
 
+# Encryption key for API keys at rest (AES-256-GCM)
+# Generate: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+# REQUIRED in production. Without it, API keys stored as plaintext.
+ENCRYPTION_KEY=generate-64-char-hex-string-for-aes256-key-encryption
+
+# Native app deep links (set after signing keys are generated)
+# ANDROID_CERT_FINGERPRINT=AA:BB:CC:...
+# APPLE_TEAM_ID=XXXXXXXXXX
+
 # Client (prefix with VITE_ — exposed to browser)
 VITE_API_URL=/api
 ```
@@ -79,7 +91,7 @@ VITE_API_URL=/api
 const CONFIG = {
   port: Number(process.env.PORT) || 3771,
   nodeEnv: process.env.NODE_ENV || 'development',
-  databaseUrl: process.env.DATABASE_URL || 'clitoris.db',
+  databaseUrl: process.env.DATABASE_URL || 'forkverse.db',
   sessionSecret: process.env.SESSION_SECRET,
   logLevel: process.env.LOG_LEVEL || 'info',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:7878',
@@ -141,6 +153,8 @@ pnpm dev
 - **Always** use `.env.example` with placeholder values for documentation
 - **Rotate** `SESSION_SECRET` if compromised
 - **Rotate** API keys periodically
+- **Set** `ENCRYPTION_KEY` in production — without it, user LLM API keys are stored as plaintext in SQLite
+- **Backup** `ENCRYPTION_KEY` securely — losing it means stored API keys become unreadable
 
 ---
 
