@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <rect width="400" height="120" fill="#0d1117" rx="8"/>
+  <text x="200" y="68" text-anchor="middle" font-family="'JetBrains Mono', 'Courier New', monospace" font-weight="700" font-size="42">
+    <tspan fill="#3fb950">&#9282;</tspan>
+    <tspan fill="#e6edf3"> Fork</tspan>
+    <tspan fill="#3fb950">verse</tspan>
+  </text>
+  <text x="200" y="95" text-anchor="middle" font-family="'JetBrains Mono', 'Courier New', monospace" font-weight="400" font-size="14" fill="#7d8590">
+    terminal.social
+  </text>
+</svg>

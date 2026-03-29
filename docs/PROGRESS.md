@@ -179,7 +179,7 @@ All documentation, configuration files, and project scaffolding.
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-03-24 | **`.env` tracked in repo** | Root `.env` removed from `.gitignore` and committed for requested workflow; **rotate GitHub OAuth secret** if repo is or becomes public |
-| 2026-03-24 | **Git sync to `main`** | Single `chore` commit for docs + client + server; `.env` not committed (secrets); stray `clitoris.db*` ignored via `.gitignore` |
+| 2026-03-24 | **Git sync to `main`** | Single `chore` commit for docs + client + server; `.env` not committed (secrets); stray legacy db ignored via `.gitignore` |
 | 2026-03-24 | **TROUBLESHOOTING: better-sqlite3 Windows** | Documented `Could not locate the bindings file`, Node ABI mismatch, and that `pnpm rebuild` may not compile — use `node-gyp rebuild` in package path |
 | 2026-03-24 | **Server `tsc` build fix** | `llmGateway` `intent`/`emotion` aligned with `@forkverse/llm` `PostIntent`/`PostEmotion`; removed unused `path` import in `media.ts` |
 | 2026-03-23 | **API keys encrypted at rest** | AES-256-GCM via ENCRYPTION_KEY env var; backward-compatible (plaintext passthrough in dev) |
